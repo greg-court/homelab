@@ -1,0 +1,42 @@
+name: Fetch Azure Key Vault Secrets
+description: Log into Azure and fetch a list of secrets from Key Vault
+inputs:
+  secrets:
+    description: 'Comma-separated list of secret names'
+    required: true
+  keyvault:
+    description: 'Azure Key Vault name'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Fetch secrets
+      shell: bash
+      run: |
+        IFS=',' read -ra secret_list <<< "${{ inputs.secrets }}"
+        for name in "${secret_list[@]}"; do
+          val=$(az keyvault secret show \
+            --vault-name "${{ inputs.keyvault }}" \
+            --name "$name" \
+            --query value -o tsv)
+
+          echo "::add-mask::$val"
+
+          key=$(echo "$name" | tr '[:lower:]-' '[:upper:]_')
+          echo "$key=$val" >> $GITHUB_ENV
+        done
+
+# Usage
+# - name: Load secrets from Azure Key Vault
+#   uses: ./.github/actions/fetch-akv-secrets
+#   with:
+#     keyvault: my-keyvault-name
+#     secrets: DOCKERHUB_PAT,REPO_TAGGING_PAT,DISCORD_WEBHOOK_URL
