@@ -115,11 +115,11 @@ jobs:
         run: |
           set -euo pipefail
           docker buildx build --platform linux/amd64 \
-            -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.new_version }}" \
+            -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.version }}" \
             -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:latest" \
             --push \
             "docker-images/${{ matrix.image }}"
-          echo "published=${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.new_version }}" >>"$GITHUB_OUTPUT"
+          echo "published=${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.version }}" >>"$GITHUB_OUTPUT"
 
       - name: Summary
         run: echo "✅ Published ${{ steps.push.outputs.published }}"
