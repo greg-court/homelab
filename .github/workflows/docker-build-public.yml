@@ -1,4 +1,4 @@
-name: Docker Images | Build & Release
+name: Docker Public | Build & Release
 
 on:
   push:
