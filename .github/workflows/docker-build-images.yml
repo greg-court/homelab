@@ -98,14 +98,14 @@ jobs:
           username: gr10
           password: ${{ secrets.DOCKERHUB_PAT }}
 
-      - name: Determine version bump
+      - name: Determine version
         id: semver
-        uses: ./.github/actions/semver-tagger
+        if: ${{ github.event.inputs.custom_version == '' }}
+        uses: PaulHatch/semantic-version@v5.4.0
         with:
-          tag_prefix: 'docker-images/${{ matrix.image }}'
-          path: 'docker-images/${{ matrix.image }}'
-          custom_version: ${{ github.event.inputs.custom_version }}
-          release_type: ${{ github.event.inputs.release_type }}
+          tag_prefix: 'docker-images/${{ matrix.image }}/v'
+          change_path: 'docker-images/${{ matrix.image }}'
+          namespace: '${{ matrix.image }}'
 
       - name: Build and Push Docker Image
         id: push
@@ -124,15 +124,15 @@ jobs:
       - name: Summary
         run: echo "✅ Published ${{ steps.push.outputs.published }}"
 
-      - name: Create tag via API
+      - name: Create Git Tag via API
         env:
           GH_TOKEN: ${{ secrets.REPO_TAGGING_PAT }}
-          NEW_TAG: ${{ steps.semver.outputs.new_tag }}
+          VERSION: ${{ github.event.inputs.custom_version || steps.semver.outputs.version_tag }}
           SHA: ${{ github.sha }}
         run: |
-          echo "🚀 Creating tag $NEW_TAG at $SHA via API"
+          echo "Creating tag: $VERSION"
           gh api repos/${{ github.repository }}/git/refs \
-            -f ref="refs/tags/$NEW_TAG" \
+            -f ref="refs/tags/$VERSION" \
             -f sha="$SHA"
 
       - name: Notify Discord
