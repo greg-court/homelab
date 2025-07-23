@@ -1,0 +1,150 @@
+name: Docker Images | Build & Release
+
+on:
+  push:
+    paths: ['docker-images/**']
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Build only this image (e.g. gh-docker-runner)'
+        required: false
+      release_type:
+        description: 'major | minor | patch (ignored if custom version given below)'
+        required: false
+      custom_version:
+        description: 'Custom version to use (overrides release_type)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - name: Check out docker-images only
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: docker-images
+
+      - id: set
+        shell: bash
+        run: |
+          set -euo pipefail
+          declare -a DIRS=()
+
+          if [[ -n "${{ github.event.inputs.image }}" ]]; then
+            if [[ -d "docker-images/${{ github.event.inputs.image }}" ]]; then
+              DIRS+=("${{ github.event.inputs.image }}")
+            else
+              echo "Manual run for '${{ github.event.inputs.image }}' specified, but directory not found. Skipping."
+            fi
+          else
+            DIFF_BASE="${{ github.event.before }}"
+            DIFF_HEAD="${{ github.sha }}"
+
+            CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "$DIFF_BASE" "$DIFF_HEAD" | grep '^docker-images/' || true)
+
+            while read -r file; do
+              [[ -z "$file" ]] && continue
+              DIR=$(echo "$file" | cut -d/ -f2)
+              if [[ -n "$DIR" ]]; then
+                DIRS+=("$DIR")
+              fi
+            done <<< "$CHANGED_FILES"
+          fi
+
+          UNIQUE_DIRS=$(printf '%s\n' "${DIRS[@]}" | sort -u)
+          MATRIX="[]"
+
+          # This prevents the matrix from ever becoming '[{"image": ""}]'
+          if [[ -n "$UNIQUE_DIRS" ]]; then
+            MATRIX=$(printf '%s\n' "${UNIQUE_DIRS[@]}" | jq -R . | jq -cs 'map({image: .})')
+          fi
+
+          echo "✅ Final matrix for build job: $MATRIX"
+          echo "matrix=$MATRIX" >>"$GITHUB_OUTPUT"
+
+  build:
+    needs: prep
+    if: needs.prep.outputs.matrix != '[]'
+    runs-on: [self-hosted, docker]
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.image || matrix.image }}
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prep.outputs.matrix) }}
+
+    steps:
+      - name: Check out full repository for tagging
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for the semver-tagger action to get all tags/history
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: gr10
+          password: ${{ secrets.DOCKERHUB_PAT }}
+
+      - name: Determine version bump
+        id: semver
+        uses: ./.github/actions/semver-tagger
+        with:
+          tag_prefix: 'docker-images/${{ matrix.image }}'
+          path: 'docker-images/${{ matrix.image }}'
+          custom_version: ${{ github.event.inputs.custom_version }}
+          release_type: ${{ github.event.inputs.release_type }}
+
+      - name: Build and Push Docker Image
+        id: push
+        env:
+          DOCKER_NAMESPACE: gr10
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker buildx build --platform linux/amd64 \
+            -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.new_version }}" \
+            -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:latest" \
+            --push \
+            "docker-images/${{ matrix.image }}"
+          echo "published=${DOCKER_NAMESPACE}/${{ matrix.image }}:${{ steps.semver.outputs.new_version }}" >>"$GITHUB_OUTPUT"
+
+      - name: Summary
+        run: echo "✅ Published ${{ steps.push.outputs.published }}"
+
+      - name: Create tag via API
+        env:
+          GH_TOKEN: ${{ secrets.REPO_TAGGING_PAT }}
+          NEW_TAG: ${{ steps.semver.outputs.new_tag }}
+          SHA: ${{ github.sha }}
+        run: |
+          echo "🚀 Creating tag $NEW_TAG at $SHA via API"
+          gh api repos/${{ github.repository }}/git/refs \
+            -f ref="refs/tags/$NEW_TAG" \
+            -f sha="$SHA"
+
+      - name: Notify Discord
+        if: success()
+        run: |
+          # Your Discord notification curl command is fine as is
+          # Using new_version and new_tag from the semver step for consistency
+          curl -H "Content-Type: application/json" \
+              -X POST \
+              -d '{
+                "username": "CI Bot",
+                "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                "content": "**🚀 Docker Build Complete**\n**Image:** `${{ matrix.image }}`\n**Version:** `${{ steps.semver.outputs.new_version }}`\n**Git tag:** `${{ steps.semver.outputs.new_tag }}`\n✅ Success!"
+              }' \
+              ${{ secrets.DISCORD_WEBHOOK_URL }}
