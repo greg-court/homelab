@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: 'Build only this image (e.g. gh-docker-runner)'
+        description: 'Build this image manually'
         required: false
       release_type:
         description: 'major | minor | patch (ignored if custom version given below)'
