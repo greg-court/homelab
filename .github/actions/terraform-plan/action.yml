@@ -1,0 +1,74 @@
+name: 'Terraform Plan'
+description: 'Runs all steps to generate and upload a Terraform plan.'
+
+inputs:
+  path:
+    description: 'The path to the Terraform code'
+    required: true
+  name:
+    description: 'A short name for the component (e.g., docker-infra)'
+    required: true
+  action:
+    description: 'Terraform action: plan or destroy'
+    required: false
+    default: 'apply'
+
+outputs:
+  has_changes:
+    description: 'Whether the Terraform plan has changes (true/false)'
+    value: ${{ steps.check_changes.outputs.has_changes }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure Azure Credentials (OIDC)
+      uses: azure/login@v2
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Terraform Init
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: terraform init
+
+    - name: Terraform Plan
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: |
+        if [[ "${{ inputs.action }}" == "destroy" ]]; then
+          terraform plan -destroy -input=false -no-color -out=tfplan
+        else
+          terraform plan -input=false -no-color -out=tfplan
+        fi
+
+    - name: Upload Plan Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: tfplan-${{ inputs.name }}
+        path: ${{ inputs.path }}/tfplan
+
+    - name: Publish Terraform Plan to Summary
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: |
+        echo '## Terraform Plan Output' >> $GITHUB_STEP_SUMMARY
+        echo '<details><summary>Click to expand</summary>' >> $GITHUB_STEP_SUMMARY
+        echo '' >> $GITHUB_STEP_SUMMARY
+        echo '```terraform' >> $GITHUB_STEP_SUMMARY
+        terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo '</details>' >> $GITHUB_STEP_SUMMARY
+
+    - name: Check for Changes
+      id: check_changes
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: |
+        PLAN_OUTPUT=$(terraform show -no-color tfplan)
+        if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        fi

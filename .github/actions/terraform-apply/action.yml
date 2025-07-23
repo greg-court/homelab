@@ -1,0 +1,40 @@
+name: 'Terraform Apply'
+description: 'Runs all steps to apply a Terraform plan.'
+
+inputs:
+  path:
+    description: 'The path to the Terraform code'
+    required: true
+  name:
+    description: 'The short name of the component (e.g., docker-infra)'
+    required: true
+  action:
+    description: 'Terraform action: plan or destroy'
+    required: false
+    default: 'apply'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure Azure Credentials (OIDC)
+      uses: azure/login@v2
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Download saved plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan-${{ inputs.name }}
+        path: ${{ inputs.path }}
+
+    - name: Terraform Init
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: terraform init -input=false
+
+    - name: Terraform Apply
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: terraform apply -auto-approve tfplan
