@@ -34,7 +34,7 @@ runs:
           echo "$key=$val" >> $GITHUB_ENV
         done
 
-# Usage
+# Usage (recommended to name secets in KV IN_THIS_FORMAT)
 # - name: Load secrets from Azure Key Vault
 #   uses: ./.github/actions/fetch-akv-secrets
 #   with:
