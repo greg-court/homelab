@@ -6,7 +6,7 @@ inputs:
     description: 'The path to the Terraform code'
     required: true
   name:
-    description: 'The short name of the component (e.g., docker-infra)'
+    description: 'The short name of the component'
     required: true
   action:
     description: 'Terraform action: plan or destroy'
