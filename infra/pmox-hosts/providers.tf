@@ -20,5 +20,3 @@ terraform {
 #   api_token = var.api_token
 #   insecure  = true
 # }
-
-variable "root_password" { type = string }
