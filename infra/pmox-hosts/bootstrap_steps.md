@@ -11,6 +11,43 @@ for host in pve01 pve02 pve03; do ssh-copy-id -o StrictHostKeyChecking=no root@$
 pvecm create pve-cluster01
 ```
 
+## Configure apt
+
+```bash
+#!/bin/bash
+set -e
+
+echo ">>> Disabling Proxmox enterprise repo"
+sed -i.bak 's/^deb https:/#deb https:/' /etc/apt/sources.list.d/pve-enterprise.list 2>/dev/null || true
+
+echo ">>> Disabling Ceph enterprise repo (if exists)"
+sed -i.bak 's|^deb https://enterprise.proxmox.com/debian/ceph.*|# &|' /etc/apt/sources.list.d/*ceph*.list 2>/dev/null || true
+
+echo ">>> Adding Proxmox no-subscription repo"
+echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
+  > /etc/apt/sources.list.d/pve-install-repo.list
+
+echo ">>> Adding Debian main repos"
+cat <<EOF > /etc/apt/sources.list.d/debian.list
+deb http://deb.debian.org/debian bookworm main contrib
+deb http://deb.debian.org/debian bookworm-updates main contrib
+deb http://security.debian.org/debian-security bookworm-security main contrib
+EOF
+
+echo ">>> Downloading Proxmox GPG key"
+wget -q https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \
+  -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+
+echo ">>> Updating and upgrading"
+apt update
+apt -y full-upgrade
+apt autoremove -y
+apt clean
+
+echo ">>> DONE"
+reboot
+```
+
 ## On joining nodes
 
 ```bash
@@ -35,5 +72,5 @@ pvesm add nfs remote-hdd \
 pvesm add iscsi remote-iscsi \
     -portal truenas.internal \
     -target iqn.2025-07.local.truenas:proxmox-extent \
-    -content images
+    -content images, vztmpl
 ```
