@@ -71,6 +71,6 @@ pvesm add nfs remote-hdd \
 ```bash
 pvesm add iscsi remote-iscsi \
     -portal truenas.internal \
-    -target iqn.2025-07.local.truenas:proxmox-extent \
-    -content images, vztmpl
+    -target iqn.2005-10.org.freenas.ctl:proxmox-extent \
+    -content images
 ```
