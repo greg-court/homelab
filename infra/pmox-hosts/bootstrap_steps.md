@@ -58,19 +58,34 @@ pvecm add pve01
 
 On any node:
 
+Backup storage etc:
+
 ```bash
 pvesm add nfs remote-hdd \
     -server truenas.internal \
     -export /mnt/tank-smr/proxmox \
     -path /mnt/pve/remote-hdd \
-    -content snippets,rootdir,backup,iso,import \
+    -content snippets,vztmpl,backup,iso,import \
     -options vers=4 \
     --prune-backups keep-all=1
 ```
 
+VM disks:
+
 ```bash
 pvesm add iscsi remote-iscsi \
     -portal truenas.internal \
-    -target iqn.2005-10.org.freenas.ctl:proxmox-extent \
+    -target iqn.2005-10.org.freenas.ctl:proxmox-vm \
     -content images
+```
+
+LXCs:
+
+```bash
+pvesm add nfs remote-nfs \
+  -server truenas.internal \
+  -export /mnt/tank-ssd/proxmox-lxc \
+  -path /mnt/pve/remote-nfs \
+  -content rootdir \
+  -options vers=4
 ```
