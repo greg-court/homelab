@@ -1,0 +1,6 @@
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["NETBIRD-GREG"]' 'pve01/100'
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["NETBIRD-FAM"]'  'pve02/101'
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["NETBIRD-DMZ"]'  'pve03/102'
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["DOCKER-INFRA"]' 'pve01/103'
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["DOCKER-DMZ"]'   'pve03/104'
+terraform import 'module.lxcs.proxmox_virtual_environment_container.fleet["DDCLIENT"]'     'pve02/105'
