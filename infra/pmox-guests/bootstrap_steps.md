@@ -89,3 +89,21 @@ pvesm add nfs remote-nfs \
   -content rootdir \
   -options vers=4
 ```
+
+## Datacenter configuration
+
+Double check current settings:
+
+```bash
+cat /etc/pve/datacenter.cfg
+```
+
+Configure:
+
+```bash
+cat <<EOF > /etc/pve/datacenter.cfg
+keyboard: en-us
+tag-style: color-map=dmz:ff2600:FFFFFF
+email: replace-me@replace-me.com
+EOF
+```

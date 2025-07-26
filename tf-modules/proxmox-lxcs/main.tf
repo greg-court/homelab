@@ -139,7 +139,9 @@ resource "proxmox_virtual_environment_container" "fleet" {
   lifecycle {
     ignore_changes = [
       operating_system[0].template_file_id,
-      started
+      started,
+      clone,
+      operating_system
     ]
   }
 }

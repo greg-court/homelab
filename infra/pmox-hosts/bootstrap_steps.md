@@ -89,3 +89,18 @@ pvesm add nfs remote-nfs \
   -content rootdir \
   -options vers=4
 ```
+
+## Configure backup
+
+```bash
+pvesh create /cluster/backup \
+  -id "daily-all-9pm" \
+  -enabled 1 \
+  -storage "remote-hdd" \
+  -compress "zstd" \
+  -mode "snapshot" \
+  -all 1 \
+  -dow "mon,tue,wed,thu,fri,sat,sun" \
+  -starttime "21:00" \
+  -prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3'
+```

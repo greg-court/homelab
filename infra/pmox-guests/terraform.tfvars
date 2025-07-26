@@ -60,7 +60,7 @@ lxcs = {
     startup = {
       order = 99
     }
-    cpu    = { cores = 4 }
+    cpu    = { cores = 1 }
     memory = { dedicated = 2048 }
     disk   = { size = 16 }
     mount_point = {
@@ -82,7 +82,7 @@ lxcs = {
     clone = {
       vm_id = 301
     }
-    cpu    = { cores = 2 }
+    cpu    = { cores = 1 }
     memory = { dedicated = 4096 }
     network_interface = {
       mac_address = "BC:24:11:41:C6:77"
