@@ -96,7 +96,7 @@ lxcs = {
     }
     disk = {
       size         = 16
-      datastore_id = "remote-nfs"
+      datastore_id = "local-zfs"
     }
     node_name = "pve02"
   }
