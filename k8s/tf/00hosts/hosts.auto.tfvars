@@ -179,7 +179,7 @@ EOF
   }
 
   "K8S-CTRL-DMZ01" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
@@ -208,7 +208,7 @@ EOF
   }
 
   "K8S-CTRL-DMZ02" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
@@ -237,7 +237,7 @@ EOF
   }
 
   "K8S-CTRL-DMZ03" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
@@ -266,7 +266,7 @@ EOF
   }
 
   "K8S-DMZ01" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
@@ -296,7 +296,7 @@ EOF
   }
 
   "K8S-DMZ02" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
@@ -326,7 +326,7 @@ EOF
   }
 
   "K8S-DMZ03" = {
-    tags             = ["talos"]
+    tags             = ["talos", "dmz"]
     on_boot          = false
     agent            = true
     bios             = "seabios"
