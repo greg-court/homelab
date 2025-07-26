@@ -186,7 +186,7 @@ EOF
     cpu              = { cores = 1 }
     memory           = { dedicated = 2048 }
     operating_system = { type = "l26" }
-    network_devices  = [{ vlan_id = 10, mac_address = "BC:24:11:A5:DF:59" }]
+    network_devices  = [{ vlan_id = 60, mac_address = "BC:24:11:A5:DF:59" }]
     disks = {
       "scsi0" = { size = 16 }
     }
@@ -215,7 +215,7 @@ EOF
     cpu              = { cores = 1 }
     memory           = { dedicated = 2048 }
     operating_system = { type = "l26" }
-    network_devices  = [{ vlan_id = 10, mac_address = "BC:24:11:5B:F5:38" }]
+    network_devices  = [{ vlan_id = 60, mac_address = "BC:24:11:5B:F5:38" }]
     disks = {
       "scsi0" = { size = 16 }
     }
@@ -244,7 +244,7 @@ EOF
     cpu              = { cores = 1 }
     memory           = { dedicated = 2048 }
     operating_system = { type = "l26" }
-    network_devices  = [{ vlan_id = 10, mac_address = "BC:24:11:B2:65:81" }]
+    network_devices  = [{ vlan_id = 60, mac_address = "BC:24:11:B2:65:81" }]
     disks = {
       "scsi0" = { size = 16 }
     }
