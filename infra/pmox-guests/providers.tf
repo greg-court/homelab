@@ -20,3 +20,11 @@ terraform {
 #   api_token = var.api_token
 #   insecure  = true
 # }
+
+variable "root_password" { type = string }
+provider "proxmox" {
+  endpoint = var.endpoint
+  username = "root@pam"
+  password = var.root_password
+  insecure = true
+}

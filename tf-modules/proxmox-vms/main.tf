@@ -22,7 +22,7 @@ locals {
   }
 }
 
-resource "proxmox_virtual_environment_vm" "vm_fleet" {
+resource "proxmox_virtual_environment_vm" "fleet" {
   for_each = local.processed_vms
 
   name                = each.key

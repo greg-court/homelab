@@ -1,7 +1,7 @@
 # --- Use this block to move from old to new LXC names ---
 # moved {
-#   from = proxmox_virtual_environment_container.lxc_fleet["OLD-NAME"]
-#   to   = proxmox_virtual_environment_container.lxc_fleet["NEW-NAME"]
+#   from = proxmox_virtual_environment_container.fleet["OLD-NAME"]
+#   to   = proxmox_virtual_environment_container.fleet["NEW-NAME"]
 # }
 
 locals {
@@ -16,7 +16,7 @@ locals {
   }
 
   processed_lxc_containers = {
-    for name, config in nonsensitive(var.lxc_containers) : name => merge(
+    for name, config in nonsensitive(var.lxcs) : name => merge(
       config,
       # It checks if a 'clone' block exists.
       lookup(config, "clone", null) == null ? {
@@ -30,10 +30,10 @@ locals {
   }
 }
 
-resource "proxmox_virtual_environment_container" "lxc_fleet" {
+resource "proxmox_virtual_environment_container" "fleet" {
   for_each = local.processed_lxc_containers
 
-  node_name    = "pve"
+  node_name    = lookup(each.value, "node_name", null)
   description  = lookup(each.value, "description", null)
   tags         = lookup(each.value, "tags", null)
   template     = lookup(each.value, "template", false)
@@ -132,7 +132,7 @@ resource "proxmox_virtual_environment_container" "lxc_fleet" {
     content {
       vm_id        = clone.value.vm_id
       datastore_id = lookup(clone.value, "datastore_id", "local-disks")
-      node_name    = lookup(clone.value, "node_name", "pve")
+      node_name    = lookup(clone.value, "node_name", each.value.node_name)
     }
   }
 

@@ -1,1 +1,1 @@
-variable "lxc_containers" { type = any }
+variable "lxcs" { type = any }
