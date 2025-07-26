@@ -1,0 +1,2 @@
+variable "lxcs" {}
+variable "endpoint" {}

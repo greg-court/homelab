@@ -14,7 +14,7 @@ lxcs = {
       vlan_id     = 20
     }
     node_name = "pve01"
-    disk = { size = 8 }
+    disk      = { size = 8 }
   }
 
   "NETBIRD-FAM" = {
@@ -31,7 +31,7 @@ lxcs = {
       vlan_id     = 30
     }
     node_name = "pve02"
-    disk = { size = 8 }
+    disk      = { size = 8 }
   }
 
   "NETBIRD-DMZ" = {
@@ -49,7 +49,7 @@ lxcs = {
       vlan_id     = 60
     }
     node_name = "pve03"
-    disk = { size = 8 }
+    disk      = { size = 8 }
   }
 
   "DOCKER-INFRA" = {
@@ -88,7 +88,7 @@ lxcs = {
       mac_address = "BC:24:11:41:C6:77"
       vlan_id     = 60
     }
-    disk = { size = 8 }
+    disk      = { size = 8 }
     node_name = "pve03"
   }
 
@@ -102,7 +102,26 @@ lxcs = {
     network_interface = {
       vlan_id = 10
     }
-    disk = { size = 8 }
+    disk      = { size = 8 }
+    node_name = "pve02"
+  }
+
+  "ADGUARD-DNS" = {
+    start_on_boot = true
+    startup       = { order = 2 }
+    operating_system = {
+      type = "ubuntu"
+    }
+    cpu    = { cores = 1 }
+    memory = { dedicated = 1024 }
+    network_interface = {
+      mac_address = "BC:24:11:E7:80:82"
+      vlan_id     = 10
+    }
+    disk = {
+      size         = 16
+      datastore_id = "remote-nfs"
+    }
     node_name = "pve02"
   }
 }
