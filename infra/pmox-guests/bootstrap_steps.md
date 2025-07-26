@@ -1,3 +1,7 @@
+## Configure network
+
+![alt text](image.png)
+
 ## On local client
 
 ```bash
