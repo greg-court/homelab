@@ -20,6 +20,8 @@ hosts = {
       # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-trust01.internal
   nodeLabels:
     zone: infra
 EOF
@@ -48,6 +50,8 @@ EOF
       # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-trust02.internal
   nodeLabels:
     zone: infra
 EOF
@@ -73,9 +77,10 @@ EOF
     talos = {
       cluster = "cluster-trust"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-trust03.internal
   nodeLabels:
     zone: infra
 EOF
@@ -191,9 +196,10 @@ EOF
     talos = {
       cluster = "cluster-dmz"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-dmz01.internal
   nodeLabels:
     zone: dmz
 EOF
@@ -219,9 +225,10 @@ EOF
     talos = {
       cluster = "cluster-dmz"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-dmz02.internal
   nodeLabels:
     zone: dmz
 EOF
@@ -247,9 +254,10 @@ EOF
     talos = {
       cluster = "cluster-dmz"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
+  network:
+    hostname: k8s-ctrl-dmz03.internal
   nodeLabels:
     zone: dmz
 EOF
