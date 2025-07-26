@@ -15,15 +15,13 @@ rm -f ~/.talos/config
 ```bash
 cd talos_config/cluster-trust
 talosctl gen config cluster-trust https://k8s-ctrl-trust01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
-  --output-dir .
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
 ```
 
 ```bash
 cd ../cluster-dmz
 talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
-  --output-dir .
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
 ```
 
 ---
@@ -39,6 +37,7 @@ talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
 ```bash
 cd talos_config/cluster-trust
 export TALOSCONFIG=$PWD/talosconfig
+talosctl config endpoint k8s-ctrl-trust01.internal
 talosctl -n k8s-ctrl-trust01.internal bootstrap
 ```
 
@@ -47,6 +46,7 @@ talosctl -n k8s-ctrl-trust01.internal bootstrap
 ```bash
 cd ../cluster-dmz
 export TALOSCONFIG=$PWD/talosconfig
+talosctl config endpoint k8s-ctrl-dmz01.internal
 talosctl -n k8s-ctrl-dmz01.internal bootstrap
 ```
 
