@@ -99,7 +99,7 @@ pvesm set remote-thin --shared 1 2>/dev/null || true
 
 # 6) Verify
 pvesm status
-lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg_remote
+lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg-remote-thin
 ```
 
 LXCs:
