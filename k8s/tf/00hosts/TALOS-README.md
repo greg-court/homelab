@@ -26,7 +26,7 @@ talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
 
 ---
 
-## 2. Terraform (or whatever provisions the nodes)
+## 2. Terraform apply (provision nodes)
 
 ---
 
