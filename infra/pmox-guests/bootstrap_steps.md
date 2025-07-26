@@ -81,16 +81,16 @@ pvesm add iscsi remote-iscsi \
 
 # 2) Grab the device path that appeared
 ls -l /dev/disk/by-id/ | grep -i truenas
-DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e   # <-- replace with your line
+DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e # <-- replace!!!
 
 # 3) Put LVM on top of that LUN
 pvcreate "$DEV"
-vgcreate vg_remote "$DEV"
-lvcreate -l 100%FREE -T -n thinpool vg_remote   # -T makes it a real thin pool
+vgcreate vg-remote-thin "$DEV"
+lvcreate -l 100%FREE -T -n thinpool vg-remote-thin
 
 # 4) Register the thinpool as Proxmox storage
 pvesm add lvmthin remote-thin \
-  -vgname vg_remote \
+  -vgname vg-remote-thin \
   -thinpool thinpool \
   -content images,rootdir
 
