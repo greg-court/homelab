@@ -189,7 +189,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
+      cluster = "cluster-dmz"
       type    = "controlplane"
       # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
@@ -217,7 +217,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
+      cluster = "cluster-dmz"
       type    = "controlplane"
       # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
@@ -245,7 +245,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
+      cluster = "cluster-dmz"
       type    = "controlplane"
       # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
@@ -273,7 +273,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster    = "cluster-trust"
+      cluster    = "cluster-dmz"
       type       = "worker"
       patch_data = <<EOF
 machine:
@@ -303,7 +303,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster    = "cluster-trust"
+      cluster    = "cluster-dmz"
       type       = "worker"
       patch_data = <<EOF
 machine:
@@ -333,7 +333,7 @@ EOF
       file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster    = "cluster-trust"
+      cluster    = "cluster-dmz"
       type       = "worker"
       patch_data = <<EOF
 machine:
