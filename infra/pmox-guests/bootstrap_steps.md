@@ -73,10 +73,33 @@ pvesm add nfs remote-hdd \
 VM disks:
 
 ```bash
+# 1) Add the raw iSCSI LUN (NO content)
 pvesm add iscsi remote-iscsi \
-    -portal truenas.internal \
-    -target iqn.2005-10.org.freenas.ctl:proxmox-vm \
-    -content images
+  -portal truenas.internal \
+  -target iqn.2005-10.org.freenas.ctl:proxmox-vm \
+  -content none
+
+# 2) Grab the device path that appeared
+ls -l /dev/disk/by-id/ | grep -i truenas
+DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e   # <-- replace with your line
+
+# 3) Put LVM on top of that LUN
+pvcreate "$DEV"
+vgcreate vg_remote "$DEV"
+lvcreate -l 100%FREE -T -n thinpool vg_remote   # -T makes it a real thin pool
+
+# 4) Register the thinpool as Proxmox storage
+pvesm add lvmthin remote-thin \
+  -vgname vg_remote \
+  -thinpool thinpool \
+  -content images,rootdir
+
+# 5) (Optional but recommended in a cluster)
+pvesm set remote-thin --shared 1 2>/dev/null || true
+
+# 6) Verify
+pvesm status
+lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg_remote
 ```
 
 LXCs:
