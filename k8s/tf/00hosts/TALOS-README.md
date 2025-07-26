@@ -36,7 +36,7 @@ talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
 
 ```bash
 cd talos_config/cluster-trust
-export TALOSCONFIG=$PWD/talosconfig
+
 talosctl config endpoint k8s-ctrl-trust01.internal
 talosctl -n k8s-ctrl-trust01.internal bootstrap
 ```
@@ -45,7 +45,7 @@ talosctl -n k8s-ctrl-trust01.internal bootstrap
 
 ```bash
 cd ../cluster-dmz
-export TALOSCONFIG=$PWD/talosconfig
+
 talosctl config endpoint k8s-ctrl-dmz01.internal
 talosctl -n k8s-ctrl-dmz01.internal bootstrap
 ```

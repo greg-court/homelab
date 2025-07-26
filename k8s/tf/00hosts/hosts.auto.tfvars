@@ -1,7 +1,7 @@
 hosts = {
   "K8S-CTRL-TRUST01" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -31,7 +31,7 @@ EOF
 
   "K8S-CTRL-TRUST02" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -61,7 +61,7 @@ EOF
 
   "K8S-CTRL-TRUST03" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -90,7 +90,7 @@ EOF
 
   "K8S-INFRA01" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -120,7 +120,7 @@ EOF
 
   "K8S-INFRA02" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -150,7 +150,7 @@ EOF
 
   "K8S-INFRA03" = {
     tags             = ["talos"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -180,7 +180,7 @@ EOF
 
   "K8S-CTRL-DMZ01" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -209,7 +209,7 @@ EOF
 
   "K8S-CTRL-DMZ02" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -238,7 +238,7 @@ EOF
 
   "K8S-CTRL-DMZ03" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -267,7 +267,7 @@ EOF
 
   "K8S-DMZ01" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -297,7 +297,7 @@ EOF
 
   "K8S-DMZ02" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
@@ -327,7 +327,7 @@ EOF
 
   "K8S-DMZ03" = {
     tags             = ["talos", "dmz"]
-    on_boot          = false
+    on_boot          = true
     agent            = true
     bios             = "seabios"
     cpu              = { cores = 1 }
