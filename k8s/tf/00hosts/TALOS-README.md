@@ -55,6 +55,8 @@ talosctl -n k8s-ctrl-dmz01.internal bootstrap
 ## 4. Manage
 
 ```bash
+talosctl config node k8s-ctrl-dmz01.internal # select DMZ node
+talosctl config node k8s-ctrl-trust01.internal # select trust node
 talosctl health
 talosctl get services
 talosctl dashboard --nodes k8s-ctrl.internal
