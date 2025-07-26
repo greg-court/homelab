@@ -75,7 +75,7 @@ resource "proxmox_virtual_environment_container" "fleet" {
   }
 
   disk {
-    datastore_id = lookup(try(each.value.disk, {}), "datastore_id", "local-disks")
+    datastore_id = lookup(try(each.value.disk, {}), "datastore_id", "local-zfs")
     size         = each.value.disk.size
   }
 
@@ -131,7 +131,7 @@ resource "proxmox_virtual_environment_container" "fleet" {
     for_each = lookup(each.value, "clone", null) != null ? [each.value.clone] : []
     content {
       vm_id        = clone.value.vm_id
-      datastore_id = lookup(clone.value, "datastore_id", "local-disks")
+      datastore_id = lookup(clone.value, "datastore_id", "local-zfs")
       node_name    = lookup(clone.value, "node_name", each.value.node_name)
     }
   }

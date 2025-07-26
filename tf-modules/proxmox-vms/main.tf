@@ -82,7 +82,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     for_each = lookup(each.value, "efi_disk", null) != null ? [each.value.efi_disk] : []
     content {
       file_format       = lookup(efi_disk.value, "file_format", "raw")
-      datastore_id      = lookup(efi_disk.value, "datastore_id", "local-disks")
+      datastore_id      = lookup(efi_disk.value, "datastore_id", "local-zfs")
       type              = lookup(efi_disk.value, "type", "4m")
       pre_enrolled_keys = lookup(efi_disk.value, "pre_enrolled_keys", true)
     }
@@ -91,7 +91,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
   dynamic "tpm_state" {
     for_each = lookup(each.value, "tpm_state", null) != null ? [each.value.tpm_state] : []
     content {
-      datastore_id = lookup(tpm_state.value, "datastore_id", "local-disks")
+      datastore_id = lookup(tpm_state.value, "datastore_id", "local-zfs")
       version      = lookup(tpm_state.value, "version", "v2.0")
     }
   }
@@ -111,7 +111,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     for_each = lookup(each.value, "initialization", null) != null ? [each.value.initialization] : []
 
     content {
-      datastore_id      = lookup(initialization.value, "datastore_id", "local-disks")
+      datastore_id      = lookup(initialization.value, "datastore_id", "local-zfs")
       user_data_file_id = lookup(initialization.value, "user_data_file_id", null)
       dynamic "ip_config" {
         for_each = [lookup(initialization.value, "ip_config", {})]
@@ -139,7 +139,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     for_each = lookup(each.value, "talos", null) != null ? [1] : []
 
     content {
-      datastore_id      = "local-disks"
+      datastore_id      = "local-zfs"
       user_data_file_id = proxmox_virtual_environment_file.talos_snippet[each.key].id
 
       ip_config {
@@ -154,7 +154,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     for_each = lookup(each.value, "disks", {})
     content {
       interface         = disk.key
-      datastore_id      = lookup(disk.value, "datastore_id", "local-disks")
+      datastore_id      = lookup(disk.value, "datastore_id", "local-zfs")
       size              = lookup(disk.value, "size", null)
       cache             = lookup(disk.value, "cache", null)
       discard           = lookup(disk.value, "discard", null)
@@ -171,7 +171,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     content {
       vm_id        = clone.value.vm_id
       full         = lookup(clone.value, "full", true)
-      datastore_id = lookup(clone.value, "datastore_id", "local-disks")
+      datastore_id = lookup(clone.value, "datastore_id", "local-zfs")
       node_name    = lookup(clone.value, "node_name", "pve")
     }
   }
