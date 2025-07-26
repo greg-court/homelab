@@ -1,58 +1,75 @@
-## Getting started
-
-Check existing contexts with `talosctl config get-contexts`
-If necessary, `rm ~/.talos/config` for a fresh start
+Here. Barebones. Multi‑cluster safe. No sanity checks.
 
 ---
 
-## Generate config with custom install image
+## 0. Reset
+
+```bash
+rm -f ~/.talos/config
+```
+
+---
+
+## 1. Generate configs (separate dirs)
 
 ```bash
 cd talos_config/cluster-trust
 talosctl gen config cluster-trust https://k8s-ctrl-trust01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
+  --output-dir .
 ```
 
 ```bash
 cd ../cluster-dmz
 talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
+  --output-dir .
 ```
 
 ---
 
-## Terraform apply at this stage
+## 2. Terraform (or whatever provisions the nodes)
 
-## First boot - mandatory first bootstrap (only need to bootstrap 1 control node)
+---
+
+## 3. Bootstrap (one control node per cluster)
+
+### cluster-trust
 
 ```bash
-talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoints k8s-ctrl-trust01.internal
-talosctl config node k8s-ctrl-trust01.internal
-talosctl bootstrap
+cd talos_config/cluster-trust
+export TALOSCONFIG=$PWD/talosconfig
+talosctl -n k8s-ctrl-trust01.internal bootstrap
 ```
+
+### cluster-dmz
 
 ```bash
 cd ../cluster-dmz
-talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoints k8s-ctrl-dmz01.internal
-talosctl config node k8s-ctrl-dmz01.internal
-talosctl bootstrap
+export TALOSCONFIG=$PWD/talosconfig
+talosctl -n k8s-ctrl-dmz01.internal bootstrap
 ```
 
-## Managing the cluster
+---
+
+## 4. Manage
 
 ```bash
 talosctl health
+talosctl get services
 talosctl dashboard --nodes k8s-ctrl.internal
 talosctl dashboard --nodes k8s-infra.internal
-talosctl get services
 ```
 
-## Create kubeconfig file (in cluster folder)
+(Use the right `export TALOSCONFIG=...` for the cluster you’re touching.)
 
+---
+
+## 5. kubeconfig
+
+```bash
 talosctl kubeconfig .
-
-## Make kubeconfig your default
-
 cp ./kubeconfig ~/.kube/config
+```
+
+Repeat in each cluster dir if you want both kubeconfigs (rename/context as needed).
