@@ -56,9 +56,7 @@ pvecm add pve01
 
 ## Add shared storage
 
-On any node:
-
-Backup storage etc:
+### Backup storage etc
 
 ```bash
 pvesm add nfs remote-hdd \
@@ -70,7 +68,7 @@ pvesm add nfs remote-hdd \
     --prune-backups keep-all=1
 ```
 
-VM disks:
+### VM disks
 
 ```bash
 # 1) Add the raw iSCSI LUN (NO content)
@@ -101,6 +99,8 @@ pvesm set remote-thin --shared 1 2>/dev/null || true
 pvesm status
 lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg-remote-thin
 ```
+
+Then reboot other nodes.
 
 LXCs:
 
