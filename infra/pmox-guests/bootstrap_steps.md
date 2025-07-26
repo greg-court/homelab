@@ -71,6 +71,7 @@ pvesm add nfs remote-hdd \
 ### VM disks
 
 ```bash
+########################################## PART 1
 # 1) Add the raw iSCSI LUN (NO content)
 pvesm add iscsi remote-iscsi \
   -portal truenas.internal \
@@ -79,6 +80,7 @@ pvesm add iscsi remote-iscsi \
 
 # 2) Grab the device path that appeared
 ls -l /dev/disk/by-id/ | grep -i truenas
+########################################## PART 2
 DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e # <-- replace!!!
 
 # 3) Put LVM on top of that LUN
