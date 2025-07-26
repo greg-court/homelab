@@ -70,7 +70,7 @@ pvesm add nfs remote-hdd \
 
 ### VM disks
 
-```bash
+```bash - RUN ON PRIMARY NODE!
 ########################################## PART 1
 # 1) Add the raw iSCSI LUN (NO content)
 pvesm add iscsi remote-iscsi \
