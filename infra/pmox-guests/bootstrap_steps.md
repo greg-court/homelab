@@ -104,6 +104,5 @@ Configure:
 cat <<EOF > /etc/pve/datacenter.cfg
 keyboard: en-us
 tag-style: color-map=dmz:ff2600:FFFFFF
-email: replace-me@replace-me.com
 EOF
 ```
