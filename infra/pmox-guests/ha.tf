@@ -24,4 +24,8 @@ resource "proxmox_virtual_environment_haresource" "adguard" {
   group = proxmox_virtual_environment_hagroup.dns_ha.group
 
   state = "started" # ensure it is running; it will be migrated on failure
+
+  # optional tunables
+  max_relocate = 3   # max → hard-fail if it bounces too often
+  max_restart  = 3   # restarts on the same node before relocation
 }
