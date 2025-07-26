@@ -21,6 +21,8 @@ talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
 
 ---
 
+## Terraform apply at this stage
+
 ## First boot - mandatory first bootstrap (only need to bootstrap 1 control node)
 
 ```bash
@@ -31,9 +33,10 @@ talosctl bootstrap
 ```
 
 ```bash
+cd ../cluster-dmz
 talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoints k8s-ctrl-trust01.internal
-talosctl config node k8s-ctrl-trust01.internal
+talosctl config endpoints k8s-ctrl-dmz01.internal
+talosctl config node k8s-ctrl-dmz01.internal
 talosctl bootstrap
 ```
 
