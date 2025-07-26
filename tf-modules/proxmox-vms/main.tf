@@ -26,7 +26,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
   for_each = local.processed_vms
 
   name                = each.key
-  node_name           = "pve"
+  node_name           = lookup(each.value, "node_name", null)
   on_boot             = each.value.on_boot
   bios                = each.value.bios
   vm_id               = lookup(each.value, "vm_id", null)
@@ -172,7 +172,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
       vm_id        = clone.value.vm_id
       full         = lookup(clone.value, "full", true)
       datastore_id = lookup(clone.value, "datastore_id", "local-zfs")
-      node_name    = lookup(clone.value, "node_name", "pve")
+      node_name    = lookup(clone.value, "node_name", each.value.node_name)
     }
   }
 

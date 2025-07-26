@@ -52,30 +52,6 @@ lxcs = {
     disk      = { size = 8 }
   }
 
-  "DOCKER-INFRA" = {
-    start_on_boot = true
-    clone = {
-      vm_id = 301
-    }
-    startup = {
-      order = 99
-    }
-    cpu    = { cores = 1 }
-    memory = { dedicated = 2048 }
-    disk   = { size = 16 }
-    mount_point = {
-      "0" = {
-        volume = "/mnt/pve/remote-hdd/template/iso"
-        path   = "/mnt/iso_storage"
-      }
-    }
-    network_interface = {
-      mac_address = "BC:24:11:33:93:F8"
-      vlan_id     = 10
-    }
-    node_name = "pve01"
-  }
-
   "DOCKER-DMZ" = {
     start_on_boot = true
     tags          = ["dmz"]
