@@ -9,9 +9,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argocd
   source:
-    repoURL: https://github.com/<you>/gitops.git # ← real repo URL
+    repoURL: https://github.com/greg-court/homelab.git # ← real repo URL
     targetRevision: main
-    path: apps # stays 'apps' until you add overlays
+    path: k8s/gitops/apps
   syncPolicy:
     automated:
       selfHeal: true
