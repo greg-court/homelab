@@ -1,7 +1,3 @@
-Here. Barebones. Multi‑cluster safe. No sanity checks.
-
----
-
 ## 0. Reset
 
 ```bash
