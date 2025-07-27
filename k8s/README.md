@@ -9,3 +9,8 @@
    Works well with Helm, Kustomize, plain YAML.
    Continuous reconciliation → self-healing, easy rollback, better visibility.
    Better lifecycle management (diffs, sync waves, app-of-apps pattern, etc.)
+
+# Learning materials
+
+1. https://www.udemy.com/course/kubernetes-masterclass-for-beginners
+2. https://youtu.be/FcBs2iwXC-U?si=IMZy22xLsfPugSIG
