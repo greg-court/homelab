@@ -5,7 +5,7 @@ for host in pve01 pve02 pve03; do ssh-keygen -R $host; done
 for host in pve01 pve02 pve03; do ssh-copy-id -o StrictHostKeyChecking=no root@$host; done
 ```
 
-## Configure apt
+## Configure apt (on each host)
 
 ```bash
 #!/bin/bash
@@ -102,5 +102,6 @@ pvesh create /cluster/backup \
   -all 1 \
   -dow "mon,tue,wed,thu,fri,sat,sun" \
   -starttime "21:00" \
-  -prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3'
+  -prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3' \
+  -mailto "<replaceme@replaceme.com>"
 ```
