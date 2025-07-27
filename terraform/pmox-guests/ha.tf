@@ -8,7 +8,7 @@ resource "proxmox_virtual_environment_hagroup" "dns_ha" {
   nodes = {
     pve01 = 100 # primary
     pve02 = 80  # equal fallback priority
-    pve03 = 60  # equal fallback priority
+    pve03 = 80  # equal fallback priority
   }
 
   restricted  = true  # only these nodes may run the service
