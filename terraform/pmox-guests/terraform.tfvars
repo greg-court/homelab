@@ -100,4 +100,38 @@ lxcs = {
     }
     node_name = "pve02"
   }
+
+  "UNIFI" = {
+    start_on_boot = true
+    clone = {
+      vm_id = 300
+    }
+    cpu    = { cores = 1 }
+    memory = { dedicated = 1024 }
+    network_interface = {
+      vlan_id     = 10
+    }
+    disk = {
+      size         = 16
+      datastore_id = "local-zfs"
+    }
+    node_name = "pve02"
+  }
+
+  "HA-TEST" = {
+    start_on_boot = true
+    clone = {
+      vm_id = 300
+    }
+    cpu    = { cores = 1 }
+    memory = { dedicated = 1024 }
+    network_interface = {
+      vlan_id     = 10
+    }
+    disk = {
+      size         = 8
+      datastore_id = "remote-nfs"
+    }
+    node_name = "pve01"
+  }
 }

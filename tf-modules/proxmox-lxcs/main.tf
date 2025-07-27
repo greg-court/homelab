@@ -131,8 +131,8 @@ resource "proxmox_virtual_environment_container" "fleet" {
     for_each = lookup(each.value, "clone", null) != null ? [each.value.clone] : []
     content {
       vm_id        = clone.value.vm_id
-      datastore_id = lookup(clone.value, "datastore_id", "local-zfs")
-      node_name    = lookup(clone.value, "node_name", each.value.node_name)
+      datastore_id = lookup(clone.value, "datastore_id", "remote-nfs")
+      node_name    = lookup(clone.value, "node_name", "pve01")
     }
   }
 
