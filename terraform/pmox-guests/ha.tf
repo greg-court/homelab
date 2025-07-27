@@ -6,7 +6,7 @@ locals {
   ha_cts = {
     for name, cfg in var.lxcs :
     name => cfg
-    if true  # flip to a conditional if you want to filter
+    if try(cfg.ha_enabled, true) == true # Excluse if ha_enabled is false
   }
 
   # Priority used for non‑primary nodes
@@ -28,7 +28,7 @@ locals {
 resource "proxmox_virtual_environment_hagroup" "ct" {
   for_each   = local.ha_cts
 
-  group      = "ct-${lower(each.key)}"          # eg. ct-adguard-dns
+  group      = "ct-${lower(each.key)}"
   comment    = "HA group for ${each.key}"
   nodes      = local.priorities[each.key]
 
@@ -42,7 +42,6 @@ resource "proxmox_virtual_environment_hagroup" "ct" {
 resource "proxmox_virtual_environment_haresource" "ct" {
   for_each    = local.ha_cts
 
-  # module.lxcs.ids must return a map(name -> vmid). Your module already does.
   resource_id = "ct:${module.lxcs.ids[each.key]}"
   group       = proxmox_virtual_environment_hagroup.ct[each.key].group
 
@@ -50,41 +49,3 @@ resource "proxmox_virtual_environment_haresource" "ct" {
   max_relocate = 3           # hard fail if it bounces >3 times
   max_restart  = 3           # restarts on same node before relocating
 }
-
-###############################################
-# OPTIONAL: fine‑grained overrides per CT (example)
-###############################################
-# variable "ha_overrides" {
-#   type = map(object({
-#     nodes       = map(number)  # explicit node->priority map
-#     no_failback = optional(bool)
-#     restricted  = optional(bool)
-#   }))
-#   default = {}
-# }
-#
-# locals {
-#   priorities = merge(
-#     {
-#       for name, cfg in local.ha_cts :
-#       name => {
-#         for n in local.cluster_nodes :
-#         n => n == cfg.node_name ? 100 : local.fallback_priority
-#       }
-#     },
-#     { for name, o in var.ha_overrides : name => lookup(o, "nodes", {}) }
-#   )
-# }
-#
-# Then inside the resources above:
-#   nodes      = local.priorities[each.key]
-#   no_failback = lookup(var.ha_overrides[each.key], "no_failback", false)
-#   restricted  = lookup(var.ha_overrides[each.key], "restricted", true)
-
-###############################################
-# HOW TO USE / CHECK
-#   terraform apply
-#   ha-manager status    # on any PVE node
-#   ha-manager group list
-#   ha-manager resource list
-###############################################
