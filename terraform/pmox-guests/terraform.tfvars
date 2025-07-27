@@ -114,7 +114,7 @@ lxcs = {
     node_name = "pve01"
   }
 
-  "DOCKER-DMZ" = {
+  "DOCKER-DMZ" = { # to be deleted
     start_on_boot = true
     tags          = ["dmz"]
     clone = {
