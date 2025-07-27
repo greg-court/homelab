@@ -97,6 +97,23 @@ lxcs = {
     node_name = "pve02"
   }
 
+  "DNS-TRAINER" = {
+    start_on_boot = true
+    cpu    = { cores = 1 }
+    clone = {
+      vm_id = 300
+    }
+    memory = { dedicated = 256 }
+    network_interface = {
+      vlan_id     = 10
+    }
+    disk = {
+      size         = 8
+      datastore_id = "remote-nfs"
+    }
+    node_name = "pve01"
+  }
+
   "DOCKER-DMZ" = {
     start_on_boot = true
     tags          = ["dmz"]
