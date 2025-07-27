@@ -1,8 +1,8 @@
 locals {
-  # Order of nodes in your cluster (edit if you add/remove nodes)
+  # Nodes in cluster
   cluster_nodes = ["pve01", "pve02", "pve03"]
 
-  # List of CT names to put under HA. By default: every CT in var.lxcs
+   # CTs eligible for HA
   ha_cts = {
     for name, cfg in var.lxcs :
     name => cfg
