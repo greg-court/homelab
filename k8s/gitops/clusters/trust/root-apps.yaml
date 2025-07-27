@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-apps # can stay the same; each Argo CD sees only its own
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  source:
+    repoURL: https://github.com/<you>/gitops.git # ← real repo URL
+    targetRevision: main
+    path: apps # stays 'apps' until you add overlays
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions: ['CreateNamespace=true']
