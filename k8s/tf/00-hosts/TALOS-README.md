@@ -81,5 +81,6 @@ KUBECONFIG=~/.kube/config:cluster-dmz/kubeconfig kubectl config view --flatten -
 # merge cluster-trust/kubeconfig
 KUBECONFIG=~/.kube/config:cluster-trust/kubeconfig kubectl config view --flatten --merge > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
 
-Repeat in each cluster dir if you want both kubeconfigs (rename/context as needed).
+# Repeat in each cluster dir if you want both kubeconfigs (rename/context as needed).
+# use K9S + kubectx for easier management
 ```
