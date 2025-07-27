@@ -7,8 +7,9 @@ locals {
     for name, cfg in var.lxcs :
     name => cfg
     if try(cfg.ha_enabled, true) == true # Exclude if ha_enabled is false
+       && try(cfg.disk.datastore_id != null # Check it's not null
+       && cfg.disk.datastore_id != "local-zfs", false) # Check its not local-zfs
   }
-
   # Priority used for non‑primary nodes
   fallback_priority = 80
 
