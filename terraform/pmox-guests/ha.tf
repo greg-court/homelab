@@ -6,7 +6,7 @@ locals {
   ha_cts = {
     for name, cfg in var.lxcs :
     name => cfg
-    if try(cfg.ha_enabled, true) == true # Excluse if ha_enabled is false
+    if try(cfg.ha_enabled, true) == true # Exclude if ha_enabled is false
   }
 
   # Priority used for non‑primary nodes
