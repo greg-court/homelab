@@ -17,7 +17,6 @@ hosts = {
     talos = {
       cluster = "cluster-trust"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
   network:
@@ -47,7 +46,6 @@ EOF
     talos = {
       cluster = "cluster-trust"
       type    = "controlplane"
-      # setting hostname in pfsense dhcp static lease
       patch_data = <<EOF
 machine:
   network:
