@@ -1,0 +1,22 @@
+---
+# This is the definitive task. It adds a managed block to the end of the
+# system-wide bashrc file, which is reliably sourced by interactive shells.
+- name: Ensure bash history search is configured in /etc/bash.bashrc
+  ansible.builtin.blockinfile:
+    path: /etc/bash.bashrc
+    block: |
+      if [[ $- == *i* ]]; then
+        bind '"\e[A": history-search-backward'
+        bind '"\e[B": history-search-forward'
+      fi
+    # This creates a marker so Ansible knows which block to manage
+    marker: '# {mark} ANSIBLE MANAGED BLOCK: BASH HISTORY SEARCH'
+    state: present
+    create: true
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Set timezone to Europe/London
+  community.general.timezone:
+    name: Europe/London

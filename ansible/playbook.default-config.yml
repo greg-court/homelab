@@ -1,0 +1,20 @@
+---
+- name: Base config on every Linux guest
+  hosts: linux
+  gather_facts: false
+  become: true
+
+  pre_tasks:
+    - name: Power-ON wrapper
+      ansible.builtin.import_role:
+        name: power_cycle
+        tasks_from: start
+
+  roles:
+    - common
+
+  post_tasks:
+    - name: Power-OFF wrapper (only if we started it)
+      ansible.builtin.import_role:
+        name: power_cycle
+        tasks_from: stop

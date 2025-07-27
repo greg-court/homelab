@@ -1,0 +1,24 @@
+---
+- name: Safe APT updates on every apt-managed guest
+  hosts: debian_based
+  gather_facts: false
+  become: true
+  serial: 1 # one at a time is safest
+
+  pre_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: start
+
+  tasks:
+    - name: Update APT packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+
+  post_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: stop

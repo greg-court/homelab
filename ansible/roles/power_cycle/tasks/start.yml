@@ -1,0 +1,69 @@
+---
+# Turn the guest on if it is stopped; remember that we did so.
+
+- name: Choose VMID and node variables
+  ansible.builtin.set_fact:
+    _pc_vmid: '{{ vmid | default(proxmox_vmid, true) }}'
+    _pc_node: '{{ node | default(proxmox_node, true) }}'
+
+- name: Bail out when metadata is missing
+  when: _pc_vmid is not defined or _pc_node is not defined
+  block:
+    - name: Show skip message
+      ansible.builtin.debug:
+        msg: 'Skipping {{ inventory_hostname }} – no Proxmox metadata found'
+
+    - name: End host
+      ansible.builtin.meta: end_host
+
+- name: Set Proxmox auth facts
+  ansible.builtin.set_fact:
+    _pc_api_host: "{{ lookup('env', 'PROXMOX_HOST') }}"
+    _pc_api_user: "{{ lookup('env', 'PROXMOX_USER') }}"
+    _pc_token_id: "{{ lookup('env', 'PROXMOX_TOKEN_ID') }}"
+    _pc_token_secret: "{{ lookup('env', 'PROXMOX_TOKEN_SECRET') }}"
+
+# ---------------- START QEMU --------------------------------------------------
+- name: Start QEMU VM when stopped
+  delegate_to: localhost
+  community.proxmox.proxmox_kvm:
+    api_host: '{{ _pc_api_host }}'
+    api_user: '{{ _pc_api_user }}'
+    api_token_id: '{{ _pc_token_id }}'
+    api_token_secret: '{{ _pc_token_secret }}'
+    vmid: '{{ _pc_vmid }}'
+    node: '{{ _pc_node }}'
+    state: started
+  when:
+    - proxmox_vmtype | default('qemu') == 'qemu'
+    - proxmox_status | default('running') == 'stopped'
+  register: _pc_start_qemu
+
+# ---------------- START LXC ---------------------------------------------------
+- name: Start LXC container when stopped
+  delegate_to: localhost
+  community.proxmox.proxmox:
+    api_host: '{{ _pc_api_host }}'
+    api_user: '{{ _pc_api_user }}'
+    api_token_id: '{{ _pc_token_id }}'
+    api_token_secret: '{{ _pc_token_secret }}'
+    vmid: '{{ _pc_vmid }}'
+    node: '{{ _pc_node }}'
+    state: started
+  when:
+    - proxmox_vmtype | default('lxc') == 'lxc'
+    - proxmox_status | default('running') == 'stopped'
+  register: _pc_start_lxc
+
+- name: Wait for SSH
+  ansible.builtin.wait_for_connection:
+    timeout: 300
+  when: (_pc_start_qemu.changed | default(false)) or (_pc_start_lxc.changed | default(false))
+
+- name: Remember that we booted the guest
+  ansible.builtin.set_fact:
+    _pc_started_by_playbook: true
+  when: (_pc_start_qemu.changed | default(false)) or (_pc_start_lxc.changed | default(false))
+
+- name: Gather facts after boot
+  ansible.builtin.setup:
