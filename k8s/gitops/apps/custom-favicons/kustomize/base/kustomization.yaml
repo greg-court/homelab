@@ -1,0 +1,8 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+
+images:
+  - name: CUSTOM_FAVICONS
+    newName: docker.io/gr10/custom-favicons
+    newTag: latest

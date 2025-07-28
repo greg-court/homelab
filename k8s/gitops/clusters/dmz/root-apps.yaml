@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/apps
+    path: k8s/gitops/apps # with multiple apps, keep point to apps/ and use Application manifests for each
   syncPolicy:
     automated:
       selfHeal: true

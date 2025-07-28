@@ -1,0 +1,63 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/custom-favicons/**'
+      - '.github/workflows/build-and-deploy.yml'
+
+permissions:
+  contents: write # allow committing back
+
+jobs:
+  build-push-update:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: docker.io/${{ secrets.DOCKER_USER }}/custom-favicons
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set TAG
+        id: vars
+        run: echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/custom-favicons
+          file: apps/custom-favicons/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.TAG }}
+
+      - name: Install kustomize
+        run: |
+          curl -sSL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.1/kustomize_v5.4.1_linux_amd64.tar.gz \
+          | tar xz && sudo mv kustomize /usr/local/bin/
+
+      - name: Update kustomize image tag
+        working-directory: apps/custom-favicons/kustomize/base
+        run: |
+          kustomize edit set image DOCKER_IMAGE_PLACEHOLDER=${IMAGE_NAME}:${{ steps.vars.outputs.TAG }}
+
+      - name: Commit & push changes
+        run: |
+          if git diff --quiet; then
+            echo "No kustomize changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "ci: bump custom-favicons image to ${{ steps.vars.outputs.TAG }}"
+          git push

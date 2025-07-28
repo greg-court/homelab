@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-favicons
+  labels:
+    app: custom-favicons
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-favicons
+  template:
+    metadata:
+      labels:
+        app: custom-favicons
+    spec:
+      containers:
+        - name: nginx
+          image: DOCKER_IMAGE_PLACEHOLDER # replaced by kustomize edit set image
+          ports:
+            - containerPort: 80
+    resources:

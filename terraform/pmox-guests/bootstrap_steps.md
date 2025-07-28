@@ -1,7 +1,8 @@
 # Next deployment notes
 
-Use https://registry.terraform.io/modules/bbtechsys/talos/proxmox/latest !!!
-Configure replicated storage on all nodes 256 local-zfs / 256 replicated-zfs
+- Use https://registry.terraform.io/modules/bbtechsys/talos/proxmox/latest !!!
+- Configure replicated storage on all nodes 32GB local-zfs / 128 local-data / 128 replicated-data - expand as required
+- K8s multi-master single-node hybrid architecture for better resource utilisation
 
 ## Configure network
 
