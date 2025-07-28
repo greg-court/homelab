@@ -1,3 +1,8 @@
+# Next deployment notes
+
+Use https://registry.terraform.io/modules/bbtechsys/talos/proxmox/latest !!!
+Configure replicated storage on all nodes 256 local-zfs / 256 replicated-zfs
+
 ## Configure network
 
 ![alt text](image.png)
