@@ -141,3 +141,19 @@ keyboard: en-us
 tag-style: color-map=dmz:ff2600:FFFFFF
 EOF
 ```
+
+## Configure Backup
+
+```bash
+pvesh create /cluster/backup \
+  --id daily-all-9pm \
+  --all 1 \
+  --storage remote-hdd \
+  --mode snapshot \
+  --compress zstd \
+  --schedule 21:00 \
+  --mailto gregcourt10@gmail.com \
+  --prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3' \
+  --notes-template '{{guestname}}' \
+  --enabled 1
+```
