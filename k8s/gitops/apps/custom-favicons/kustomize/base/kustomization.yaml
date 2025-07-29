@@ -3,6 +3,6 @@ resources:
   - service.yaml
 
 images:
-  - name: CUSTOM_FAVICONS
+  - name: DOCKER_IMAGE_PLACEHOLDER
     newName: docker.io/gr10/custom-favicons
     newTag: latest
