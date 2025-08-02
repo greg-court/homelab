@@ -39,7 +39,7 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   # --- Disk ----------------------------------------------------------------
   disk {
-    datastore_id = "local-lvm"
+    datastore_id = "local-zfs"
     size         = 32
     interface    = "scsi0"
   }
