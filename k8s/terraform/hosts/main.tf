@@ -14,8 +14,8 @@ locals {
 resource "proxmox_virtual_environment_vm" "node" {
   for_each = local.all_nodes
 
-  name        = each.key
-  node_name   = each.value.host
+  name      = each.key
+  node_name = each.value.host
 
   # --- CPU & RAM -----------------------------------------------------------
   cpu {
