@@ -36,7 +36,7 @@ resource "talos_machine_configuration_apply" "dmz_cp" {
 }
 
 resource "talos_machine_bootstrap" "dmz" {
-  depends_on          = [for r in talos_machine_configuration_apply.dmz_cp : r]
+  depends_on          = [talos_machine_configuration_apply.dmz_cp]
   node                = "k8s-dmz-01.internal"
   client_configuration = talos_machine_secrets.dmz.client_configuration
 }

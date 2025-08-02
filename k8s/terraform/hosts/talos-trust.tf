@@ -44,10 +44,11 @@ resource "talos_machine_configuration_apply" "trust_cp" {
 
 # Bootstrap only one of the nodes
 resource "talos_machine_bootstrap" "trust" {
-  depends_on          = [for r in talos_machine_configuration_apply.trust_cp : r]
+  depends_on          = [talos_machine_configuration_apply.trust_cp]
   node                = "k8s-svc-01.internal"
   client_configuration = talos_machine_secrets.trust.client_configuration
 }
+
 
 # Grab the kubeconfig once etcd is up
 resource "talos_cluster_kubeconfig" "trust" {
