@@ -1,63 +1,26 @@
-## 0. Reset
+## 0. Reset if desired
 
 ```bash
 rm -f ~/.talos/config
+# in each config directory:
+talosctl config merge ./talosconfig
 ```
 
----
-
-## 1. Generate configs (separate dirs)
+## 1. Kubeconfig
 
 ```bash
-cd talos_config/cluster-trust
-talosctl gen config cluster-trust https://k8s-ctrl-trust01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
+KUBECONFIG=~/.kube/config:./kubeconfig kubectl config view --flatten --merge > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
 ```
 
-```bash
-cd ../cluster-dmz
-talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
-```
-
----
-
-## 2. Terraform apply (provision nodes)
-
----
-
-## 3. Bootstrap (one control node per cluster)
-
-### cluster-trust
-
-```bash
-cd talos_config/cluster-trust
-talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoint k8s-trust-01.internal
-talosctl -n k8s-trust-01.internal bootstrap
-```
-
-### cluster-dmz
-
-```bash
-cd ../cluster-dmz
-talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoint k8s-dmz-01.internal
-talosctl -n k8s-dmz-01.internal bootstrap
-```
-
----
-
-## 4. Manage
+## 2. Manage
 
 ```bash
 talosctl config contexts # see contexts
 talosctl config use-context cluster-trust # select trust context
-talosctl config node k8s-ctrl-trust01.internal # select trust node
+talosctl config node k8s-trust-01.internal # select trust node
 talosctl health
 talosctl get services
-talosctl dashboard --nodes k8s-ctrl.internal
-talosctl dashboard --nodes k8s-infra.internal
+talosctl dashboard --nodes k8s-trust-01.internal
 ```
 
 ---
