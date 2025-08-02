@@ -25,17 +25,14 @@ Nothing on the nodes or in Terraform state is touched.
 # cluster-trust
 cd talos_config/cluster-trust
 talosctl gen config cluster-trust https://k8s-svc-01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
-  --output-controlplane controlplane.yaml \
-  --output-worker      worker.yaml        # optional
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
 ```
 
 ```bash
 # cluster-dmz
 cd ../cluster-dmz
 talosctl gen config cluster-dmz https://k8s-dmz-01.internal:6443 \
-  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5 \
-  --output-controlplane controlplane.yaml
+  --install-image factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.10.5
 ```
 
 Commit those two YAMLs — they rarely change.
