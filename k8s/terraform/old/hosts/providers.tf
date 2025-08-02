@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.8.0"
   required_providers {
-    proxmox = { source = "bpg/proxmox",      version = ">= 0.80" }
-    talos   = { source = "siderolabs/talos", version = ">= 0.6.0" }
-    local   = { source = "hashicorp/local",  version = ">= 2.4.0" }
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = ">= 0.80"
+    }
   }
   # backend "azurerm" {
   #   subscription_id      = "f01a5d70-cf46-4291-80de-336ee2a894d4"
@@ -28,5 +28,3 @@ provider "proxmox" {
   password = var.root_password
   insecure = true
 }
-
-provider "talos" {}
