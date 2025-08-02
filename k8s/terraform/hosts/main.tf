@@ -3,9 +3,9 @@ locals {
     for cname, c in var.clusters :
     {
       for n, v in c.nodes :
-      "${cname}_${n}" => merge(v, {
-        cluster = cname
-        vlan_id = c.vlan_id
+      n => merge(v, {
+        cluster  = cname
+        vlan_id  = c.vlan_id
       })
     }
   ]...)
