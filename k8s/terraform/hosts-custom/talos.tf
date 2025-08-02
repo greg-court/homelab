@@ -2,17 +2,17 @@
 # 0.  Flatten clusters → hosts (and add host_id once)
 ############################################################
 locals {
-  hosts = {
-    for cluster_name, c in var.clusters :
-    # map key: "cluster/host"
-    for host_id, h in c.hosts :
-    "${cluster_name}/${host_id}" => merge(h, {
-      cluster_name = cluster_name
-      host_id      = host_id         # <— add it here
-      vlan_id      = c.vlan_id
-      zone         = c.zone
-    })
-  }
+  hosts = merge([
+    for cluster_name, c in var.clusters : {
+      for host_id, h in c.hosts :
+      "${cluster_name}/${host_id}" => merge(h, {
+        cluster_name = cluster_name
+        host_id      = host_id
+        vlan_id      = c.vlan_id
+        zone         = c.zone
+      })
+    }
+  ]...)
 }
 
 ############################################################
