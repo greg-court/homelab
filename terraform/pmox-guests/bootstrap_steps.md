@@ -114,10 +114,10 @@ pvecm add pve01
 
 ### Backup storage etc
 
-pvesm add nfs nfs-tank \
+pvesm add nfs nfs-hdd \
     -server truenas.internal \
     -export /mnt/tank-smr/proxmox \
-    -path /mnt/pve/nfs-tank \
+    -path /mnt/pve/nfs-hdd \
     -content snippets,vztmpl,backup,iso,import \
     -options vers=4 \
     --prune-backups keep-all=1
