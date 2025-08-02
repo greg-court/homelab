@@ -28,6 +28,7 @@ resource "talos_machine_configuration_apply" "trust_cp" {
         install = {
           disk  = var.disk_device
           image = var.talos_install_image
+          auto  = true
         }
         network = {
           hostname = each.key # k8s-ctrl-trust0X

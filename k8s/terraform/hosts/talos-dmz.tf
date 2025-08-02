@@ -26,6 +26,7 @@ resource "talos_machine_configuration_apply" "dmz_cp" {
         install = {
           disk  = var.disk_device
           image = var.talos_install_image
+          auto  = true
         }
         network    = { hostname = each.key }
         nodeLabels = { zone = "dmz" }

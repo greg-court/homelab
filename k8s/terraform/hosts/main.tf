@@ -19,6 +19,9 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   on_boot = true
   tags    = ["talos"]
+  agent {
+    enabled = false
+  }
 
   machine = "q35"
   cpu {
