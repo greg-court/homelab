@@ -1,36 +1,41 @@
-locals {
-  clusters = keys(var.clusters)
-}
-
-# 1) Load each cluster’s talosconfig
+# Load talosconfig per cluster
 data "talos_client_configuration" "cc" {
-  for_each    = local.clusters
+  for_each    = var.clusters
   config_path = "${path.module}/talos_config/${each.key}/talosconfig"
 }
 
-# 2) Extract the secrets section from controlplane.yaml
-data "yaml_decode" "secrets" {
-  for_each = local.clusters
-  content  = file("${path.module}/talos_config/${each.key}/controlplane.yaml")
+# Decode secrets from controlplane.yaml with built-in fn
+locals {
+  secrets_yaml = {
+    for name in keys(var.clusters) :
+    name => yamldecode(
+      file("${path.module}/talos_config/${name}/controlplane.yaml")
+    ).cluster.secrets
+  }
 }
 
 resource "talos_machine_secrets" "imported" {
-  for_each = local.clusters
-  yaml     = yamlencode(data.yaml_decode.secrets[each.key].cluster.secrets)
+  for_each = local.secrets_yaml
+  yaml     = yamlencode(each.value)
 }
 
-# 3) Bootstrap exactly one node per cluster
+# Bootstrap first control-plane node (sorted for determinism)
 resource "talos_machine_bootstrap" "this" {
-  for_each             = local.clusters
-  node                 = "https://${lower(element(sort(keys(each.value.hosts)), 0))}.internal:50000"
+  for_each = var.clusters
+
+  node = "https://${lower(
+    element(sort(keys(each.value.hosts)), 0)
+  )}.internal:50000"
+
   client_configuration = data.talos_client_configuration.cc[each.key].id
   secrets              = talos_machine_secrets.imported[each.key].id
-  depends_on           = [module.proxmox_vms] # wait for VMs first
+
+  depends_on = [module.proxmox_vms]
 }
 
-# 4) Optionally block until the API says “healthy”
+# Wait until the cluster is healthy
 data "talos_cluster_health" "ready" {
-  for_each             = local.clusters
+  for_each             = var.clusters
   client_configuration = data.talos_client_configuration.cc[each.key].id
   depends_on           = [talos_machine_bootstrap.this]
 }
