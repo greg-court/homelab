@@ -46,7 +46,7 @@ iface bond0 inet manual
 
 auto vmbr0
 iface vmbr0 inet static
-	address 192.168.2.243/24
+	address 192.168.2.242/24
 	gateway 192.168.2.1
 	bridge-ports bond0
 	bridge-stp off
@@ -124,36 +124,37 @@ pvesm add nfs nfs-hdd \
 
 ### VM disks
 
-# - RUN ON PRIMARY NODE!
+# - RUN ON ONE NODE!
 ########################################## PART 1
-# 1) Add the raw iSCSI LUN (NO content)
+# 0) Discover the target again (one node is enough – others will pick it up)
+iscsiadm -m discovery -t sendtargets -p truenas.internal
+
+# 1) Add the raw iSCSI LUN to Proxmox (content=none; no “use LUNs directly”)
 pvesm add iscsi iscsi-raw \
   -portal truenas.internal \
   -target iqn.2005-10.org.freenas.ctl:proxmox-vm \
   -content none
 
-# 2) Grab the device path that appeared
-ls -l /dev/disk/by-id/ | grep -i truenas
-########################################## PART 2
-DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e # <-- replace!!!
+# 2) Get the device path that appeared
+ls -l /dev/disk/by-id/ | grep -i scsi    # find the line for your LUN
+DEV=/dev/disk/by-id/scsi-36589cfc0000005b94968269e41f463c2   # <-- adjust
 
-# 3) Put LVM on top of that LUN
+# 3) Create a *regular* LVM volume group on the LUN
 pvcreate "$DEV"
-vgcreate vg-iscsi-thin "$DEV"
-lvcreate -l 100%FREE -T -n thinpool vg-iscsi-thin
+vgcreate vg-iscsi "$DEV"
 
-# 4) Register the thinpool as Proxmox storage
-pvesm add lvmthin iscsi-thin \
-  -vgname vg-iscsi-thin \
-  -thinpool thinpool \
+# 4) Register the VG as LVM (THICK) storage in Proxmox
+# LVM THIN NOT SUPPORTED FOR MULTI-NODE ACCESS!
+pvesm add lvm iscsi-thick \
+  -vgname vg-iscsi \
   -content images,rootdir
 
-# 5) (Optional but recommended in a cluster)
-pvesm set iscsi-thin --shared 1 2>/dev/null || true
+# 5) Mark it shared in the UI (just metadata; LVM itself still serialises access)
+pvesm set iscsi-thick --shared 1
 
-# 6) Verify
+# 6) Verify everything
 pvesm status
-lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg-iscsi-thin
+vgs        # should list vg-iscsi as “shared” and “active”
 ```
 
 Then reboot other nodes.
