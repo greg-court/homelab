@@ -63,5 +63,5 @@ resource "local_sensitive_file" "trust_kubeconfig" {
 
 resource "local_sensitive_file" "trust_talosconfig" {
   filename = "${path.module}/cluster-trust/talosconfig"
-  content  = yamlencode(talos_machine_secrets.trust.client_configuration)
+  content  = data.talos_client_configuration.trust.talos_config
 }

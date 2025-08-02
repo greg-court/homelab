@@ -53,5 +53,5 @@ resource "local_sensitive_file" "dmz_kubeconfig" {
 
 resource "local_sensitive_file" "dmz_talosconfig" {
   filename = "${path.module}/cluster-dmz/talosconfig"
-  content  = yamlencode(talos_machine_secrets.dmz.client_configuration)
+  content  = data.talos_client_configuration.dmz.talos_config
 }
