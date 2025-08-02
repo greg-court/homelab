@@ -135,21 +135,6 @@ resource "proxmox_virtual_environment_vm" "fleet" {
     }
   }
 
-  dynamic "initialization" {
-    for_each = lookup(each.value, "talos", null) != null ? [1] : []
-
-    content {
-      datastore_id      = "local-zfs"
-      user_data_file_id = proxmox_virtual_environment_file.talos_snippet[each.key].id
-
-      ip_config {
-        ipv4 {
-          address = "dhcp" # Talos will override if static in config
-        }
-      }
-    }
-  }
-
   dynamic "disk" {
     for_each = lookup(each.value, "disks", {})
     content {

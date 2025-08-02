@@ -20,26 +20,12 @@ locals {
         local.base_vm,
         {
           tags = distinct(concat(local.base_vm.tags, lookup(c, "extra_tags", [])))
+          network_devices = [{ vlan_id = c.vlan_id, mac_address = h.mac_address }]
+          node_name       = h.node_name
 
-          network_devices = [{
-            vlan_id     = c.vlan_id
-            mac_address = h.mac_address
-          }]
-
-          node_name = h.node_name
-
-          talos = {
-            cluster = cluster_name
-            type    = "controlplane"
-            patch_data = yamlencode({
-              machine = {
-                network    = { hostname = "${lower(host_id)}.internal" }
-                nodeLabels = { zone = c.zone }
-              }
-              cluster = {
-                allowSchedulingOnControlPlanes = true
-              }
-            })
+          initialization = {
+            datastore_id      = "local-zfs"
+            user_data_file_id = proxmox_virtual_environment_file.vm_snippet["${cluster_name}/${host_id}"].id
           }
         }
       )
@@ -48,7 +34,6 @@ locals {
 }
 
 module "proxmox_vms" {
-  source              = "../../../tf-modules/proxmox-vms"
-  vms                 = local.vms # <-- flattened map
-  talos_templates_dir = "${path.module}/talos_config"
+  source = "../../../tf-modules/proxmox-vms"
+  vms    = local.vms
 }
