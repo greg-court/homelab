@@ -68,7 +68,7 @@ data "talos_client_configuration" "cc" {
 resource "local_file" "talosconfig_out" {
   for_each = data.talos_client_configuration.cc
   content  = each.value.talos_config
-  filename = "${path.module}/talos_config/${each.key}/talosconfig"
+  filename = "${path.module}/configs/${each.key}/talosconfig"
 }
 
 # Bootstrap the first CP node after VMs exist
@@ -90,5 +90,5 @@ resource "talos_cluster_kubeconfig" "kc" {
 resource "local_file" "kubeconfig_out" {
   for_each = talos_cluster_kubeconfig.kc
   content  = each.value.kubeconfig_raw
-  filename = "${path.module}/talos_config/${each.key}/kubeconfig"
+  filename = "${path.module}/configs/${each.key}/kubeconfig"
 }
