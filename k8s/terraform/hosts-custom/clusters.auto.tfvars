@@ -5,7 +5,7 @@ clusters = {
     hosts = {
       k8s-trust-01 = {
         mac_address  = "BC:24:11:D2:72:43"
-        node_name    = "pve02"
+        node_name    = "pve02" # temp
       }
       k8s-trust-02 = {
         mac_address  = "BC:24:11:E2:67:FD"
@@ -24,7 +24,7 @@ clusters = {
     hosts = {
        k8s-dmz-01 = {
         mac_address  = "BC:24:11:A5:DF:59"
-        node_name    = "pve03"
+        node_name    = "pve03" # temp
       }
       k8s-dmz-02 = {
         mac_address  = "BC:24:11:5B:F5:38"
