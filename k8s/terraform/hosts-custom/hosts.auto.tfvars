@@ -12,11 +12,11 @@ hosts = {
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
-      type    = "controlplane"
+      cluster    = "cluster-trust"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:
@@ -43,11 +43,11 @@ EOF
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
-      type    = "controlplane"
+      cluster    = "cluster-trust"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:
@@ -74,11 +74,11 @@ EOF
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-trust"
-      type    = "controlplane"
+      cluster    = "cluster-trust"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:
@@ -105,11 +105,11 @@ EOF
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-dmz"
-      type    = "controlplane"
+      cluster    = "cluster-dmz"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:
@@ -136,11 +136,11 @@ EOF
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-dmz"
-      type    = "controlplane"
+      cluster    = "cluster-dmz"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:
@@ -167,11 +167,11 @@ EOF
       "scsi0" = { size = 16 }
     }
     cdrom = {
-      file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+      file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
     }
     talos = {
-      cluster = "cluster-dmz"
-      type    = "controlplane"
+      cluster    = "cluster-dmz"
+      type       = "controlplane"
       patch_data = <<EOF
 machine:
   network:

@@ -11,6 +11,7 @@ data "utils_deep_merge_yaml" "talos_config" {
 }
 
 resource "proxmox_virtual_environment_file" "talos_snippet" {
+  timeout_upload      = 30
   for_each = {
     for name, config in var.vms :
     name => {
