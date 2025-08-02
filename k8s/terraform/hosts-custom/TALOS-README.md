@@ -33,8 +33,8 @@ talosctl gen config cluster-dmz https://k8s-ctrl-dmz01.internal:6443 \
 ```bash
 cd talos_config/cluster-trust
 talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoint k8s-ctrl-trust01.internal
-talosctl -n k8s-ctrl-trust01.internal bootstrap
+talosctl config endpoint k8s-trust-01.internal
+talosctl -n k8s-trust-01.internal bootstrap
 ```
 
 ### cluster-dmz
@@ -42,8 +42,8 @@ talosctl -n k8s-ctrl-trust01.internal bootstrap
 ```bash
 cd ../cluster-dmz
 talosctl config merge ./talosconfig # writes `~/.talos/config`
-talosctl config endpoint k8s-ctrl-dmz01.internal
-talosctl -n k8s-ctrl-dmz01.internal bootstrap
+talosctl config endpoint k8s-dmz-01.internal
+talosctl -n k8s-dmz-01.internal bootstrap
 ```
 
 ---
