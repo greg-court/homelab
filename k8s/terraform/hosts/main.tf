@@ -46,6 +46,6 @@ resource "proxmox_virtual_environment_vm" "node" {
 
   # Talos will push its NoCloud config later; all we need is an ISO drive
   cdrom {
-    file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
+    file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso"
   }
 }
