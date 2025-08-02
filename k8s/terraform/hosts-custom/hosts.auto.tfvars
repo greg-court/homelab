@@ -27,7 +27,7 @@ cluster:
   allowSchedulingOnControlPlanes: true
 EOF
     }
-    node_name = "pve01"
+    node_name = "pve02"
   }
 
   "K8S-TRUST-02" = {
@@ -120,7 +120,7 @@ cluster:
   allowSchedulingOnControlPlanes: true
 EOF
     }
-    node_name = "pve01"
+    node_name = "pve03"
   }
 
   "K8S-DMZ-02" = {
