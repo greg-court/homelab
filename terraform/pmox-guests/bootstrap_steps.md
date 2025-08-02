@@ -48,7 +48,7 @@ iface bond0 inet manual
 	bond-slaves enp1s0 enp2s0
 	bond-miimon 100
 	bond-mode 802.3ad
-  bond-xmit-hash-policy layer3+4
+	bond-xmit-hash-policy layer3+4
 
 auto vmbr0
 iface vmbr0 inet static
