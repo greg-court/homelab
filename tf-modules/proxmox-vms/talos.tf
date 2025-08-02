@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_file" "talos_snippet" {
     if lookup(config, "talos", null) != null
   }
   content_type = "snippets"
-  datastore_id = "remote-hdd"
+  datastore_id = "nfs-hdd"
   node_name    = each.value.node_name
 
   source_raw {

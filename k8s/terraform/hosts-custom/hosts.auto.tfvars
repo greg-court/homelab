@@ -23,6 +23,8 @@ machine:
     hostname: k8s-trust-01.internal
   nodeLabels:
     zone: infra
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve01"
@@ -52,6 +54,8 @@ machine:
     hostname: k8s-trust-02.internal
   nodeLabels:
     zone: infra
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve02"
@@ -81,6 +85,8 @@ machine:
     hostname: k8s-trust-03.internal
   nodeLabels:
     zone: infra
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve03"
@@ -110,6 +116,8 @@ machine:
     hostname: k8s-dmz-01.internal
   nodeLabels:
     zone: dmz
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve01"
@@ -139,6 +147,8 @@ machine:
     hostname: k8s-dmz-02.internal
   nodeLabels:
     zone: dmz
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve02"
@@ -168,6 +178,8 @@ machine:
     hostname: k8s-dmz-03.internal
   nodeLabels:
     zone: dmz
+cluster:
+  allowSchedulingOnControlPlanes: true
 EOF
     }
     node_name = "pve03"
