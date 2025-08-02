@@ -1,2 +1,2 @@
-talos_config/
+**/hosts-custom/configs/
 kubeconfig
