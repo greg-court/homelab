@@ -33,7 +33,7 @@ data "talos_client_configuration" "cluster" {
 }
 
 data "talos_machine_configuration" "cp" {
-  for_each         = { for k, meta in local.clusters_meta : k => meta.nodes_local }
+ for_each           = local.clusters_meta
   cluster_name     = each.key
   machine_type     = "controlplane"
   cluster_endpoint = "https://${local.clusters_meta[each.key].endpoint_host}:6443"
