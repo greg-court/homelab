@@ -17,19 +17,18 @@ resource "proxmox_virtual_environment_vm" "node" {
   name      = each.key
   node_name = each.value.host
 
-  # --- CPU & RAM -----------------------------------------------------------
+  on_boot = true
+  tags    = ["talos"]
+
+  machine = "q35"
   cpu {
+    type  = "host"
     cores = 2
   }
   memory {
     dedicated = 4096
   }
 
-  # --- Boot & metadata -----------------------------------------------------
-  on_boot = true
-  tags    = ["talos"]
-
-  # --- Network -------------------------------------------------------------
   network_device {
     bridge      = "vmbr0"
     model       = "virtio"
