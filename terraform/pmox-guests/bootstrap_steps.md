@@ -109,26 +109,25 @@ pvecm create pve-cluster01
 pvecm add pve01
 ```
 
+```bash
 ## Add shared storage
 
 ### Backup storage etc
 
-```bash
-pvesm add nfs remote-hdd \
+pvesm add nfs nfs-tank \
     -server truenas.internal \
     -export /mnt/tank-smr/proxmox \
-    -path /mnt/pve/remote-hdd \
+    -path /mnt/pve/nfs-tank \
     -content snippets,vztmpl,backup,iso,import \
     -options vers=4 \
     --prune-backups keep-all=1
-```
 
 ### VM disks
 
-```bash - RUN ON PRIMARY NODE!
+# - RUN ON PRIMARY NODE!
 ########################################## PART 1
 # 1) Add the raw iSCSI LUN (NO content)
-pvesm add iscsi remote-iscsi \
+pvesm add iscsi iscsi-raw \
   -portal truenas.internal \
   -target iqn.2005-10.org.freenas.ctl:proxmox-vm \
   -content none
@@ -140,21 +139,21 @@ DEV=/dev/disk/by-id/scsi-STrueNAS_iSCSI_Disk_42b7572be7b271e # <-- replace!!!
 
 # 3) Put LVM on top of that LUN
 pvcreate "$DEV"
-vgcreate vg-remote-thin "$DEV"
-lvcreate -l 100%FREE -T -n thinpool vg-remote-thin
+vgcreate vg-iscsi-thin "$DEV"
+lvcreate -l 100%FREE -T -n thinpool vg-iscsi-thin
 
 # 4) Register the thinpool as Proxmox storage
-pvesm add lvmthin remote-thin \
-  -vgname vg-remote-thin \
+pvesm add lvmthin iscsi-thin \
+  -vgname vg-iscsi-thin \
   -thinpool thinpool \
   -content images,rootdir
 
 # 5) (Optional but recommended in a cluster)
-pvesm set remote-thin --shared 1 2>/dev/null || true
+pvesm set iscsi-thin --shared 1 2>/dev/null || true
 
 # 6) Verify
 pvesm status
-lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg-remote-thin
+lvs -o lv_name,vg_name,attr,data_percent,metadata_percent vg-iscsi-thin
 ```
 
 Then reboot other nodes.
@@ -162,10 +161,10 @@ Then reboot other nodes.
 LXCs:
 
 ```bash
-pvesm add nfs remote-nfs \
+pvesm add nfs nfs-lxc \
   -server truenas.internal \
   -export /mnt/tank-ssd/proxmox-lxc \
-  -path /mnt/pve/remote-nfs \
+  -path /mnt/pve/nfs-lxc \
   -content rootdir \
   -options vers=4
 ```
