@@ -1,3 +1,8 @@
+variable "endpoint" {
+  description = "Proxmox API endpoint"
+  default     = "https://pve02:8006/api2/json"
+}
+
 variable "disk_device" {
   description = "Target disk inside the VM"
   default     = "/dev/sda"
@@ -14,5 +19,5 @@ variable "talos_install_image" {
 
 variable "clusters" {
   description = "Map of clusters with their nodes and configurations"
-  type = any
+  type        = any
 }

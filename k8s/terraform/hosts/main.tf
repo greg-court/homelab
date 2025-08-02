@@ -1,37 +1,51 @@
 locals {
-   all_nodes = merge([
+  all_nodes = merge([
     for cname, c in var.clusters :
     {
       for n, v in c.nodes :
-      "${cname}_${n}" => merge(v, { cluster = cname })
+      "${cname}_${n}" => merge(v, {
+        cluster = cname
+        vlan_id = c.vlan_id
+      })
     }
   ]...)
 }
 
-resource "proxmox_vm_qemu" "node" {
+resource "proxmox_virtual_environment_vm" "node" {
   for_each = local.all_nodes
 
-  name        = each.value.ip                     # VM name on Proxmox
-  vmid        = each.value.vmid
-  target_node = each.value.host
-  cores       = 2
-  memory      = 4096
-  bios        = "seabios"
-  agent       = 1
-  onboot      = true
-  tags        = "talos"
+  name        = each.key
+  node_name   = each.value.host
 
-  network {
-    model   = "virtio"
-    bridge  = "vmbr0"
-    tag     = each.value.cluster == "trust" ? local.clusters.trust.vlan_id : local.clusters.dmz.vlan_id
-    macaddr = each.value.mac
+  # --- CPU & RAM -----------------------------------------------------------
+  cpu {
+    cores = 2
+  }
+  memory {
+    dedicated = 4096
   }
 
+  # --- Boot & metadata -----------------------------------------------------
+  on_boot = true
+  tags    = ["talos"]
+
+  # --- Network -------------------------------------------------------------
+  network_device {
+    bridge      = "vmbr0"
+    model       = "virtio"
+    mac_address = each.value.mac
+    vlan_id     = each.value.vlan_id
+  }
+
+  # --- Disk ----------------------------------------------------------------
   disk {
-    slot    = 0
-    size    = "32G"
-    storage = "local-lvm"
-    type    = "scsi"
+    datastore_id = "local-lvm"
+    size         = 32
+    interface    = "scsi0"
+  }
+
+  # Talos will push its NoCloud config later; all we need is an ISO drive
+  cdrom {
+    file_id = "remote-hdd:iso/talos-nocloud-amd64-qemu.iso"
   }
 }

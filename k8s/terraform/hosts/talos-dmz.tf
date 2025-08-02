@@ -3,22 +3,22 @@ resource "talos_machine_secrets" "dmz" {}
 data "talos_client_configuration" "dmz" {
   cluster_name         = "cluster-dmz"
   client_configuration = talos_machine_secrets.dmz.client_configuration
-  nodes                = [for n in local.clusters.dmz.nodes : n.ip]
+  nodes                = [for hostname, _ in var.clusters.dmz.nodes : "${hostname}.internal"]
 }
 
 data "talos_machine_configuration" "dmz_cp" {
-  for_each         = local.clusters.dmz.nodes
+  for_each         = var.clusters.dmz.nodes
   cluster_name     = "cluster-dmz"
   machine_type     = "controlplane"
-  cluster_endpoint = local.clusters.dmz.endpoint
+  cluster_endpoint = var.clusters.dmz.endpoint
   machine_secrets  = talos_machine_secrets.dmz.machine_secrets
 }
 
 resource "talos_machine_configuration_apply" "dmz_cp" {
-  for_each                   = data.talos_machine_configuration.dmz_cp
-  client_configuration       = talos_machine_secrets.dmz.client_configuration
+  for_each                    = data.talos_machine_configuration.dmz_cp
+  client_configuration        = talos_machine_secrets.dmz.client_configuration
   machine_configuration_input = each.value.machine_configuration
-  node                       = each.value.ip
+  node                        = "${each.key}.internal"
 
   config_patches = [
     yamlencode({
@@ -27,7 +27,7 @@ resource "talos_machine_configuration_apply" "dmz_cp" {
           disk  = var.disk_device
           image = var.talos_install_image
         }
-        network = { hostname = each.key }
+        network    = { hostname = each.key }
         nodeLabels = { zone = "dmz" }
       }
       cluster = { allowSchedulingOnControlPlanes = true }
@@ -36,8 +36,8 @@ resource "talos_machine_configuration_apply" "dmz_cp" {
 }
 
 resource "talos_machine_bootstrap" "dmz" {
-  depends_on          = [talos_machine_configuration_apply.dmz_cp]
-  node                = "k8s-dmz-01.internal"
+  depends_on           = [talos_machine_configuration_apply.dmz_cp]
+  node                 = "k8s-dmz-01.internal"
   client_configuration = talos_machine_secrets.dmz.client_configuration
 }
 

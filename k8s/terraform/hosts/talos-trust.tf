@@ -3,25 +3,24 @@ resource "talos_machine_secrets" "trust" {}
 data "talos_client_configuration" "trust" {
   cluster_name         = "cluster-trust"
   client_configuration = talos_machine_secrets.trust.client_configuration
-  # All nodes are reachable at their service IPs
-  nodes = [for n in local.clusters.trust.nodes : n.ip]
+  nodes                = [for hostname, _ in var.clusters.trust.nodes : "${hostname}.internal"]
 }
 
 # Generate a control-plane config for every node
 data "talos_machine_configuration" "trust_cp" {
-  for_each         = local.clusters.trust.nodes
+  for_each         = var.clusters.trust.nodes
   cluster_name     = "cluster-trust"
   machine_type     = "controlplane"
-  cluster_endpoint = local.clusters.trust.endpoint
+  cluster_endpoint = var.clusters.trust.endpoint
   machine_secrets  = talos_machine_secrets.trust.machine_secrets
 }
 
 # Push config + custom patches (installer image, allow scheduling, hostname)
 resource "talos_machine_configuration_apply" "trust_cp" {
-  for_each                   = data.talos_machine_configuration.trust_cp
-  client_configuration       = talos_machine_secrets.trust.client_configuration
+  for_each                    = data.talos_machine_configuration.trust_cp
+  client_configuration        = talos_machine_secrets.trust.client_configuration
   machine_configuration_input = each.value.machine_configuration
-  node                       = each.value.ip
+  node                        = "${each.key}.internal"
 
   config_patches = [
     yamlencode({
@@ -31,7 +30,7 @@ resource "talos_machine_configuration_apply" "trust_cp" {
           image = var.talos_install_image
         }
         network = {
-          hostname = each.key             # k8s-ctrl-trust0X
+          hostname = each.key # k8s-ctrl-trust0X
         }
         nodeLabels = { zone = "svc" }
       }
@@ -44,8 +43,8 @@ resource "talos_machine_configuration_apply" "trust_cp" {
 
 # Bootstrap only one of the nodes
 resource "talos_machine_bootstrap" "trust" {
-  depends_on          = [talos_machine_configuration_apply.trust_cp]
-  node                = "k8s-svc-01.internal"
+  depends_on           = [talos_machine_configuration_apply.trust_cp]
+  node                 = "k8s-svc-01.internal"
   client_configuration = talos_machine_secrets.trust.client_configuration
 }
 
