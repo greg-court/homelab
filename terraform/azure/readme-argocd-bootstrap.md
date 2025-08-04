@@ -28,6 +28,6 @@ Then go to https://localhost:8080
 
 ## Temporarily give argoCD admin (lock down later!!!)
 
-kubectl create clusterrolebinding argocd-apps-cluster-admin \
+kubectl create clusterrolebinding argocd-application-controller-admin \
  --clusterrole=cluster-admin \
  --serviceaccount=argocd:argocd-application-controller
