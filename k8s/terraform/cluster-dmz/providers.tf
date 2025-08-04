@@ -12,11 +12,11 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "../hosts-custom/configs/cluster-dmz/kubeconfig"
+  config_path = "../hosts/configs/cluster-dmz/kubeconfig"
 }
 
 provider "helm" {
-  kubernetes {
-    config_path = "../hosts-custom/configs/cluster-dmz/kubeconfig"
+  kubernetes = {
+    config_path = "../hosts/configs/cluster-dmz/kubeconfig"
   }
 }
