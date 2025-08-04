@@ -18,7 +18,6 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 # ---- Install Argo CD via Helm -----
-
 resource "helm_release" "argocd" {
   name             = "argocd"
   namespace        = kubernetes_namespace.argocd.metadata[0].name
@@ -49,7 +48,6 @@ resource "helm_release" "argocd" {
 }
 
 # ---- Bootstrap Project ------------
-
 resource "kubernetes_manifest" "bootstrap_project" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
@@ -81,7 +79,6 @@ resource "kubernetes_manifest" "bootstrap_project" {
 }
 
 # ---- Root Application (App of Apps)
-
 resource "kubernetes_manifest" "root_app" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"

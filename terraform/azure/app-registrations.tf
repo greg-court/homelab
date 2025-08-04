@@ -3,7 +3,6 @@
 #   type        = string
 # }
 
-# 1.  Declarative spec – nothing here is a resource yet
 locals {
   ad_apps = {
     gh-homelab = {

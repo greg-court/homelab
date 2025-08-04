@@ -16,7 +16,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     config_path = "../hosts/configs/cluster-trust/kubeconfig"
   }
 }

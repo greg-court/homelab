@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oidc-proxy
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik # Traefik is already watching this ns
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: gitops/apps/oidc-proxy # see next paragraph
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]

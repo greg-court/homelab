@@ -1,0 +1,42 @@
+# k8s/gitops/base/oidc-proxy/ingress.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: trust-oidc
+  namespace: traefik # or any ns Traefik watches
+spec:
+  type: ExternalName
+  externalName: k8s-trust-01.internal # or VIP for the control plane
+  ports:
+    - port: 6443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trust-oidc
+  namespace: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+spec:
+  tls:
+    - hosts: ['oidc.gregc.online']
+      secretName: oidc-cert # cert-manager will get Let’s Encrypt
+  rules:
+    - host: oidc.gregc.online
+      http:
+        paths:
+          - path: /.well-known/openid-configuration
+            pathType: Prefix
+            backend:
+              service:
+                name: trust-oidc
+                port:
+                  number: 6443
+          - path: /openid/v1/
+            pathType: Prefix
+            backend:
+              service:
+                name: trust-oidc
+                port:
+                  number: 6443

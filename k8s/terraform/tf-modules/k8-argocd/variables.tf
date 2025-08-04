@@ -3,11 +3,10 @@ variable "argocd_namespace" {
   default     = "argocd"
 }
 
-# Git repo that contains your Argo CD app-of-apps definitions
 variable "bootstrap_repo_url" {
   type        = string
   description = "Git repo URL that has the root Application (or a directory of apps)."
-  default     = "https://github.com/your-org/your-gitops-repo.git"
+  default     = "https://github.com/greg-court/homelab.git"
 }
 
 variable "bootstrap_repo_revision" {
