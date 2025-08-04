@@ -21,6 +21,9 @@ locals {
     # createClusterRoles = true
     # createAggregateRoles = true
     # server = { service = { type = "ClusterIP" } } # keeps UI internal
+    controller = {
+      serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
+    }
     configs = {
       clusters = {
         inCluster = { enabled = true } # auto-adds the cluster entry
