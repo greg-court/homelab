@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agents-and-runners
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: agents-and-runners # auto-created
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: k8s/gitops/apps/agents-and-runners
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: [CreateNamespace=true]

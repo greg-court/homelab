@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-ansible-runner
+  namespace: agents-and-runners
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: gh-ansible-runner }
+  template:
+    metadata:
+      labels: { app: gh-ansible-runner }
+    spec:
+      containers:
+        - name: runner
+          image: docker.io/gr10/gh-ansible-runner:latest
+          envFrom:
+            - secretRef:
+                name: gh-runners-env
+          env:
+            - name: RUNNER_LABELS
+              value: 'self-hosted,ansible'
+          resources: {}

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-docker-runner
+  namespace: agents-and-runners
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: gh-docker-runner }
+  template:
+    metadata:
+      labels: { app: gh-docker-runner }
+    spec:
+      containers:
+        - name: runner
+          image: docker.io/gr10/gh-docker-runner:latest
+          envFrom:
+            - secretRef:
+                name: gh-runners-env
+          env:
+            - name: RUNNER_LABELS
+              value: 'self-hosted,docker'
+          resources: {}

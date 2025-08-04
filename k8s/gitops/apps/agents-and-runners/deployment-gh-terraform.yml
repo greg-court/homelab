@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-terraform-runner
+  namespace: agents-and-runners
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: gh-terraform-runner }
+  template:
+    metadata:
+      labels: { app: gh-terraform-runner }
+    spec:
+      containers:
+        - name: runner
+          image: terraform.io/gr10/gh-terraform-runner:latest
+          envFrom:
+            - secretRef:
+                name: gh-runners-env
+          env:
+            - name: RUNNER_LABELS
+              value: 'self-hosted,terraform'
+          resources: {}

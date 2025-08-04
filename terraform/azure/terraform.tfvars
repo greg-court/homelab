@@ -4,8 +4,8 @@ secret_names = {
   ansible-proxmox-api-token-secret = ""
   ansible-proxmox-api-user         = ""
 
-  docker-user = ""
-  docker-pat           = ""
+  docker-user             = ""
+  docker-pat              = ""
   tfc-agent-token         = ""
   cloudflare-api-token    = ""
   packer-default-password = ""
