@@ -1,8 +1,8 @@
 resources:
   - namespace.yml
   - secretstore.yml
-  - externalsecret-gh.yml
-  - externalsecret-tfc.yml
+  - externalsecrets-gh.yml
+  - externalsecrets-tfc.yml
   - deployment-gh-ansible.yml
   - deployment-gh-docker.yml
   - deployment-gh-packer.yml
