@@ -25,3 +25,9 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 
 Then go to https://localhost:8080
+
+## Temporarily give argoCD admin (lock down later!!!)
+
+kubectl create clusterrolebinding argocd-apps-cluster-admin \
+ --clusterrole=cluster-admin \
+ --serviceaccount=argocd:argocd-application-controller
