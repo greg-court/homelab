@@ -1,20 +1,21 @@
 secret_names = {
-  ansible-ssh-private-key  = ""
-  dockerhub-pat            = ""
-  repo-admin-pat           = ""
-  repo-tagging-pat         = ""
-  tfc-agent-token          = ""
+  ansible-ssh-private-key          = ""
+  ansible-proxmox-api-token-id     = ""
+  ansible-proxmox-api-token-secret = ""
+  ansible-proxmox-api-user         = ""
 
-  cloudflare-api-token     = ""
-  default-packer-password  = ""
-  discord-webhook-url      = ""
-  proxmox-api-token-id     = ""
-  proxmox-api-token-secret = ""
-  proxmox-api-user         = ""
-  ssh-public-key           = ""
+  docker-user = ""
+  docker-pat           = ""
+  tfc-agent-token         = ""
+  cloudflare-api-token    = ""
+  packer-default-password = ""
+
+  repo-admin-pat      = ""
+  repo-tagging-pat    = ""
+  discord-webhook-url = ""
 }
 
 # need to be bootstrapped in GH repo
-# azure-client-id          = ""
-# azure-subscription-id    = ""
-# azure-tenant-id          = ""
+# AZURE_CLIENT_ID          = ""
+# AZURE_SUBSCRIPTION_ID    = ""
+# AZURE_TENANT_ID          = ""

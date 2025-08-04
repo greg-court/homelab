@@ -31,7 +31,12 @@ runs:
           echo "::add-mask::$val"
 
           key=$(echo "$name" | tr '[:lower:]-' '[:upper:]_')
-          echo "$key=$val" >> $GITHUB_ENV
+
+          # mask for logs
+          echo "::add-mask::$val"
+
+          # write to job env (works with multi-line)
+          printf '%s<<EOF\n%s\nEOF\n' "$key" "$val" >> "$GITHUB_ENV"
         done
 
 # Usage (recommended to name secets in KV IN_THIS_FORMAT)
@@ -39,4 +44,4 @@ runs:
 #   uses: ./.github/actions/fetch-akv-secrets
 #   with:
 #     keyvault: my-keyvault-name
-#     secrets: DOCKERHUB_PAT,REPO_TAGGING_PAT,DISCORD_WEBHOOK_URL
+#     secrets: dockerhub-pat,ansible-proxmox-api-token-secret,ansible-proxmox-api-user

@@ -20,30 +20,40 @@ jobs:
           fetch-depth: 1
           sparse-checkout: |
             ansible
+
+      - name: Load secrets from Azure Key Vault
+        uses: ./.github/actions/fetch-akv-secrets
+        with:
+          keyvault: my-keyvault-name
+          secrets: ansible-ssh-private-key,ansible-proxmox-api-token-id,ansible-proxmox-api-token-secret
+
       - name: Install Ansible collections
         run: ansible-galaxy collection install -r requirements.yml
+
       - name: Install Python libs for Proxmox modules
         run: |
           python3 -m pip install --break-system-packages --upgrade pip
           python3 -m pip install --break-system-packages proxmoxer requests
+
       - name: Set up Ansible SSH key
         env:
-          ANSIBLE_SSH_KEY: ${{ secrets.ANSIBLE_SSH_PRIVATE_KEY }}
+          ANSIBLE_SSH_KEY: ${{ env.ANSIBLE_SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$ANSIBLE_SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+
       - name: Run the state-aware update playbook
         env:
           # full URL for the inventory plugin
-          PROXMOX_URL: ${{ vars.PROXMOX_BASE_URL }}
+          PROXMOX_URL: 'https://pve02.internal:8006/api2/json'
 
           # host[:port] for the modules
-          PROXMOX_HOST: ${{ vars.PROXMOX_HOST }}
+          PROXMOX_HOST: 'pve02.internal:8006'
 
           # token user!id and secret come from secrets
-          PROXMOX_USER_TOKEN_INPUT: ${{ secrets.PROXMOX_API_TOKEN_ID }}
-          PROXMOX_SECRET_INPUT: ${{ secrets.PROXMOX_API_TOKEN_SECRET }}
+          PROXMOX_USER_TOKEN_INPUT: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_ID }}
+          PROXMOX_SECRET_INPUT: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_SECRET }}
         run: |
           # Split the "user!tokenid" secret into its parts
           export PROXMOX_USER=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f1)

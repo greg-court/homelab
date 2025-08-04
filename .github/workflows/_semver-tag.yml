@@ -1,0 +1,70 @@
+name: semver-tag # reusable, not scheduled directly
+
+on:
+  workflow_call:
+    inputs:
+      tag_prefix:
+        required: true
+        type: string
+      change_path:
+        required: true
+        type: string
+      major_pattern:
+        required: false
+        type: string
+        default: '(MAJOR)'
+      minor_pattern:
+        required: false
+        type: string
+        default: '(MINOR)'
+      create_release:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      # Optional – let callers override with a PAT,
+      # otherwise the normal GITHUB_TOKEN is used.
+      token:
+        required: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout (sparse, full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            ${{ inputs.change_path }}
+          token: ${{ secrets.token || github.token }}
+
+      - name: Calculate semantic version
+        id: semver
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: ${{ inputs.tag_prefix }}
+          change_path: ${{ inputs.change_path }}
+          major_pattern: ${{ inputs.major_pattern }}
+          minor_pattern: ${{ inputs.minor_pattern }}
+          search_commit_body: true
+
+      - name: Push new tag
+        if: steps.semver.outputs.version_type != 'none'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.semver.outputs.version_tag }}"
+          git push origin "${{ steps.semver.outputs.version_tag }}"
+
+      - name: Create GitHub release
+        if: inputs.create_release && steps.semver.outputs.version_type != 'none'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.semver.outputs.version_tag }}
+          name: ${{ steps.semver.outputs.version }}
+          body: |
+            Automated release from workflow **${{ github.workflow }}** run **${{ github.run_number }}**.
