@@ -1,0 +1,53 @@
+name: 'Ansible | Scheduled Daily Updates'
+
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  apply-updates:
+    name: Apply Daily Updates
+    runs-on: [self-hosted, ansible]
+    defaults:
+      run:
+        working-directory: ./ansible
+
+    steps:
+      - name: Check out ansible directory
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            ansible
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r requirements.yml
+      - name: Install Python libs for Proxmox modules
+        run: |
+          python3 -m pip install --break-system-packages --upgrade pip
+          python3 -m pip install --break-system-packages proxmoxer requests
+      - name: Set up Ansible SSH key
+        env:
+          ANSIBLE_SSH_KEY: ${{ secrets.ANSIBLE_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$ANSIBLE_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+      - name: Run the state-aware update playbook
+        env:
+          # full URL for the inventory plugin
+          PROXMOX_URL: ${{ vars.PROXMOX_BASE_URL }}
+
+          # host[:port] for the modules
+          PROXMOX_HOST: ${{ vars.PROXMOX_HOST }}
+
+          # token user!id and secret come from secrets
+          PROXMOX_USER_TOKEN_INPUT: ${{ secrets.PROXMOX_API_TOKEN_ID }}
+          PROXMOX_SECRET_INPUT: ${{ secrets.PROXMOX_API_TOKEN_SECRET }}
+        run: |
+          # Split the "user!tokenid" secret into its parts
+          export PROXMOX_USER=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f1)
+          export PROXMOX_TOKEN_ID=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f2)
+          export PROXMOX_TOKEN_SECRET="$PROXMOX_SECRET_INPUT"
+          # Nothing else needed; inventory + modules now get what they expect
+          ansible-playbook playbook.updates.yml -v

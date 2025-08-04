@@ -1,0 +1,105 @@
+name: Ansible | Deploy Default Config
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ansible/playbook.default-config.yml
+      - ansible/roles/*
+      - ansible/inventory/*
+      - ansible/ansible.cfg
+  pull_request:
+    branches: [main]
+    paths:
+      - ansible/playbook.default-config.yml
+      - ansible/roles/*
+      - ansible/inventory/*
+      - ansible/ansible.cfg
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Force a release type: major | minor | patch'
+        required: false
+      custom_version:
+        description: 'Force a specific version (e.g., 1.2.3)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Lint and Deploy Ansible
+    runs-on: [self-hosted, ansible]
+    defaults:
+      run:
+        working-directory: ./ansible
+
+    env:
+      ANSIBLE_PLAYBOOK: playbook.default-config.yml
+
+    steps:
+      - name: Check out ansible directory only
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            ansible
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r requirements.yml
+      - name: Install Python libs for Proxmox modules
+        run: |
+          python3 -m pip install --break-system-packages --upgrade pip
+          python3 -m pip install --break-system-packages proxmoxer requests
+
+      - name: Prepare Proxmox env vars
+        env:
+          PROXMOX_URL_INPUT: 'https://pve02.internal:8006'
+          PROXMOX_HOST_INPUT: 'pve02.internal:8006'
+          PROXMOX_USER_TOKEN_INPUT: ${{ secrets.PROXMOX_API_TOKEN_ID }}
+          PROXMOX_SECRET_INPUT: ${{ secrets.PROXMOX_API_TOKEN_SECRET }}
+        run: |
+          PROX_USER=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f1)
+          PROX_TOKEN_ID=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f2)
+
+          {
+            echo "PROXMOX_URL=$PROXMOX_URL_INPUT"
+            echo "PROXMOX_HOST=$PROXMOX_HOST_INPUT"
+            echo "PROXMOX_USER=$PROX_USER"
+            echo "PROXMOX_TOKEN_ID=$PROX_TOKEN_ID"
+            echo "PROXMOX_TOKEN_SECRET=$PROXMOX_SECRET_INPUT"
+          } >> $GITHUB_ENV
+
+      - name: Set up SSH key for Ansible
+        env:
+          ANSIBLE_SSH_KEY: ${{ secrets.ANSIBLE_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$ANSIBLE_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Lint Ansible Playbooks
+        run: ansible-lint $ANSIBLE_PLAYBOOK
+
+      - name: Run Ansible Playbook Syntax Check
+        run: ansible-playbook $ANSIBLE_PLAYBOOK --syntax-check
+
+      - name: Run Ansible Playbook (Dry Run)
+        if: github.event_name == 'pull_request'
+        run: ansible-playbook $ANSIBLE_PLAYBOOK --check
+
+      - name: Run Ansible Playbook (Deploy)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: ansible-playbook $ANSIBLE_PLAYBOOK -v
+
+  tag_release:
+    needs: deploy
+    if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    uses: ./.github/workflows/_tag-release.yml
+    with:
+      tag_prefix: ansible
+      path: ansible
+      custom_version: ${{ github.event.inputs.custom_version }}
+      release_type: ${{ github.event.inputs.release_type }}
+    secrets: inherit

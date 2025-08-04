@@ -4,6 +4,10 @@ terraform {
       source  = "bpg/proxmox"
       version = ">= 0.80"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.5"
+    }
   }
   # backend "azurerm" {
   #   subscription_id      = "f01a5d70-cf46-4291-80de-336ee2a894d4"
@@ -23,7 +27,7 @@ terraform {
 
 variable "root_password" { type = string }
 provider "proxmox" {
-  endpoint = var.endpoint
+  endpoint = var.pve_endpoint
   username = "root@pam"
   password = var.root_password
   insecure = true
