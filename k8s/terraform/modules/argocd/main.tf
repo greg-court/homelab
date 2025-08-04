@@ -16,16 +16,8 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 locals {
-   # cluster-wide install + in-cluster registration + ClusterIP UI
   base_values = yamlencode({
-    createClusterRoles = true
-    createAggregateRoles = true
-    configs = {
-      clusters = {
-        inCluster = { enabled = true } # auto-adds the cluster entry
-      }
-    }
-    server = { service = { type = "ClusterIP" } } # keeps UI internal
+
   })
 }
 
@@ -36,7 +28,7 @@ resource "helm_release" "argocd" {
   chart      = "argo-cd"
 
   create_namespace = false
-  values           = [local.base_values]
+  # values           = [local.base_values]
 }
 
 # ---------- bootstrap “app-of-apps” -----------------------------------------
