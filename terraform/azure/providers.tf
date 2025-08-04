@@ -1,9 +1,7 @@
 terraform {
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.0"
-    }
+    azurerm = { source  = "hashicorp/azurerm", version = ">= 4.0" }
+    azuread = { source = "hashicorp/azuread",  version = ">=3.0" }
   }
 }
 
@@ -13,4 +11,5 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
+provider "azuread" {}
 data "azurerm_client_config" "current" {}
