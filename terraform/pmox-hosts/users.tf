@@ -1,6 +1,6 @@
 resource "random_password" "pw" {
   for_each = { for uid, cfg in var.proxmox_users : uid => cfg
-               if try(cfg.password, null) == null }
+  if try(cfg.password, null) == null }
 
   length  = 32
   special = true
@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_user" "user" {
   }
 
   lifecycle {
-    ignore_changes = [password]        # keep plans clean
+    ignore_changes = [password] # keep plans clean
   }
 }
 
@@ -49,11 +49,11 @@ locals {
 resource "proxmox_virtual_environment_user_token" "token" {
   for_each = local.tokens
 
-  user_id                = each.value.user_id
-  token_name             = each.value.token_name
-  comment                = lookup(each.value, "comment", "Terraform-managed token")
-  privileges_separation  = lookup(each.value, "privileges_separation", false)
-  expiration_date        = lookup(each.value, "expiration_date", null)
+  user_id               = each.value.user_id
+  token_name            = each.value.token_name
+  comment               = lookup(each.value, "comment", "Terraform-managed token")
+  privileges_separation = lookup(each.value, "privileges_separation", false)
+  expiration_date       = lookup(each.value, "expiration_date", null)
 }
 
 output "proxmox_token_secrets" {

@@ -3,7 +3,7 @@ proxmox_users = {
   "ansible@pve" = {
     comment = "Automation user"
     acls = [
-      { path = "/vms", role_id = "PVEVMAdmin" }
+      { path = "/", role_id = "PVEAdmin" }
     ]
     tokens = {
       ansible-cd = {
