@@ -1,4 +1,0 @@
-configs:
-  clusters:
-    inCluster:
-      enabled: true # <- writes the cluster entry into Argo CD's ConfigMap

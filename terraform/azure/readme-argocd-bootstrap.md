@@ -10,24 +10,3 @@ kubectl create ns external-secrets 2>/dev/null || true # ignore if exists
 kubectl -n external-secrets create secret generic azure-kv-creds \
  --from-literal=client-secret='<ESO_CLIENT_SECRET>'
 ```
-
-## Get temporary access to ArgoCD GUI while you configure LBs
-
-```bash
-
-kubectl -n argocd port-forward svc/argocd-server 8080:443
-```
-
-## Get argocd credentials
-
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-Then go to https://localhost:8080
-
-## Temporarily give argoCD admin (lock down later!!!)
-
-kubectl create clusterrolebinding argocd-application-controller-admin \
- --clusterrole=cluster-admin \
- --serviceaccount=argocd:argocd-application-controller
