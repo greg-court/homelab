@@ -19,6 +19,7 @@ locals {
    # cluster-wide install + in-cluster registration + ClusterIP UI
   base_values = yamlencode({
     createClusterRoles = true
+    createAggregateRoles = true
     configs = {
       clusters = {
         inCluster = { enabled = true } # auto-adds the cluster entry

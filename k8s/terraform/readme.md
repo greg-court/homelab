@@ -4,7 +4,7 @@ cd cluster-trust
 terraform init
 terraform apply -target=module.argocd.helm_release.argocd --auto-approve
 terraform apply --auto-approve # create root-app, done
-kubectx admin@cluster-dmz
+kubectx admin@cluster-trust
 kubectl -n argocd port-forward svc/argocd-server 8080:443
 
 # DMZ cluster (same two-step)
