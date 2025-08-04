@@ -2,11 +2,11 @@ terraform {
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 3"
+      version = ">= 3"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2"
+      version = ">= 2"
     }
   }
 }
@@ -17,16 +17,13 @@ resource "kubernetes_namespace" "argocd" {
   }
 }
 
-#####################################
 # ---- Install Argo CD via Helm -----
-#####################################
 
 resource "helm_release" "argocd" {
   name             = "argocd"
   namespace        = kubernetes_namespace.argocd.metadata[0].name
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
-  version          = "8.2.2" # chart version, not Argo CD app version
   create_namespace = false
 
   # Minimal values override; extend as needed
@@ -51,9 +48,7 @@ resource "helm_release" "argocd" {
   ]
 }
 
-#####################################
 # ---- Bootstrap Project ------------
-#####################################
 
 resource "kubernetes_manifest" "bootstrap_project" {
   manifest = {
@@ -85,9 +80,7 @@ resource "kubernetes_manifest" "bootstrap_project" {
   depends_on = [helm_release.argocd]
 }
 
-#####################################
 # ---- Root Application (App of Apps)
-#####################################
 
 resource "kubernetes_manifest" "root_app" {
   manifest = {

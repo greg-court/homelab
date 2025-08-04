@@ -4,5 +4,5 @@ resources:
 
 images:
   - name: DOCKER_IMAGE_PLACEHOLDER
-    newName: docker.io/gr10/custom-favicons
+    newName: docker.io/gr10/nginx-favicons
     newTag: latest

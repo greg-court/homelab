@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-favicons # unique inside this Argo CD
+  namespace: argocd
+spec:
+  project: default # or another AppProject if you create one
+  destination:
+    server: https://kubernetes.default.svc # “this” cluster
+    namespace: nginx-favicons # will be auto-created
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: k8s/gitops/apps/nginx-favicons # <— points at your Kustomize dir
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

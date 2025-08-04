@@ -2,21 +2,21 @@ terraform {
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2"
+      version = ">= 2"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2"
+      version = ">= 3"
     }
   }
 }
 
 provider "kubernetes" {
-  config_path = "./kubeconfig"
+  config_path = "../hosts-custom/configs/cluster-dmz/kubeconfig"
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "./kubeconfig"
+    config_path = "../hosts-custom/configs/cluster-dmz/kubeconfig"
   }
 }

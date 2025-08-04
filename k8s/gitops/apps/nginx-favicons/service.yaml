@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: custom-favicons
+  name: nginx-favicons
 spec:
   type: ClusterIP
   selector:
-    app: custom-favicons
+    app: nginx-favicons
   ports:
     - port: 80
       targetPort: 80

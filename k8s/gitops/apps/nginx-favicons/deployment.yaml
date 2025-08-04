@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: custom-favicons
+  name: nginx-favicons
   labels:
-    app: custom-favicons
+    app: nginx-favicons
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: custom-favicons
+      app: nginx-favicons
   template:
     metadata:
       labels:
-        app: custom-favicons
+        app: nginx-favicons
     spec:
       containers:
         - name: nginx
