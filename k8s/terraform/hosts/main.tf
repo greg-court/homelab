@@ -19,7 +19,7 @@ locals {
       upper(host_id) => merge(
         local.base_vm,
         {
-          tags = distinct(concat(local.base_vm.tags, lookup(c, "extra_tags", [])))
+          tags            = distinct(concat(local.base_vm.tags, lookup(c, "extra_tags", [])))
           network_devices = [{ vlan_id = c.vlan_id, mac_address = h.mac_address }]
           node_name       = h.node_name
 

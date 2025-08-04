@@ -21,7 +21,7 @@ resource "talos_machine_secrets" "cluster" {
 
 # 2.  One machine-config per VM (control-plane shown)
 data "talos_machine_configuration" "vm" {
-  for_each         = local.hosts
+  for_each = local.hosts
 
   cluster_name     = each.value.cluster_name
   machine_type     = "controlplane"
@@ -34,8 +34,8 @@ data "talos_machine_configuration" "vm" {
       machine = {
         network = { hostname = lower("${each.value.host_id}.internal") }
         install = {
-         disk = "/dev/sda"
-         image = var.install_image
+          disk  = "/dev/sda"
+          image = var.install_image
         }
         nodeLabels = { zone = each.value.zone }
       }
@@ -59,10 +59,10 @@ resource "proxmox_virtual_environment_file" "vm_snippet" {
 
 # One client-config per cluster (re-use secrets bundle)
 data "talos_client_configuration" "cc" {
-  for_each            = var.clusters
-  cluster_name        = each.key
+  for_each             = var.clusters
+  cluster_name         = each.key
   client_configuration = talos_machine_secrets.cluster[each.key].client_configuration
-  nodes               = [lower(element(keys(each.value.hosts), 0))]   # first host
+  nodes                = [lower(element(keys(each.value.hosts), 0))] # first host
 }
 
 resource "local_file" "talosconfig_out" {
@@ -73,18 +73,18 @@ resource "local_file" "talosconfig_out" {
 
 # Bootstrap the first CP node after VMs exist
 resource "talos_machine_bootstrap" "cluster" {
-  for_each            = var.clusters
-  node                = "${lower(element(keys(each.value.hosts), 0))}.internal"
+  for_each             = var.clusters
+  node                 = "${lower(element(keys(each.value.hosts), 0))}.internal"
   client_configuration = talos_machine_secrets.cluster[each.key].client_configuration
-  depends_on          = [module.proxmox_vms]
+  depends_on           = [module.proxmox_vms]
 }
 
 # Grab kubeconfig as soon as the API comes up
 resource "talos_cluster_kubeconfig" "kc" {
-  for_each            = var.clusters
-  node                = talos_machine_bootstrap.cluster[each.key].node
+  for_each             = var.clusters
+  node                 = talos_machine_bootstrap.cluster[each.key].node
   client_configuration = talos_machine_secrets.cluster[each.key].client_configuration
-  depends_on          = [talos_machine_bootstrap.cluster]
+  depends_on           = [talos_machine_bootstrap.cluster]
 }
 
 resource "local_file" "kubeconfig_out" {
