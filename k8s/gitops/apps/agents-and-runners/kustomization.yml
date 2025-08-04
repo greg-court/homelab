@@ -1,10 +1,10 @@
 resources:
-  - namespace.yaml
-  - secretstore.yaml
-  - externalsecret-gh.yaml
-  - externalsecret-tfc.yaml
-  - deployment-gh-ansible.yaml
-  - deployment-gh-docker.yaml
-  - deployment-gh-packer.yaml
-  - deployment-gh-terraform.yaml
-  - deployment-tfc-agent.yaml
+  - namespace.yml
+  - secretstore.yml
+  - externalsecret-gh.yml
+  - externalsecret-tfc.yml
+  - deployment-gh-ansible.yml
+  - deployment-gh-docker.yml
+  - deployment-gh-packer.yml
+  - deployment-gh-terraform.yml
+  - deployment-tfc-agent.yml
