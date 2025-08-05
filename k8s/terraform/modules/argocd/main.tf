@@ -22,7 +22,7 @@ locals {
     }
     configs = {
       clusters = {
-        inCluster = { enabled = true } # auto-adds the cluster entry
+        inCluster = { enabled = true } # required to get AKV secret
       }
     }
   })
