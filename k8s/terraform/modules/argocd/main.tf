@@ -20,11 +20,11 @@ locals {
     controller = {
       serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
     }
-    configs = {
-      clusters = {
-        inCluster = { enabled = true } # required to get AKV secret
-      }
-    }
+    # configs = { # enabling this causes deployment to fail
+    #   clusters = {
+    #     inCluster = { enabled = true }
+    #   }
+    # }
   })
 }
 
