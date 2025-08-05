@@ -19,3 +19,11 @@ kubectx admin@cluster-dmz
 kubectl -n argocd get secret argocd-initial-admin-secret \
  -o jsonpath="{.data.password}" | base64 -d && echo
 kubectl -n argocd port-forward svc/argocd-server 8080:443
+
+kubectl get clusterrolebinding argocd-application-controller-admin -o yaml
+kubectl get clusterrole argocd-application-controller -o yaml
+kubectl describe clusterrole argocd-application-controller
+kubectl get clusterrolebinding -o wide | grep argocd-application-controller
+kubectl get rolebinding -n argocd -o wide | grep argocd-application-controller
+SA=system:serviceaccount:argocd:argocd-application-controller
+kubectl auth can-i --as=$SA --list

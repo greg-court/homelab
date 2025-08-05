@@ -16,11 +16,7 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 locals {
-   # cluster-wide install + in-cluster registration + ClusterIP UI
   base_values = yamlencode({
-    # createClusterRoles = true
-    # createAggregateRoles = true
-    # server = { service = { type = "ClusterIP" } } # keeps UI internal
     controller = {
       serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
     }
