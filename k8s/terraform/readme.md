@@ -20,6 +20,10 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
  -o jsonpath="{.data.password}" | base64 -d && echo
 kubectl -n argocd port-forward svc/argocd-server 8080:443
 
+# Troubleshooting
+
+## Permissions
+
 kubectl get clusterrolebinding argocd-application-controller-admin -o yaml
 kubectl get clusterrole argocd-application-controller -o yaml
 kubectl describe clusterrole argocd-application-controller
@@ -27,3 +31,8 @@ kubectl get clusterrolebinding -o wide | grep argocd-application-controller
 kubectl get rolebinding -n argocd -o wide | grep argocd-application-controller
 SA=system:serviceaccount:argocd:argocd-application-controller
 kubectl auth can-i --as=$SA --list
+
+## Logs
+
+kubectl logs -n argocd argocd-application-controller-0 -f
+k logs -n <namespace> <pod name> -f

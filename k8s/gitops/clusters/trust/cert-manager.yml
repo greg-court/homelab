@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: cert-manager
   namespace: argocd
+  # Wave 0 so that any chart needing certificates (ESO, Istio, …) can be wave 1+
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
 spec:
   destination:
     server: https://kubernetes.default.svc
@@ -19,4 +22,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions: [CreateNamespace=true]
+    syncOptions:
+      - CreateNamespace=true
