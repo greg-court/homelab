@@ -33,7 +33,7 @@ locals {
           #     into a Secret the application-controller can read
           #
           # Without this kubeconfig Argo’s controller would reach the
-          # API server **unauthenticated** and you’d see:
+          # API server unauthenticated and you’d see:
           #   “failed to get cluster info: the server has asked
           #    for the client to provide credentials”
         }
