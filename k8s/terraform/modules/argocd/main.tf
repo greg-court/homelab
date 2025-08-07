@@ -55,18 +55,59 @@ resource "helm_release" "argocd" {
 resource "null_resource" "wait_argocd_ready" {
   depends_on = [helm_release.argocd]
 
+  # 1) Controller pod is up
   provisioner "local-exec" {
-    command = "kubectl -n argocd rollout status sts/argocd-application-controller --timeout=180s"
+    interpreter = ["/bin/bash", "-lc"]
+    command     = "kubectl -n argocd rollout status sts/argocd-application-controller --timeout=180s"
   }
 
-  # Ensure Argo CD generated its secret key (fixes those 'server.secretkey is missing' warnings)
+  # 2) CRB exists
   provisioner "local-exec" {
-    command = "kubectl -n argocd get secret argocd-secret -o jsonpath='{.data.server\\.secretkey}' >/dev/null"
+    interpreter = ["/bin/bash", "-lc"]
+    command     = <<-EOT
+      set -euo pipefail
+      for i in {1..60}; do
+        if kubectl get clusterrolebinding argocd-application-controller -o name >/dev/null 2>&1; then
+          exit 0
+        fi
+        sleep 3
+      done
+      echo "CRB argocd-application-controller not found" >&2
+      exit 1
+    EOT
   }
 
-  # Ensure the in-cluster kubeconfig exists when you set configs.clusters.inCluster.enabled=true
+  # 3) SA RBAC actually works
   provisioner "local-exec" {
-    command = "kubectl -n argocd get secret argocd-manager-kubeconfig >/dev/null"
+    interpreter = ["/bin/bash", "-lc"]
+    command     = <<-EOT
+      set -euo pipefail
+      for i in {1..60}; do
+        if kubectl auth can-i --as=system:serviceaccount:argocd:argocd-application-controller list configmaps --all-namespaces \
+           && kubectl auth can-i --as=system:serviceaccount:argocd:argocd-application-controller list secrets --all-namespaces; then
+          exit 0
+        fi
+        sleep 3
+      done
+      echo "controller RBAC not effective yet" >&2
+      exit 1
+    EOT
+  }
+
+  # 4) server.secretkey present
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-lc"]
+    command     = <<-EOT
+      set -euo pipefail
+      for i in {1..60}; do
+        if kubectl -n argocd get secret argocd-secret -o jsonpath='{.data.server\\.secretkey}' >/dev/null 2>&1; then
+          exit 0
+        fi
+        sleep 3
+      done
+      echo "argocd-secret missing server.secretkey" >&2
+      exit 1
+    EOT
   }
 }
 
