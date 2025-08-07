@@ -39,7 +39,15 @@ data "talos_machine_configuration" "vm" {
         }
         nodeLabels = { zone = each.value.zone }
       }
-      cluster = { allowSchedulingOnControlPlanes = true }
+      cluster = {
+        allowSchedulingOnControlPlanes = true
+        apiServer = {
+          extraArgs = {
+            "service-account-issuer" = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+            "api-audiences"          = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+          }
+        }
+      }
     })
   ]
 }

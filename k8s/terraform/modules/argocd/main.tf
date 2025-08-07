@@ -1,11 +1,11 @@
 terraform {
   required_providers {
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = ">=2"
-      }
-    helm       = {
-      source = "hashicorp/helm",
+    }
+    helm = {
+      source  = "hashicorp/helm",
       version = ">=3"
     }
   }
@@ -39,12 +39,8 @@ locals {
       clusters = {
         inCluster = { enabled = true }
       }
-      # 2.  tell the chart to run the hook that writes the Secret
-      clusterCredentials = {
-        enabled = true
-      }
     }
-    # 3.  give the API server read access so argocd-server stops “Unauthorized”
+    # 2.  give the API server read access so argocd-server stops “Unauthorized”
     server = {
       rbac = { namespaced = false }
     }
@@ -85,7 +81,7 @@ resource "kubernetes_manifest" "root_app" {
         directory      = { recurse = true }
       }
       syncPolicy = {
-        automated  = { prune = true, selfHeal = true }
+        automated   = { prune = true, selfHeal = true }
         syncOptions = ["CreateNamespace=true"]
       }
     }
