@@ -16,15 +16,30 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 locals {
+  # ------------------------------------------------------------
+  # Argo CD must have credentials for the API server it deploys to.
+  # Setting `configs.clusters.inCluster.enabled = true` tells the Helm
+  # chart to:
+  #   • create a service-account called `argocd-manager`
+  #   • bind it to cluster-admin (or the RBAC you override)
+  #   • generate a kubeconfig and store it in a secret named
+  #     `cluster-kubernetes-default-svc-<uid>`
+  #
+  # Without this secret the application-controller talks to
+  # https://kubernetes.default.svc with **no credentials**, which
+  # surfaces as:
+  #   “failed to get cluster info … the server has asked for the
+  #    client to provide credentials”
+  # ------------------------------------------------------------
   base_values = yamlencode({
     controller = {
       serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
     }
-    # configs = { # enabling this causes deployment to fail
-    #   clusters = {
-    #     inCluster = { enabled = true }
-    #   }
-    # }
+    configs = { # 
+      clusters = {
+        inCluster = { enabled = true }
+      }
+    }
   })
 }
 
