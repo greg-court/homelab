@@ -52,64 +52,34 @@ resource "helm_release" "argocd" {
   values           = [local.base_values]
 }
 
-resource "null_resource" "wait_argocd_ready" {
-  depends_on = [helm_release.argocd]
-
-  # 1) Controller pod is up
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-lc"]
-    command     = "kubectl -n argocd rollout status sts/argocd-application-controller --timeout=180s"
-  }
-
-  # 2) CRB exists
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-lc"]
-    command     = <<-EOT
-      set -euo pipefail
-      for i in {1..60}; do
-        if kubectl get clusterrolebinding argocd-application-controller -o name >/dev/null 2>&1; then
-          exit 0
-        fi
-        sleep 3
-      done
-      echo "CRB argocd-application-controller not found" >&2
-      exit 1
-    EOT
-  }
-
-  # 3) SA RBAC actually works
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-lc"]
-    command     = <<-EOT
-      set -euo pipefail
-      for i in {1..60}; do
-        if kubectl auth can-i --as=system:serviceaccount:argocd:argocd-application-controller list configmaps --all-namespaces \
-           && kubectl auth can-i --as=system:serviceaccount:argocd:argocd-application-controller list secrets --all-namespaces; then
-          exit 0
-        fi
-        sleep 3
-      done
-      echo "controller RBAC not effective yet" >&2
-      exit 1
-    EOT
-  }
-
-  # 4) server.secretkey present
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-lc"]
-    command     = <<-EOT
-      set -euo pipefail
-      for i in {1..60}; do
-        if kubectl -n argocd get secret argocd-secret -o jsonpath='{.data.server\\.secretkey}' >/dev/null 2>&1; then
-          exit 0
-        fi
-        sleep 3
-      done
-      echo "argocd-secret missing server.secretkey" >&2
-      exit 1
-    EOT
-  }
-}
+# resource "null_resource" "provision_cluster_secret"  {
+#   provisioner "local-exec" {
+#     interpreter = ["/bin/bash","-lc"]
+#     command = <<-EOT
+#       set -euo pipefail
+#       if ! kubectl -n argocd get secret -l argocd.argoproj.io/secret-type=cluster -o name | grep -q .; then
+#         TOKEN=$(kubectl -n argocd create token argocd-application-controller --duration=24h)
+#         cat <<EOF | kubectl -n argocd apply -f -
+#         apiVersion: v1
+#         kind: Secret
+#         metadata:
+#           name: in-cluster
+#           labels:
+#             argocd.argoproj.io/secret-type: cluster
+#         type: Opaque
+#         stringData:
+#           name: in-cluster
+#           server: https://kubernetes.default.svc
+#           config: |
+#             {
+#               "bearerToken": "$TOKEN",
+#               "tlsClientConfig": { "insecure": false }
+#             }
+#         EOF
+#       fi
+#     EOT
+#   }
+# }
 
 # ---------- bootstrap “app-of-apps” -----------------------------------------
 resource "kubernetes_manifest" "root_app" {
@@ -139,5 +109,6 @@ resource "kubernetes_manifest" "root_app" {
       }
     }
   }
-  depends_on = [helm_release.argocd, null_resource.wait_argocd_ready]
+  depends_on = [helm_release.argocd]
+  # depends_on = [helm_release.argocd, null_resource.provision_cluster_secret]
 }
