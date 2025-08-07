@@ -44,10 +44,6 @@ kubectl -n argocd exec -it argocd-application-controller-0 -- \
 kubectl -n argocd exec -it argocd-application-controller-0 -- \
  cat /var/run/secrets/kubernetes.io/serviceaccount/token
 
-## Logs
-
-kubectl logs -n argocd argocd-application-controller-0 -f
-
 # Advanced troubleshooting - Checking the audiences
 
 NS=argocd
@@ -66,3 +62,7 @@ PY
 kubectl -n kube-system get pod -l component=kube-apiserver \
  -o jsonpath='{.items[0].spec.containers[0].command}' | tr ',' '\n' |
 grep -- --api-audiences
+
+## Logs
+
+kubectl logs -n argocd argocd-application-controller-0 -f
