@@ -16,33 +16,28 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 locals {
-  # ------------------------------------------------------------
-  # Argo CD must have credentials for the API server it deploys to.
-  # Setting `configs.clusters.inCluster.enabled = true` tells the Helm
-  # chart to:
-  #   - create a service-account called `argocd-manager`
-  #   - bind it to cluster-admin (or the RBAC you override)
-  #   - generate a kubeconfig and store it in a secret named `cluster-kubernetes-default-svc-<uid>`
-  #
-  # Without this secret the application-controller talks to
-  # https://kubernetes.default.svc with no credentials, which
-  # surfaces as:
-  #   “failed to get cluster info … the server has asked for the
-  #    client to provide credentials”
-  # ------------------------------------------------------------
   base_values = yamlencode({
     controller = {
-      serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
+      # Use Kubernetes Server-Side Apply so very large manifests
+      # don’t hit the old 256 KiB annotation limit.
+      serverSideApply = { enabled = true }
     }
-    # 1.  create the SA
     configs = {
       clusters = {
-        inCluster = { enabled = true }
+        inCluster = {
+          enabled = true
+          # When enabled the chart:
+          #   - creates a ServiceAccount called `argocd-manager`
+          #   - binds it (cluster-admin by default) so it can talk to the API
+          #   - writes a kubeconfig for https://kubernetes.default.svc
+          #     into a Secret the application-controller can read
+          #
+          # Without this kubeconfig Argo’s controller would reach the
+          # API server **unauthenticated** and you’d see:
+          #   “failed to get cluster info: the server has asked
+          #    for the client to provide credentials”
+        }
       }
-    }
-    # 2.  give the API server read access so argocd-server stops “Unauthorized”
-    server = {
-      rbac = { namespaced = false }
     }
   })
 }
