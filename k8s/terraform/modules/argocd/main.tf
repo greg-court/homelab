@@ -35,7 +35,7 @@ locals {
     controller = {
       serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
     }
-    configs = { # 
+    configs = {
       clusters = {
         inCluster = { enabled = true }
       }
