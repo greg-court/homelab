@@ -34,15 +34,19 @@ locals {
     controller = {
       serverSideApply = { enabled = true } # <-- SSA ON, prevents large annotations causing issues
     }
+    # 1.  create the SA
     configs = {
       clusters = {
         inCluster = { enabled = true }
       }
-    }
-    server = {  # Give argocd-server cluster-scope read access (fixes “Unauthorized” crash)
-      rbac = {
-        clusterRole = { create = true }
+      # 2.  tell the chart to run the hook that writes the Secret
+      clusterCredentials = {
+        enabled = true
       }
+    }
+    # 3.  give the API server read access so argocd-server stops “Unauthorized”
+    server = {
+      rbac = { namespaced = false }
     }
   })
 }
@@ -52,6 +56,7 @@ resource "helm_release" "argocd" {
   namespace  = kubernetes_namespace.argocd.metadata[0].name
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
+  version    = "8.2.5"
 
   create_namespace = false
   values           = [local.base_values]

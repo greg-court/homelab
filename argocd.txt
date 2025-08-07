@@ -1265,6 +1265,8 @@ server:
   podAnnotations: {}
   podLabels: {}
   priorityClassName: ""
+  rbac:
+    namespaced: false
   readinessProbe:
     failureThreshold: 3
     initialDelaySeconds: 10
