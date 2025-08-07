@@ -1,2 +1,2 @@
-**/hosts-custom/configs/
-kubeconfig
+**/kubeconfig
+**/talosconfig
