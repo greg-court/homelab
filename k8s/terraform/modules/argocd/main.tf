@@ -20,13 +20,12 @@ locals {
   # Argo CD must have credentials for the API server it deploys to.
   # Setting `configs.clusters.inCluster.enabled = true` tells the Helm
   # chart to:
-  #   • create a service-account called `argocd-manager`
-  #   • bind it to cluster-admin (or the RBAC you override)
-  #   • generate a kubeconfig and store it in a secret named
-  #     `cluster-kubernetes-default-svc-<uid>`
+  #   - create a service-account called `argocd-manager`
+  #   - bind it to cluster-admin (or the RBAC you override)
+  #   - generate a kubeconfig and store it in a secret named `cluster-kubernetes-default-svc-<uid>`
   #
   # Without this secret the application-controller talks to
-  # https://kubernetes.default.svc with **no credentials**, which
+  # https://kubernetes.default.svc with no credentials, which
   # surfaces as:
   #   “failed to get cluster info … the server has asked for the
   #    client to provide credentials”
@@ -38,6 +37,11 @@ locals {
     configs = {
       clusters = {
         inCluster = { enabled = true }
+      }
+    }
+    server = {  # Give argocd-server cluster-scope read access (fixes “Unauthorized” crash)
+      rbac = {
+        clusterRole = { create = true }
       }
     }
   })

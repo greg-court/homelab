@@ -47,3 +47,22 @@ kubectl -n argocd exec -it argocd-application-controller-0 -- \
 ## Logs
 
 kubectl logs -n argocd argocd-application-controller-0 -f
+
+# Advanced troubleshooting - Checking the audiences
+
+NS=argocd
+POD=$(kubectl -n $NS get pods \
+      -l app.kubernetes.io/name=argocd-application-controller \
+      -o jsonpath='{.items[0].metadata.name}')
+TOKEN=$(kubectl -n $NS exec "$POD" -- \
+ cat /var/run/secrets/kubernetes.io/serviceaccount/token | tr -d '\n')
+python3 - <<PY
+import base64, json, textwrap
+t = """$TOKEN"""
+payload = t.split('.')[1]
+data = json.loads(base64.urlsafe_b64decode(payload + '=='))
+print("\nToken audiences:\n", textwrap.indent(json.dumps(data['aud'], indent=2), " "))
+PY
+kubectl -n kube-system get pod -l component=kube-apiserver \
+ -o jsonpath='{.items[0].spec.containers[0].command}' | tr ',' '\n' |
+grep -- --api-audiences
