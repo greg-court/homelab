@@ -4,7 +4,7 @@ metadata:
   name: cert-manager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '-1' # create it first
+    argocd.argoproj.io/sync-wave: '-2' # create it first
 spec:
   destination:
     server: https://kubernetes.default.svc
