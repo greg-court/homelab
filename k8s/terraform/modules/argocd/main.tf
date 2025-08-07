@@ -18,9 +18,7 @@ resource "kubernetes_namespace" "argocd" {
 locals {
   base_values = yamlencode({
     controller = {
-      # Use Kubernetes Server-Side Apply so very large manifests
-      # don’t hit the old 256 KiB annotation limit.
-      serverSideApply = { enabled = true }
+      serverSideApply = { enabled = true } # this uses SSA for this helm chart only - NOT a global setting!
       rbac = { namespaced = false }
     }
     configs = {
