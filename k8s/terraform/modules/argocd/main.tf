@@ -52,6 +52,24 @@ resource "helm_release" "argocd" {
   values           = [local.base_values]
 }
 
+resource "null_resource" "wait_argocd_ready" {
+  depends_on = [helm_release.argocd]
+
+  provisioner "local-exec" {
+    command = "kubectl -n argocd rollout status sts/argocd-application-controller --timeout=180s"
+  }
+
+  # Ensure Argo CD generated its secret key (fixes those 'server.secretkey is missing' warnings)
+  provisioner "local-exec" {
+    command = "kubectl -n argocd get secret argocd-secret -o jsonpath='{.data.server\\.secretkey}' >/dev/null"
+  }
+
+  # Ensure the in-cluster kubeconfig exists when you set configs.clusters.inCluster.enabled=true
+  provisioner "local-exec" {
+    command = "kubectl -n argocd get secret argocd-manager-kubeconfig >/dev/null"
+  }
+}
+
 # ---------- bootstrap “app-of-apps” -----------------------------------------
 resource "kubernetes_manifest" "root_app" {
   manifest = {
@@ -80,5 +98,5 @@ resource "kubernetes_manifest" "root_app" {
       }
     }
   }
-  depends_on = [helm_release.argocd]
+  depends_on = [helm_release.argocd, null_resource.wait_argocd_ready]
 }

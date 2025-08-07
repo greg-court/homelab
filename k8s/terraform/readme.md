@@ -34,8 +34,6 @@ kubectl auth can-i --as=$SA --list
 
 ## Check Configuration
 
-<!-- helm get values argocd -n argocd --all > argocd.txt -->
-
 kubectl -n argocd get secret argocd-secret -o yaml
 
 ## Check tokens
