@@ -21,6 +21,7 @@ locals {
       # Use Kubernetes Server-Side Apply so very large manifests
       # don’t hit the old 256 KiB annotation limit.
       serverSideApply = { enabled = true }
+      rbac = { namespaced = false }
     }
     configs = {
       clusters = {
