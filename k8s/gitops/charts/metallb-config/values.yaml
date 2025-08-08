@@ -10,4 +10,5 @@ addressPool:
 l2Advertisement:
   enabled: true
   name: l2
-  interfaces: []
+  interfaces:
+    - '*'
