@@ -49,7 +49,8 @@ data "talos_machine_configuration" "vm" {
             "api-audiences"          = "https://kubernetes.default.svc"
           }
           admissionControl = [
-            # as per https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
+            # as per https://www.talos.dev/v1.10/kubernetes-guides/network/deploying-cilium/
+            # and https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
             # to allow cilium to run tests
             {
               name = "PodSecurity"
