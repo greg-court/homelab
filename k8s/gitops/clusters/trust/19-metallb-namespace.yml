@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-namespace
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-21'
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: charts/empty # Using the empty chart (see below)
+    helm:
+      values: |
+        name: metallb-system
+        labels:
+          pod-security.kubernetes.io/enforce: "privileged"
+          pod-security.kubernetes.io/audit: "baseline"
+          pod-security.kubernetes.io/warn:  "baseline"
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
