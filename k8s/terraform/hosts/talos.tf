@@ -42,7 +42,11 @@ data "talos_machine_configuration" "vm" {
         }
         nodeLabels = { zone = each.value.zone }
         features = {
-          kubePrism = { enabled = true, port = 7445 }                  # you’re using k8sServiceHost=localhost
+          # - Talos HostDNS normally forwards CoreDNS upstream lookups to 169.254.116.108.
+          # - With Cilium bpf.masquerade=true, pods hitting that link-local IP time out.
+          # - So we disable forwarding so CoreDNS queries go straight to machine.network.nameservers.
+          # - kubePrism stays enabled to match cilium’s k8sServiceHost=localhost / k8sServicePort=7445.
+          kubePrism = { enabled = true, port = 7445 }
           hostDNS   = { enabled = true, forwardKubeDNSToHost = false } # without this, external DNS resolution is broken with Cilium
         }
       }
