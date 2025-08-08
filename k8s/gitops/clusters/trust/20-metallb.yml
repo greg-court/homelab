@@ -20,7 +20,6 @@ spec:
           frr:
             enabled: false
           ignoreExcludeLB: true
-          logLevel: debug
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     # Namespace is created by metallb-namespace app (with PSA labels)
