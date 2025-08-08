@@ -32,7 +32,10 @@ data "talos_machine_configuration" "vm" {
   config_patches = [
     yamlencode({
       machine = {
-        network = { hostname = lower("${each.value.host_id}.internal") }
+        network = {
+          hostname    = lower("${each.value.host_id}.internal")
+          nameservers = var.clusters[each.value.cluster_name].nameservers
+        }
         install = {
           disk  = "/dev/sda"
           image = var.install_image
