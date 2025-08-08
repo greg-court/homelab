@@ -212,4 +212,8 @@ for ID in $(qm list | awk 'tolower($2) ~ /k8s/ {print $1}'); do
     ip link show "$IF" >/dev/null 2>&1 && ip link set "$IF" promisc on
   done
 done
+
+# or temporarily (though security risk):
+ip link set bond0 promisc on
+ip link set vmbr0 promisc on
 ```
