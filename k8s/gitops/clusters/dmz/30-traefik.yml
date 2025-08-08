@@ -21,7 +21,7 @@ spec:
             metallb.io/address-pool: dmz-pool
           spec:
             loadBalancerIP: "192.168.4.250"
-            externalTrafficPolicy: Local
+            externalTrafficPolicy: Local # keep real client IPs and avoid an extra hop
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
