@@ -41,10 +41,6 @@ data "talos_machine_configuration" "vm" {
           image = var.install_image
         }
         nodeLabels = { zone = each.value.zone }
-        # features = {
-        #   kubePrism = { enabled = true, port = 7445 }                  # you’re using k8sServiceHost=localhost
-        #   hostDNS   = { enabled = true, forwardKubeDNSToHost = false } # without this, external DNS resolution is broken with Cilium
-        # }
       }
       cluster = {
         allowSchedulingOnControlPlanes = true
