@@ -35,18 +35,6 @@ locals {
   })]
 }
 
-# # Wait a bit after the API is reachable for TRUST
-# resource "time_sleep" "after_bootstrap_trust" {
-#   create_duration = "5s"
-#   depends_on      = [talos_cluster_kubeconfig.kc["cluster-trust"]]
-# }
-
-# # Wait a bit after the API is reachable for DMZ
-# resource "time_sleep" "after_bootstrap_dmz" {
-#   create_duration = "5s"
-#   depends_on      = [talos_cluster_kubeconfig.kc["cluster-dmz"]]
-# }
-
 resource "helm_release" "cilium_trust" {
   provider        = helm.trust
   name            = "cilium"
@@ -76,32 +64,3 @@ resource "helm_release" "cilium_dmz" {
 
   depends_on = [talos_cluster_kubeconfig.kc]
 }
-
-# locals {
-#   cilium_test_labels = {
-#     "pod-security.kubernetes.io/enforce" = "privileged"
-#     "pod-security.kubernetes.io/audit"   = "privileged"
-#     "pod-security.kubernetes.io/warn"    = "privileged"
-#   }
-# }
-
-# resource "kubernetes_namespace" "cilium_test_trust" {
-#   provider = kubernetes.trust
-#   metadata {
-#     name   = "cilium-test-1"
-#     labels = local.cilium_test_labels
-#   }
-#   depends_on = [helm_release.cilium_trust]
-# }
-
-# resource "kubernetes_namespace" "cilium_test_dmz" {
-#   provider = kubernetes.dmz
-#   metadata {
-#     name   = "cilium-test-1"
-#     labels = local.cilium_test_labels
-#   }
-#   depends_on = [helm_release.cilium_dmz]
-# }
-
-# now to run tests, use
-# cilium connectivity test --test-namespace cilium-test-1 --force-deploy
