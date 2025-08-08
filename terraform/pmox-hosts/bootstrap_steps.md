@@ -203,9 +203,13 @@ pvesh create /cluster/backup \
   --enabled 1
 ```
 
-## Enable promiscuous mode (avoid issues with VIP ARP)
+## Enable promiscuous mode on k8s VMs (avoid issues with VIP ARP)
 
 ```bash
-ip link set bond0 promisc on
-ip link set vmbr0 promisc on
+# loops through VMs with name 'k8s' in it and enables promisc on them
+for ID in $(qm list | awk 'tolower($2) ~ /k8s/ {print $1}'); do
+  for IF in tap${ID}i0 fwbr${ID}i0 fwpr${ID}p0; do
+    ip link show "$IF" >/dev/null 2>&1 && ip link set "$IF" promisc on
+  done
+done
 ```
