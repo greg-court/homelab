@@ -1,13 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:best-practices",
-    ":rebaseStalePrs"
-  ],
-  "labels": [
-    "deps",
-    "renovate"
-  ],
+  "extends": ["config:best-practices", ":rebaseStalePrs"],
+  "labels": ["deps", "renovate"],
   "timezone": "Europe/London",
   "prConcurrentLimit": 10,
   "prHourlyLimit": 6,
@@ -36,9 +30,7 @@
     ]
   },
   "argocd": {
-    "managerFilePatterns": [
-      "/(^|/)k8s/gitops/clusters/.+\\.ya?ml$/"
-    ]
+    "managerFilePatterns": ["/(^|/)k8s/gitops/clusters/.+\\.ya?ml$/"]
   },
   "kustomize": {
     "pinDigests": false
@@ -88,85 +80,47 @@
       "pinDigests": false
     },
     {
-      "matchManagers": [
-        "helmv3",
-        "helmfile",
-        "helm-values"
-      ],
+      "matchManagers": ["helmv3", "helmfile", "helm-values"],
       "groupName": "helm charts"
     },
     {
-      "matchManagers": [
-        "dockerfile",
-        "docker-compose"
-      ],
+      "matchManagers": ["dockerfile", "docker-compose"],
       "groupName": "base/container images"
     },
     {
-      "matchManagers": [
-        "github-actions"
-      ],
+      "matchManagers": ["github-actions"],
       "groupName": "github actions"
     },
     {
-      "matchManagers": [
-        "terraform",
-        "terragrunt"
-      ],
+      "matchManagers": ["terraform", "terragrunt"],
       "groupName": "terraform providers/modules"
     },
     {
-      "matchManagers": [
-        "ansible-galaxy"
-      ],
+      "matchManagers": ["ansible-galaxy"],
       "groupName": "ansible galaxy"
     },
     {
-      "matchManagers": [
-        "kubernetes",
-        "kustomize",
-        "argocd"
-      ],
-      "matchFileNames": [
-        "k8s/gitops/clusters/dmz/**"
-      ],
+      "matchManagers": ["kubernetes", "kustomize", "argocd"],
+      "matchFileNames": ["k8s/gitops/clusters/dmz/**"],
       "groupName": "platform (dmz)"
     },
     {
-      "matchManagers": [
-        "kubernetes",
-        "kustomize",
-        "argocd"
-      ],
-      "matchFileNames": [
-        "k8s/gitops/clusters/trust/**"
-      ],
+      "matchManagers": ["kubernetes", "kustomize", "argocd"],
+      "matchFileNames": ["k8s/gitops/clusters/trust/**"],
       "groupName": "platform (trust)"
     },
     {
-      "matchDatasources": [
-        "helm"
-      ],
+      "matchDatasources": ["helm"],
       "minimumReleaseAge": "1 day"
     },
     {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     },
     {
-      "matchManagers": [
-        "dockerfile",
-        "docker-compose"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchUpdateTypes": ["patch"],
       "automerge": true
     },
     // Disable digest-only updates (but keep version pinning)
@@ -177,34 +131,21 @@
         "kubernetes",
         "kustomize"
       ],
-      "matchUpdateTypes": [
-        "digest"
-      ],
+      "matchUpdateTypes": ["digest"],
       "enabled": false
     },
     {
-      "matchManagers": [
-        "terraform",
-        "terragrunt"
-      ],
-      "extends": [
-        ":semanticCommitType(chore)"
-      ],
-      "schedule": [
-        "on monday"
-      ],
-      "postUpdateOptions": [
-        "terraformLockFile"
-      ]
+      "matchManagers": ["terraform", "terragrunt"],
+      "extends": [":semanticCommitType(chore)"],
+      "schedule": ["on monday"],
+      "postUpdateOptions": ["terraformLockFile"]
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
       "description": "Catch image tags in arbitrary YAML under k8s/gitops",
-      "managerFilePatterns": [
-        "/(^|/)k8s/gitops/.+\\.ya?ml$/"
-      ],
+      "managerFilePatterns": ["/(^|/)k8s/gitops/.+\\.ya?ml$/"],
       "matchStrings": [
         "image:\\s*(?<depName>[^:\\s]+):(?<currentValue>[^\\s#]+)"
       ],
