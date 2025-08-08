@@ -68,7 +68,7 @@ data "talos_machine_configuration" "vm" {
                 exemptions = {
                   usernames      = []
                   runtimeClasses = []
-                  namespaces     = ["kube-system", "cilium-test-1"]
+                  namespaces     = ["cilium-test-1"]
                 }
               }
             }
