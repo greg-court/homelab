@@ -1,0 +1,4 @@
+resources:
+  - rbac.yml
+  - configmap.yml
+  - daemonset.yml

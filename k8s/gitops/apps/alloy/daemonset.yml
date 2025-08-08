@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: alloy
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels: { app: alloy }
+  template:
+    metadata:
+      labels: { app: alloy }
+    spec:
+      serviceAccountName: alloy
+      # Tolerate control-plane so you also ship control-plane pod logs
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: alloy
+          # Choose a recent Alloy (adjust if you know a newer tag)
+          image: grafana/alloy:v1.8.0
+          args:
+            [
+              'run',
+              '/etc/alloy/config.river',
+              '--server.http.listen-addr=0.0.0.0:12345',
+            ]
+          ports:
+            - name: http
+              containerPort: 12345
+          volumeMounts:
+            - { name: varlog, mountPath: /var/log }
+            - { name: varlib, mountPath: /var/lib }
+            - { name: pods, mountPath: /var/log/pods }
+            - { name: config, mountPath: /etc/alloy }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+      volumes:
+        - name: varlog
+          hostPath: { path: /var/log }
+        - name: varlib
+          hostPath: { path: /var/lib }
+        - name: pods
+          hostPath: { path: /var/log/pods }
+        - name: config
+          configMap:
+            name: alloy-config
+            items: [{ key: config.river, path: config.river }]
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: false
+  updateStrategy: { type: RollingUpdate }

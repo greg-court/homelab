@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-4' }
+spec:
+  project: platform
+  destination: { server: https://kubernetes.default.svc, namespace: monitoring }
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: 6.35.1 # chart version (app is Loki 3.5.x)
+    helm:
+      values: |
+        loki:
+          auth_enabled: false
+          server:
+            http_listen_port: 3100
+          commonConfig:
+            replication_factor: 1
+          storage:
+            type: filesystem
+          schemaConfig:
+            configs:
+            - from: 2024-01-01
+              store: tsdb
+              object_store: filesystem
+              schema: v13
+              index:
+                prefix: loki_index_
+                period: 24h
+          limits_config:
+            retention_period: 336h    # 14d
+        singleBinary:
+          replicas: 1
+          persistence:
+            enabled: true
+            storageClass: loki-local
+            size: 128Gi
+        monitoring:
+          selfMonitoring:
+            enabled: false      # we'll use KPS for metrics
+        test:
+          enabled: false
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

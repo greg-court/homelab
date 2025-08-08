@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: monitoring
+data:
+  config.river: |
+    // Discover pods
+    discovery.kubernetes "pods" {
+      role = "pod"
+      selectors {
+        role = "pod"
+      }
+    }
+
+    // Tail container logs using kube metadata
+    loki.source.kubernetes "pods" {
+      targets    = discovery.kubernetes.pods.targets
+      forward_to = [loki.process.pods.receiver]
+    }
+
+    // Add labels, drop very noisy namespaces if you want
+    loki.process "pods" {
+      stage.static_labels { values = { cluster = "trust" } }
+      // Example drops:
+      // stage.drop { expression = "namespace = \"kube-system\" and container = \"kube-proxy\"" }
+      forward_to = [loki.write.default.receiver]
+    }
+
+    // Kubernetes events -> Loki
+    discovery.kubernetes "events" {
+      role = "event"
+    }
+
+    loki.source.kubernetes_events "events" {
+      targets    = discovery.kubernetes.events.targets
+      forward_to = [loki.write.default.receiver]
+    }
+
+    loki.write "default" {
+      endpoint {
+        url = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+      }
+    }
