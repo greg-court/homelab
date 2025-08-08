@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout (sparse, full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
           sparse-checkout: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: Calculate semantic version
         id: semver
-        uses: paulhatch/semantic-version@v5.4.0
+        uses: paulhatch/semantic-version@a8f8f59fd7f0625188492e945240f12d7ad2dca3 # v5.4.0
         with:
           tag_prefix: ${{ inputs.tag_prefix }}
           change_path: ${{ inputs.change_path }}
@@ -62,7 +62,7 @@ jobs:
 
       - name: Create GitHub release
         if: inputs.create_release && steps.semver.outputs.version_type != 'none'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2
         with:
           tag_name: ${{ steps.semver.outputs.version_tag }}
           name: ${{ steps.semver.outputs.version }}

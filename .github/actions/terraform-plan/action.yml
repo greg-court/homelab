@@ -22,7 +22,7 @@ runs:
   using: 'composite'
   steps:
     - name: Configure Azure Credentials (OIDC)
-      uses: azure/login@v2
+      uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
       with:
         client-id: ${{ env.AZURE_CLIENT_ID }}
         tenant-id: ${{ env.AZURE_TENANT_ID }}
@@ -44,7 +44,7 @@ runs:
         fi
 
     - name: Upload Plan Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       with:
         name: tfplan-${{ inputs.name }}
         path: ${{ inputs.path }}/tfplan
