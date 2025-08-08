@@ -1,0 +1,18 @@
+# netshoot-on-node.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot-on-node
+  namespace: debug
+spec:
+  nodeName: k8s-trust-01 # you already echoed this
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  containers:
+    - name: netshoot
+      image: nicolaka/netshoot:latest
+      command: ['bash', '-lc', 'sleep infinity']
+      securityContext:
+        privileged: true
+      resources: {}
+  restartPolicy: Never
