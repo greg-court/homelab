@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: traefik
   namespace: argocd
-  annotations: { argocd.argoproj.io/sync-wave: "-10" }
+  annotations: { argocd.argoproj.io/sync-wave: '-10' }
 spec:
   project: platform
   destination:
@@ -19,10 +19,12 @@ spec:
           type: LoadBalancer
           annotations:
             metallb.io/address-pool: dmz-pool
-            metallb.io/loadBalancerIPs: "192.168.4.250"
+          spec:
+            loadBalancerIP: "192.168.4.250"
+            externalTrafficPolicy: Local
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
-    syncOptions: [ "CreateNamespace=true" ]
+    syncOptions: ['CreateNamespace=true']

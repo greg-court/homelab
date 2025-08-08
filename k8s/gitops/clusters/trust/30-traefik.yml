@@ -19,7 +19,9 @@ spec:
           type: LoadBalancer
           annotations:
             metallb.io/address-pool: trust-pool
-            metallb.io/loadBalancerIPs: "192.168.3.250"
+          spec:
+            loadBalancerIP: "192.168.3.250"
+            externalTrafficPolicy: Local
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
