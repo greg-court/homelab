@@ -7,7 +7,7 @@ extends:
 
 labels: [deps, renovate]
 timezone: Europe/London
-schedule: ["after 08:00 and before 18:00 on Monday to Friday"]
+schedule: ['after 08:00 and before 18:00 on Monday to Friday']
 prConcurrentLimit: 10
 prHourlyLimit: 6
 dependencyDashboard: true
@@ -30,6 +30,7 @@ enabledManagers:
 
 # Tell managers where to look (use fileMatch, not managerFilePatterns)
 kubernetes:
+  pinDigests: true
   fileMatch:
     - "(^|/)k8s/gitops/apps/.+\\.ya?ml$"
     - "(^|/)k8s/gitops/clusters/.+\\.ya?ml$"
@@ -38,24 +39,21 @@ argocd:
   fileMatch:
     - "(^|/)k8s/gitops/clusters/.+\\.ya?ml$"
 
-# Optional: digest pinning (docker pinDigests is migrated into a packageRule automatically)
 kustomize:
-  pinDigests: true
-kubernetes:
   pinDigests: true
 
 ignorePaths:
-  - "**/.terraform/**"
-  - "**/terraform.tfstate*"
-  - "**/terraform.tfvars"
-  - "**/terraform/**/talosconfig"
-  - "**/k8s/terraform.tfstate*"
+  - '**/.terraform/**'
+  - '**/terraform.tfstate*'
+  - '**/terraform.tfvars'
+  - '**/terraform/**/talosconfig'
+  - '**/k8s/terraform.tfstate*'
 
 hostRules:
   - hostType: docker
     matchHost: ghcr.io
     username: github
-    password: "{{ env.GITHUB_TOKEN }}"
+    password: '{{ env.GITHUB_TOKEN }}'
   - { hostType: helm, matchHost: charts.jetstack.io }
   - { hostType: helm, matchHost: prometheus-community.github.io }
   - { hostType: helm, matchHost: grafana.github.io }
@@ -64,7 +62,7 @@ hostRules:
   - { hostType: helm, matchHost: charts.external-secrets.io }
 
 packageRules:
-  - matchCategories: [docker]    # migrate docker.pinDigests -> packageRule
+  - matchCategories: [docker] # migrate docker.pinDigests -> packageRule
     pinDigests: true
 
   - matchManagers: [helmv3, helmfile, helm-values]
@@ -84,15 +82,15 @@ packageRules:
 
   # Group per-cluster for k8s/argocd
   - matchManagers: [kubernetes, kustomize, argocd]
-    matchFileNames: ["k8s/gitops/clusters/dmz/**"]
+    matchFileNames: ['k8s/gitops/clusters/dmz/**']
     groupName: platform (dmz)
   - matchManagers: [kubernetes, kustomize, argocd]
-    matchFileNames: ["k8s/gitops/clusters/trust/**"]
+    matchFileNames: ['k8s/gitops/clusters/trust/**']
     groupName: platform (trust)
 
   # Helm flakiness buffer
   - matchDatasources: [helm]
-    minimumReleaseAge: "1 day"
+    minimumReleaseAge: '1 day'
 
   # Safe automerge
   - matchManagers: [github-actions]
@@ -104,9 +102,9 @@ packageRules:
 
   # Terraform lockfile maintenance weekly
   - matchManagers: [terraform, terragrunt]
-    extends: [":semanticCommitType(chore)"]
-    schedule: ["on monday"]
-    postUpdateOptions: ["terraformLockFile"]
+    extends: [':semanticCommitType(chore)']
+    schedule: ['on monday']
+    postUpdateOptions: ['terraformLockFile']
 
 # Regex manager to catch stray "image: repo:tag" in YAML
 customManagers:
