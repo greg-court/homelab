@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: charts/metallb-config
+    path: k8s/gitops/charts/metallb-config
     helm:
       values: |
         namespace: metallb-system

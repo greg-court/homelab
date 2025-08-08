@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: apps/nginx-favicons
+    path: k8s/gitops/apps/nginx-favicons
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']

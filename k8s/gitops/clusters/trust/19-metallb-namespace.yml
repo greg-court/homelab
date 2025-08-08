@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: charts/empty # Using the empty chart (see below)
+    path: k8s/gitops/charts/empty # Using the empty chart (see below)
     helm:
       values: |
         name: metallb-system
