@@ -8,3 +8,4 @@ resources:
   - deployment-gh-packer.yml
   - deployment-gh-terraform.yml
   - deployment-tfc.yml
+  - configmap.yml
