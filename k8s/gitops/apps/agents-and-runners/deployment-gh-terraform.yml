@@ -17,6 +17,8 @@ spec:
           envFrom:
             - secretRef:
                 name: gh-runners-env
+            - configMapRef:
+                name: gh-runners-config
           env:
             - name: RUNNER_LABELS
               value: 'self-hosted,terraform'
