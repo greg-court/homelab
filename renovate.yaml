@@ -134,3 +134,4 @@ packageRules:
 customManagers:
   - customType: regex
     description: Catch image tags i
+# test config change
