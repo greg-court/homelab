@@ -34,7 +34,8 @@ data "talos_machine_configuration" "vm" {
       machine = {
         network = {
           hostname    = lower("${each.value.host_id}.internal")
-          nameservers = var.clusters[each.value.cluster_name].nameservers
+          # use DHCP by not specifying nameservers
+          # nameservers = var.clusters[each.value.cluster_name].nameservers
         }
         install = {
           disk  = "/dev/sda"
