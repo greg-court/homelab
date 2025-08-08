@@ -35,17 +35,17 @@ locals {
   })]
 }
 
-# Wait a bit after the API is reachable for TRUST
-resource "time_sleep" "after_bootstrap_trust" {
-  create_duration = "90s"
-  depends_on      = [talos_cluster_kubeconfig.kc["cluster-trust"]]
-}
+# # Wait a bit after the API is reachable for TRUST
+# resource "time_sleep" "after_bootstrap_trust" {
+#   create_duration = "5s"
+#   depends_on      = [talos_cluster_kubeconfig.kc["cluster-trust"]]
+# }
 
-# Wait a bit after the API is reachable for DMZ
-resource "time_sleep" "after_bootstrap_dmz" {
-  create_duration = "90s"
-  depends_on      = [talos_cluster_kubeconfig.kc["cluster-dmz"]]
-}
+# # Wait a bit after the API is reachable for DMZ
+# resource "time_sleep" "after_bootstrap_dmz" {
+#   create_duration = "5s"
+#   depends_on      = [talos_cluster_kubeconfig.kc["cluster-dmz"]]
+# }
 
 resource "helm_release" "cilium_trust" {
   provider        = helm.trust
@@ -59,7 +59,7 @@ resource "helm_release" "cilium_trust" {
   atomic          = true
   cleanup_on_fail = true
 
-  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_trust]
+  depends_on = [talos_cluster_kubeconfig.kc]
 }
 
 resource "helm_release" "cilium_dmz" {
@@ -74,5 +74,5 @@ resource "helm_release" "cilium_dmz" {
   atomic          = true
   cleanup_on_fail = true
 
-  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_dmz]
+  depends_on = [talos_cluster_kubeconfig.kc]
 }

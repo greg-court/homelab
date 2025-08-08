@@ -15,6 +15,7 @@ cd ../cluster-trust && talosctl config merge ./talosconfig
 ## 2. Kubeconfig
 
 ```bash
+cd ..
 # merge cluster-dmz/kubeconfig
 KUBECONFIG=~/.kube/config:cluster-dmz/kubeconfig kubectl config view --flatten --merge > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
 
