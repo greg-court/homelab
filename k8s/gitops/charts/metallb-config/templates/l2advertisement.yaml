@@ -7,4 +7,8 @@ metadata:
 spec:
   ipAddressPools:
     - {{ .Values.addressPool.name }}
+  {{- with .Values.l2Advertisement.interfaces }}
+  interfaces:
+{{ toYaml . | indent 4 }}
+  {{- end }}
 {{- end }}
