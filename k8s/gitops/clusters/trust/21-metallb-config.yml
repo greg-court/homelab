@@ -22,7 +22,6 @@ spec:
           protocol: layer2
           addresses:
             - 192.168.3.250-192.168.3.250
-          autoAssign: false
         l2Advertisement:
           enabled: true
           name: trust-l2
