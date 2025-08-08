@@ -13,7 +13,7 @@ locals {
           audiences = ["api://AzureADTokenExchange"]
 
           role_assignments = [
-            { role = "Key Vault Secrets User",        scope = azurerm_key_vault.homelab.id },
+            { role = "Key Vault Secrets User", scope = azurerm_key_vault.homelab.id },
             { role = "Storage Blob Data Contributor", scope = azurerm_storage_account.homelab.id },
           ]
         }
@@ -37,7 +37,7 @@ locals {
 
 # 2.  Applications & Service Principals
 resource "azuread_application" "app" {
-  for_each    = local.ad_apps
+  for_each     = local.ad_apps
   display_name = each.key
 }
 
@@ -53,8 +53,8 @@ locals {
       for fid_key, fid_def in app_def.federated_identities : merge(
         fid_def,
         {
-          map_key      = "${app_key}-${fid_key}"   # ⚑ used only for for_each
-          display_name = fid_key                  # ⚑ what you want to see in Entra ID
+          map_key        = "${app_key}-${fid_key}" # ⚑ used only for for_each
+          display_name   = fid_key                 # ⚑ what you want to see in Entra ID
           application_id = azuread_application.app[app_key].id
           principal_id   = azuread_service_principal.sp[app_key].object_id
         }
@@ -67,7 +67,7 @@ resource "azuread_application_federated_identity_credential" "fic" {
   for_each = { for f in local.federated_flat : f.map_key => f }
 
   application_id = each.value.application_id
-  display_name   = each.value.display_name   # ← now just “gh-actions-main”
+  display_name   = each.value.display_name # ← now just “gh-actions-main”
   description    = try(each.value.description, null)
   issuer         = each.value.issuer
   subject        = each.value.subject

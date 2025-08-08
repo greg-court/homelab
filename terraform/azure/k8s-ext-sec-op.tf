@@ -22,10 +22,10 @@ resource "azurerm_role_assignment" "eso_kv" {
 }
 
 # Handy outputs (copy them; never commit secrets)
-output "eso_client_id"     { value = azuread_application.eso_trust.client_id }
-output "tenant_id"         { value = data.azurerm_client_config.current.tenant_id }
-output "kv_uri"            { value = azurerm_key_vault.homelab.vault_uri }
+output "eso_client_id" { value = azuread_application.eso_trust.client_id }
+output "tenant_id" { value = data.azurerm_client_config.current.tenant_id }
+output "kv_uri" { value = azurerm_key_vault.homelab.vault_uri }
 output "eso_client_secret" {
- value = azuread_application_password.eso_pwd.value
+  value     = azuread_application_password.eso_pwd.value
   sensitive = true
 }

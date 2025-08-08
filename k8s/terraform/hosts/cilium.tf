@@ -35,32 +35,44 @@ locals {
   })]
 }
 
-resource "helm_release" "cilium_trust" {
-  provider   = helm.trust
-  name       = "cilium"
-  namespace  = "kube-system"
-  repository = "https://helm.cilium.io"
-  chart      = "cilium"
-  version    = "1.18.0"
-  values     = local.cilium_config
-  timeout          = 600
-  atomic           = true
-  cleanup_on_fail  = true
+# Wait a bit after the API is reachable for TRUST
+resource "time_sleep" "after_bootstrap_trust" {
+  create_duration = "90s"
+  depends_on      = [talos_cluster_kubeconfig.kc["cluster-trust"]]
+}
 
-  depends_on = [talos_cluster_kubeconfig.kc]
+# Wait a bit after the API is reachable for DMZ
+resource "time_sleep" "after_bootstrap_dmz" {
+  create_duration = "90s"
+  depends_on      = [talos_cluster_kubeconfig.kc["cluster-dmz"]]
+}
+
+resource "helm_release" "cilium_trust" {
+  provider        = helm.trust
+  name            = "cilium"
+  namespace       = "kube-system"
+  repository      = "https://helm.cilium.io"
+  chart           = "cilium"
+  version         = "1.18.0"
+  values          = local.cilium_config
+  timeout         = 600
+  atomic          = true
+  cleanup_on_fail = true
+
+  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_trust]
 }
 
 resource "helm_release" "cilium_dmz" {
-  provider   = helm.dmz
-  name       = "cilium"
-  namespace  = "kube-system"
-  repository = "https://helm.cilium.io"
-  chart      = "cilium"
-  version    = "1.18.0"
-  values     = local.cilium_config
-  timeout          = 600
-  atomic           = true
-  cleanup_on_fail  = true
+  provider        = helm.dmz
+  name            = "cilium"
+  namespace       = "kube-system"
+  repository      = "https://helm.cilium.io"
+  chart           = "cilium"
+  version         = "1.18.0"
+  values          = local.cilium_config
+  timeout         = 600
+  atomic          = true
+  cleanup_on_fail = true
 
-  depends_on = [talos_cluster_kubeconfig.kc]
+  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_dmz]
 }

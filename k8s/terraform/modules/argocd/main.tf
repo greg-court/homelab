@@ -19,7 +19,7 @@ locals {
   base_values = yamlencode({
     controller = {
       serverSideApply = { enabled = true } # this uses SSA for this helm chart only - NOT a global setting!
-      rbac = { namespaced = false }
+      rbac            = { namespaced = false }
     }
     configs = {
       clusters = {
