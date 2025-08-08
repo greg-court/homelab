@@ -1,0 +1,144 @@
+{
+  // Renovate config for your homelab repo
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "extends": ["config:best-practices", ":rebaseStalePrs"],
+
+  "labels": ["deps", "renovate"],
+  "timezone": "Europe/London",
+  // "schedule": ["after 08:00 and before 18:00 on Monday to Friday"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 6,
+  "dependencyDashboard": true,
+  "rebaseWhen": "conflicted",
+
+  "enabledManagers": [
+    "helmv3",
+    "helmfile",
+    "helm-values",
+    "kustomize",
+    "kubernetes",
+    "argocd",
+    "dockerfile",
+    "docker-compose",
+    "github-actions",
+    "terraform",
+    "terragrunt",
+    "ansible-galaxy",
+    "custom.regex"
+  ],
+
+  // Tell managers where to look (use fileMatch, not managerFilePatterns)
+  "kubernetes": {
+    "pinDigests": false,
+    "fileMatch": [
+      "(^|/)k8s/gitops/apps/.+\\.ya?ml$",
+      "(^|/)k8s/gitops/clusters/.+\\.ya?ml$"
+    ]
+  },
+
+  "argocd": {
+    "fileMatch": ["(^|/)k8s/gitops/clusters/.+\\.ya?ml$"]
+  },
+
+  "kustomize": {
+    "pinDigests": false
+  },
+
+  "ignorePaths": [
+    "**/.terraform/**",
+    "**/terraform.tfstate*",
+    "**/terraform.tfvars",
+    "**/terraform/**/talosconfig",
+    "**/k8s/terraform.tfstate*"
+  ],
+
+  "hostRules": [
+    {
+      "hostType": "docker",
+      "matchHost": "ghcr.io",
+      "username": "github",
+      "password": "{{ env.GITHUB_TOKEN }}"
+    },
+    { "hostType": "helm", "matchHost": "charts.jetstack.io" },
+    { "hostType": "helm", "matchHost": "prometheus-community.github.io" },
+    { "hostType": "helm", "matchHost": "grafana.github.io" },
+    { "hostType": "helm", "matchHost": "traefik.github.io" },
+    { "hostType": "helm", "matchHost": "metallb.github.io" },
+    { "hostType": "helm", "matchHost": "charts.external-secrets.io" }
+  ],
+
+  "packageRules": [
+    {
+      "matchCategories": ["docker"], // migrate docker.pinDigests -> packageRule
+      "pinDigests": false
+    },
+    {
+      "matchManagers": ["helmv3", "helmfile", "helm-values"],
+      "groupName": "helm charts"
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "base/container images"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "matchManagers": ["terraform", "terragrunt"],
+      "groupName": "terraform providers/modules"
+    },
+    {
+      "matchManagers": ["ansible-galaxy"],
+      "groupName": "ansible galaxy"
+    },
+    // Group per-cluster for k8s/argocd
+    {
+      "matchManagers": ["kubernetes", "kustomize", "argocd"],
+      "matchFileNames": ["k8s/gitops/clusters/dmz/**"],
+      "groupName": "platform (dmz)"
+    },
+    {
+      "matchManagers": ["kubernetes", "kustomize", "argocd"],
+      "matchFileNames": ["k8s/gitops/clusters/trust/**"],
+      "groupName": "platform (trust)"
+    },
+    // Helm flakiness buffer
+    {
+      "matchDatasources": ["helm"],
+      "minimumReleaseAge": "1 day"
+    },
+    // Safe automerge
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    // Terraform lockfile maintenance weekly
+    {
+      "matchManagers": ["terraform", "terragrunt"],
+      "extends": [":semanticCommitType(chore)"],
+      "schedule": ["on monday"],
+      "postUpdateOptions": ["terraformLockFile"]
+    }
+  ],
+
+  // Regex manager to catch stray "image: repo:tag" in YAML
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Catch image tags in arbitrary YAML under k8s/gitops",
+      "fileMatch": ["(^|/)k8s/gitops/.+\\.ya?ml$"],
+      "matchStrings": [
+        "image:\\s*(?<depName>[^:\\s]+):(?<currentValue>[^\\s#]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
