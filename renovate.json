@@ -120,6 +120,16 @@
       "matchUpdateTypes": ["patch"],
       "automerge": true
     },
+    {
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose",
+        "kubernetes",
+        "kustomize"
+      ],
+      "matchUpdateTypes": ["digest"],
+      "enabled": false
+    },
     // Terraform lockfile maintenance weekly
     {
       "matchManagers": ["terraform", "terragrunt"],
