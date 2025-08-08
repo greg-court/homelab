@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://traefik.github.io/charts
     chart: traefik-crds
-    targetRevision: 1.8.1
+    targetRevision: 1.10.0
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']
