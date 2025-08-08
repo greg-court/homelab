@@ -1,18 +1,27 @@
-# netshoot-on-node.yaml
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
-  name: netshoot-on-node
+  name: netshoot-on-every-node
   namespace: debug
 spec:
-  nodeName: k8s-trust-01 # you already echoed this
-  hostNetwork: true
-  dnsPolicy: ClusterFirstWithHostNet
-  containers:
-    - name: netshoot
-      image: nicolaka/netshoot:latest
-      command: ['bash', '-lc', 'sleep infinity']
-      securityContext:
-        privileged: true
-      resources: {}
-  restartPolicy: Never
+  selector:
+    matchLabels: { app: netshoot-on-every-node }
+  template:
+    metadata:
+      labels: { app: netshoot-on-every-node }
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+      containers:
+        - name: netshoot
+          image: nicolaka/netshoot:latest
+          command: ['bash', '-lc', 'sleep infinity']
+          securityContext:
+            privileged: true
+      restartPolicy: Always
+  updateStrategy: { type: RollingUpdate }
