@@ -7,7 +7,7 @@ extends:
 
 labels: [deps, renovate]
 timezone: Europe/London
-schedule: ['after 08:00 and before 18:00 on Monday to Friday']
+# schedule: ['after 08:00 and before 18:00 on Monday to Friday']
 prConcurrentLimit: 10
 prHourlyLimit: 6
 dependencyDashboard: true
