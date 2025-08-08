@@ -33,7 +33,7 @@ data "talos_machine_configuration" "vm" {
     yamlencode({
       machine = {
         network = {
-          hostname    = lower("${each.value.host_id}.internal")
+          hostname = lower("${each.value.host_id}.internal")
           # use DHCP by not specifying nameservers
           # nameservers = var.clusters[each.value.cluster_name].nameservers
         }
