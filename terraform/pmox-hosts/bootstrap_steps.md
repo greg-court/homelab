@@ -202,3 +202,10 @@ pvesh create /cluster/backup \
   --notes-template '{{guestname}}' \
   --enabled 1
 ```
+
+## Enable promiscuous mode (avoid issues with VIP ARP)
+
+```bash
+ip link set bond0 promisc on
+ip link set vmbr0 promisc on
+```
