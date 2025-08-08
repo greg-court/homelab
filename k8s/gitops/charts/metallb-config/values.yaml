@@ -11,4 +11,4 @@ l2Advertisement:
   enabled: true
   name: l2
   interfaces:
-    - '*'
+    - eth0
