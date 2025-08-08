@@ -43,8 +43,10 @@ data "talos_machine_configuration" "vm" {
         allowSchedulingOnControlPlanes = true
         apiServer = {
           extraArgs = {
-            "service-account-issuer" = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
-            "api-audiences"          = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+            # "service-account-issuer" = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+            # "api-audiences"          = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+            "service-account-issuer" = "https://kubernetes.default.svc"
+            "api-audiences"          = "https://kubernetes.default.svc"
           }
         }
       }

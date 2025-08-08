@@ -52,35 +52,6 @@ resource "helm_release" "argocd" {
   values           = [local.base_values]
 }
 
-# resource "null_resource" "provision_cluster_secret"  {
-#   provisioner "local-exec" {
-#     interpreter = ["/bin/bash","-lc"]
-#     command = <<-EOT
-#       set -euo pipefail
-#       if ! kubectl -n argocd get secret -l argocd.argoproj.io/secret-type=cluster -o name | grep -q .; then
-#         TOKEN=$(kubectl -n argocd create token argocd-application-controller --duration=24h)
-#         cat <<EOF | kubectl -n argocd apply -f -
-#         apiVersion: v1
-#         kind: Secret
-#         metadata:
-#           name: in-cluster
-#           labels:
-#             argocd.argoproj.io/secret-type: cluster
-#         type: Opaque
-#         stringData:
-#           name: in-cluster
-#           server: https://kubernetes.default.svc
-#           config: |
-#             {
-#               "bearerToken": "$TOKEN",
-#               "tlsClientConfig": { "insecure": false }
-#             }
-#         EOF
-#       fi
-#     EOT
-#   }
-# }
-
 # ---------- bootstrap “app-of-apps” -----------------------------------------
 resource "kubernetes_manifest" "root_app" {
   manifest = {
@@ -110,5 +81,4 @@ resource "kubernetes_manifest" "root_app" {
     }
   }
   depends_on = [helm_release.argocd]
-  # depends_on = [helm_release.argocd, null_resource.provision_cluster_secret]
 }
