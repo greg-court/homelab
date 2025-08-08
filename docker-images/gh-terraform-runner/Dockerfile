@@ -1,5 +1,5 @@
 # Stick to the requested debian:stable-slim base image
-FROM debian:stable-slim
+FROM debian:stable-slim@sha256:377ddc2a20fe8632a49b69dcfff10fccbd5b4f0b8c2d593420a6a5e03070dfa1
 
 # Set noninteractive frontend for apt to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
