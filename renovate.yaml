@@ -1,122 +1,100 @@
 # Renovate config for your homelab repo
-# Docs: https://docs.renovatebot.com/
-# File name: renovate.yaml  (in repo root)
-
 $schema: https://docs.renovatebot.com/renovate-schema.json
 
 extends:
   - config:best-practices
   - :rebaseStalePrs
 
-labels:
-  - deps
-  - renovate
-
+labels: [deps, renovate]
 timezone: Europe/London
-schedule:
-  - after 08:00 and before 18:00 on Monday to Friday
-
+schedule: ["after 08:00 and before 18:00 on Monday to Friday"]
 prConcurrentLimit: 10
 prHourlyLimit: 6
 dependencyDashboard: true
 rebaseWhen: conflicted
 
-# Enable the managers you use
 enabledManagers:
-  - helmv3 # Chart.yaml
-  - helmfile # helmfile.yaml
-  - helm-values # values.yaml with chart refs
-  - kustomize # kustomization.yaml
-  - kubernetes # raw K8s YAML image refs
-  - argocd # Argo CD Application YAMLs (chart targetRevision, images)
-  - dockerfile # Dockerfiles
+  - helmv3
+  - helmfile
+  - helm-values
+  - kustomize
+  - kubernetes
+  - argocd
+  - dockerfile
   - docker-compose
   - github-actions
   - terraform
   - terragrunt
   - ansible-galaxy
-  - custom.regex # our regex catcher for stray image: tags
+  - custom.regex
 
-# Where to scan for K8s and Argo CD files
+# Tell managers where to look (use fileMatch, not managerFilePatterns)
 kubernetes:
-  pinDigests: true
-  managerFilePatterns:
-    - "^k8s/gitops/apps/.+\\.ya?ml$"
-    - "^k8s/gitops/clusters/.+\\.ya?ml$"
+  fileMatch:
+    - "(^|/)k8s/gitops/apps/.+\\.ya?ml$"
+    - "(^|/)k8s/gitops/clusters/.+\\.ya?ml$"
 
 argocd:
-  managerFilePatterns:
-    - "^k8s/gitops/clusters/.+\\.ya?ml$"
+  fileMatch:
+    - "(^|/)k8s/gitops/clusters/.+\\.ya?ml$"
 
-# Optional: pin images to digests (immutable deploys)
-docker:
-  pinDigests: true
+# Optional: digest pinning (docker pinDigests is migrated into a packageRule automatically)
 kustomize:
   pinDigests: true
+kubernetes:
+  pinDigests: true
 
-# Keep Renovate away from state/artefacts
 ignorePaths:
-  - '**/.terraform/**'
-  - '**/terraform.tfstate*'
-  - '**/terraform.tfvars'
-  - '**/terraform/**/talosconfig'
-  - '**/k8s/terraform.tfstate*'
+  - "**/.terraform/**"
+  - "**/terraform.tfstate*"
+  - "**/terraform.tfvars"
+  - "**/terraform/**/talosconfig"
+  - "**/k8s/terraform.tfstate*"
 
-# Public registries don't need auth, but add private creds here (via env or Mend portal)
 hostRules:
   - hostType: docker
     matchHost: ghcr.io
     username: github
-    password: '{{ env.GITHUB_TOKEN }}'
-  - hostType: helm
-    matchHost: charts.jetstack.io
-  - hostType: helm
-    matchHost: prometheus-community.github.io
-  - hostType: helm
-    matchHost: grafana.github.io
-  - hostType: helm
-    matchHost: traefik.github.io
-  - hostType: helm
-    matchHost: metallb.github.io
-  - hostType: helm
-    matchHost: charts.external-secrets.io
+    password: "{{ env.GITHUB_TOKEN }}"
+  - { hostType: helm, matchHost: charts.jetstack.io }
+  - { hostType: helm, matchHost: prometheus-community.github.io }
+  - { hostType: helm, matchHost: grafana.github.io }
+  - { hostType: helm, matchHost: traefik.github.io }
+  - { hostType: helm, matchHost: metallb.github.io }
+  - { hostType: helm, matchHost: charts.external-secrets.io }
 
 packageRules:
-  # Group Helm updates together
+  - matchCategories: [docker]    # migrate docker.pinDigests -> packageRule
+    pinDigests: true
+
   - matchManagers: [helmv3, helmfile, helm-values]
     groupName: helm charts
 
-  # Group container base images
   - matchManagers: [dockerfile, docker-compose]
     groupName: base/container images
 
-  # Group GitHub Actions
   - matchManagers: [github-actions]
     groupName: github actions
 
-  # Group Terraform
   - matchManagers: [terraform, terragrunt]
     groupName: terraform providers/modules
 
-  # Group Ansible Galaxy
   - matchManagers: [ansible-galaxy]
     groupName: ansible galaxy
 
-  # ArgoCD/K8s updates grouped per cluster (so TRUST/DMZ changes don't mix)
+  # Group per-cluster for k8s/argocd
   - matchManagers: [kubernetes, kustomize, argocd]
-    matchFileNames:
-      - 'k8s/gitops/clusters/dmz/**'
+    matchFileNames: ["k8s/gitops/clusters/dmz/**"]
     groupName: platform (dmz)
   - matchManagers: [kubernetes, kustomize, argocd]
-    matchFileNames:
-      - 'k8s/gitops/clusters/trust/**'
+    matchFileNames: ["k8s/gitops/clusters/trust/**"]
     groupName: platform (trust)
 
-  # Helm: wait a day to dodge flaky releases
+  # Helm flakiness buffer
   - matchDatasources: [helm]
-    stabilityDays: 1
+    minimumReleaseAge: "1 day"
 
-  # Auto-merge safe stuff
+  # Safe automerge
   - matchManagers: [github-actions]
     matchUpdateTypes: [minor, patch]
     automerge: true
@@ -124,14 +102,18 @@ packageRules:
     matchUpdateTypes: [patch]
     automerge: true
 
-  # Terraform: refresh lockfiles weekly
+  # Terraform lockfile maintenance weekly
   - matchManagers: [terraform, terragrunt]
-    extends: [':semanticCommitType(chore)']
-    schedule: ['on monday']
-    postUpdateOptions: ['terraformLockFile']
+    extends: [":semanticCommitType(chore)"]
+    schedule: ["on monday"]
+    postUpdateOptions: ["terraformLockFile"]
 
-# Catch any stray "image: repo:tag" lines in YAML under gitops
+# Regex manager to catch stray "image: repo:tag" in YAML
 customManagers:
   - customType: regex
-    description: Catch image tags i
-# test config change
+    description: Catch image tags in arbitrary YAML under k8s/gitops
+    fileMatch:
+      - "(^|/)k8s/gitops/.+\\.ya?ml$"
+    matchStrings:
+      - "image:\\s*(?<depName>[^:\\s]+):(?<currentValue>[^\\s#]+)"
+    datasourceTemplate: docker
