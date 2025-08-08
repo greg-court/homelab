@@ -19,7 +19,6 @@ spec:
         speaker:
           frr:
             enabled: false
-          ignoreExcludeLB: true
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     # Namespace is created by metallb-namespace app (with PSA labels)
