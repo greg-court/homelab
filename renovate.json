@@ -84,9 +84,7 @@
   ],
   "packageRules": [
     {
-      "matchCategories": [
-        "docker"
-      ],
+      "matchCategories": ["docker"], // no digest pinning for docker
       "pinDigests": false
     },
     {
@@ -171,6 +169,7 @@
       ],
       "automerge": true
     },
+    // Disable digest-only updates (but keep version pinning)
     {
       "matchManagers": [
         "dockerfile",
