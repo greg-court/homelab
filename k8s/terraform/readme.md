@@ -11,7 +11,6 @@ kubectl -n argocd port-forward svc/argocd-server 8080:443
 
 # TRUST cluster
 
-
 cd cluster-trust
 terraform init
 terraform apply -target=module.argocd.helm_release.argocd --auto-approve

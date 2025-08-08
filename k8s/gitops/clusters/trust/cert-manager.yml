@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: cert-manager
-  targetRevision: '1.18.2'
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: '-2' # create it first
@@ -14,6 +13,7 @@ spec:
   source:
     repoURL: https://charts.jetstack.io
     chart: cert-manager
+    targetRevision: v1.15.1
     helm:
       parameters:
         - name: installCRDs
