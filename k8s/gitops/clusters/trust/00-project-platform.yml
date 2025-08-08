@@ -12,8 +12,8 @@ spec:
     - https://github.com/greg-court/homelab.git
     - https://charts.jetstack.io
     - https://metallb.github.io/metallb
-    - https://kubernetes.github.io/ingress-nginx
-    - https://charts.external-secrets.io
+    - https://charts.external-secrets.io # (only if you use it in this cluster)
+    - https://traefik.github.io/charts
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'

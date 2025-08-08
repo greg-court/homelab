@@ -3,29 +3,13 @@ kind: Application
 metadata:
   name: expose-argocd
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: '10'
+  annotations: { argocd.argoproj.io/sync-wave: "10" }
 spec:
   project: platform
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd # Ingress must live with its Service
+  destination: { server: https://kubernetes.default.svc, namespace: argocd }
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/charts/ingress-app
-    helm:
-      values: |
-        host: argocd.trust.k8s.internal
-        ingressClassName: nginx
-        service:
-          name: argocd-server
-          namespace: argocd
-          port: 443
-        backendProtocol: HTTPS
-        tls:
-          enabled: true
-          secretName: argocd-trust-tls
-          clusterIssuer: homelab-ca
+    path: k8s/gitops/apps/expose-argocd
   syncPolicy:
     automated: { prune: true, selfHeal: true }
