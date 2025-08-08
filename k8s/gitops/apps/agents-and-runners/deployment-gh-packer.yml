@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: runner
-          image: packer.io/gr10/gh-packer-runner:latest
+          image: docker.io/gr10/gh-packer-runner:latest
           envFrom:
             - secretRef:
                 name: gh-runners-env
