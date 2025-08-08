@@ -1,0 +1,14 @@
+{{- if .Values.tls.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{- if .Values.tls.secretName -}}{{ .Values.tls.secretName }}-cert{{- else -}}{{ printf "%s-cert" (regexReplaceAll "[^a-z0-9-]" (lower .Values.host) "-") }}{{- end }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ default (printf "%s-tls" (regexReplaceAll "[^a-z0-9-]" (lower .Values.host) "-")) .Values.tls.secretName }}
+  dnsNames:
+    - {{ .Values.host }}
+  issuerRef:
+    kind: ClusterIssuer
+    name: {{ .Values.tls.clusterIssuer }}
+{{- end }}

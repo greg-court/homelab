@@ -4,23 +4,20 @@ metadata:
   name: cert-manager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '-2' # create it first
+    argocd.argoproj.io/sync-wave: '-30'
 spec:
+  project: platform
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
-  project: default
   source:
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.15.1
+    targetRevision: v1.18.2
     helm:
       parameters:
         - name: installCRDs
           value: 'true'
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['CreateNamespace=true']

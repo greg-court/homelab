@@ -1,0 +1,18 @@
+ingressClassName: nginx
+
+host: example.local
+
+service:
+  name: ''
+  # namespace: ""   # not used by the template; Ingress must be in same ns as Service
+  port: 80
+
+annotations: {}
+labels: {}
+
+tls:
+  enabled: true
+  secretName: '' # default: derived from host
+  clusterIssuer: homelab-ca
+
+backendProtocol: '' # e.g. "HTTPS" for argocd-server

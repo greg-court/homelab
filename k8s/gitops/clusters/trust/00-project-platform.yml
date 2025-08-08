@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: Platform building blocks (networking, ingress, PKI, exposures)
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - https://github.com/greg-court/homelab.git
+    - https://charts.jetstack.io
+    - https://metallb.github.io/metallb
+    - https://kubernetes.github.io/ingress-nginx
+    - https://charts.external-secrets.io
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
