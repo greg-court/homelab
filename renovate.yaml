@@ -1,133 +1,137 @@
-# Renovate configuration for Homelab
-# Docs: https://docs.renovatebot.com/configuration-options/
-# YAML is accepted by Renovate and lets you add comments like this one.
-# File can be named `renovate.yaml`, `.renovaterc.yaml`, or `.renovaterc.yml`
+# Renovate config for your homelab repo
+# Docs: https://docs.renovatebot.com/
+# File name: renovate.yaml  (in repo root)
 
 $schema: https://docs.renovatebot.com/renovate-schema.json
 
-# Base presets
 extends:
-  - config:best-practices # Good defaults from Renovate
-  - :rebaseStalePrs # Rebase PRs if they get out of date
+  - config:best-practices
+  - :rebaseStalePrs
 
 labels:
   - deps
   - renovate
 
 timezone: Europe/London
-
-# Only check during working hours to reduce noise
 schedule:
   - after 08:00 and before 18:00 on Monday to Friday
 
-# Limit concurrent open PRs so you don’t get spammed
 prConcurrentLimit: 10
+prHourlyLimit: 6
+dependencyDashboard: true
+rebaseWhen: conflicted
 
-# Enable only the managers we actually care about in this repo
+# Enable the managers you use
 enabledManagers:
-  - helmfile # helmfile.yaml
-  - helm-values # values.yaml with chart refs
-  - helmv3 # Chart.yaml dependencies (v3)
-  - kustomize # kustomization.yaml images
-  - kubernetes # image tags in manifests
-  - dockerfile # Dockerfiles
-  - docker-compose # docker-compose.yml
-  - github-actions # .github/workflows/*.yml
-  - terraform # *.tf
-  - terragrunt # terragrunt.hcl
-  - ansible-galaxy # requirements.yml for roles/collections
+  - helmv3              # Chart.yaml
+  - helmfile            # helmfile.yaml
+  - helm-values         # values.yaml with chart refs
+  - kustomize           # kustomization.yaml
+  - kubernetes          # raw K8s YAML image refs
+  - argocd              # Argo CD Application YAMLs (chart targetRevision, images)
+  - dockerfile          # Dockerfiles
+  - docker-compose
+  - github-actions
+  - terraform
+  - terragrunt
+  - ansible-galaxy
+  - custom.regex        # our regex catcher for stray image: tags
 
-# Extra config for Kubernetes manifests — tell Renovate where they are
+# Where to scan for K8s and Argo CD files
 kubernetes:
   managerFilePatterns:
-    - "^k8s/gitops/apps/.*\\.ya?ml$"
-    - "^k8s/gitops/clusters/.*\\.ya?ml$"
+    - "^k8s/gitops/apps/.+\\.ya?ml$"
+    - "^k8s/gitops/clusters/.+\\.ya?ml$"
 
-# Ignore Terraform state files, Talos configs, and other junk we don't want touched
+argocd:
+  managerFilePatterns:
+    - "^k8s/gitops/clusters/.+\\.ya?ml$"
+
+# Optional: pin images to digests (immutable deploys)
+docker:
+  pinDigests: true
+kustomize:
+  pinDigests: true
+kubernetes:
+  pinDigests: true
+
+# Keep Renovate away from state/artefacts
 ignorePaths:
-  - '**/.terraform/**'
-  - '**/terraform.tfstate*'
-  - '**/terraform.tfvars'
-  - '**/terraform/**/talosconfig'
-  - '**/k8s/terraform.tfstate*'
+  - "**/.terraform/**"
+  - "**/terraform.tfstate*"
+  - "**/terraform.tfvars"
+  - "**/terraform/**/talosconfig"
+  - "**/k8s/terraform.tfstate*"
 
-# Registry authentication — add secrets via env vars or Renovate’s dashboard
+# Public registries don't need auth, but add private creds here (via env or Mend portal)
 hostRules:
   - hostType: docker
     matchHost: ghcr.io
     username: github
-    password: '{{ env.GITHUB_TOKEN }}'
+    password: "{{ env.GITHUB_TOKEN }}"
   - hostType: helm
-    matchHost: charts.bitnami.com
+    matchHost: charts.jetstack.io
+  - hostType: helm
+    matchHost: prometheus-community.github.io
+  - hostType: helm
+    matchHost: grafana.github.io
+  - hostType: helm
+    matchHost: traefik.github.io
+  - hostType: helm
+    matchHost: metallb.github.io
+  - hostType: helm
+    matchHost: charts.external-secrets.io
 
 packageRules:
-  # Group Helm-related updates into one PR
-  - matchManagers:
-      - helmfile
-      - helm-values
-      - helmv3
+  # Group Helm updates together
+  - matchManagers: [helmv3, helmfile, helm-values]
     groupName: helm charts
 
-  # Group Kustomize and raw K8s YAML image tag bumps
-  - matchManagers:
-      - kustomize
-      - kubernetes
-    groupName: k8s image tags
-
-  # Group container image updates
-  - matchManagers:
-      - dockerfile
-      - docker-compose
+  # Group container base images
+  - matchManagers: [dockerfile, docker-compose]
     groupName: base/container images
 
-  # Group GitHub Actions bumps
-  - matchManagers:
-      - github-actions
+  # Group GitHub Actions
+  - matchManagers: [github-actions]
     groupName: github actions
 
-  # Group Terraform updates (providers/modules)
-  - matchManagers:
-      - terraform
-      - terragrunt
+  # Group Terraform
+  - matchManagers: [terraform, terragrunt]
     groupName: terraform providers/modules
 
-  # Group Ansible Galaxy role/collection bumps
-  - matchManagers:
-      - ansible-galaxy
+  # Group Ansible Galaxy
+  - matchManagers: [ansible-galaxy]
     groupName: ansible galaxy
 
-  # Wait 1 day before applying Helm chart updates (catch flaky releases)
-  - matchDatasources:
-      - helm
+  # ArgoCD/K8s updates grouped per cluster (so TRUST/DMZ changes don't mix)
+  - matchManagers: [kubernetes, kustomize, argocd]
+    matchFileNames:
+      - "k8s/gitops/clusters/dmz/**"
+    groupName: platform (dmz)
+  - matchManagers: [kubernetes, kustomize, argocd]
+    matchFileNames:
+      - "k8s/gitops/clusters/trust/**"
+    groupName: platform (trust)
+
+  # Helm: wait a day to dodge flaky releases
+  - matchDatasources: [helm]
     stabilityDays: 1
 
-  # Auto-merge safe updates
-  - matchManagers:
-      - github-actions
-    matchUpdateTypes: ['minor', 'patch']
+  # Auto-merge safe stuff
+  - matchManagers: [github-actions]
+    matchUpdateTypes: [minor, patch]
     automerge: true
-  - matchManagers:
-      - dockerfile
-      - docker-compose
-    matchUpdateTypes: ['patch']
+  - matchManagers: [dockerfile, docker-compose]
+    matchUpdateTypes: [patch]
     automerge: true
 
-  # Keep Terraform lockfiles fresh weekly
-  - matchManagers:
-      - terraform
-      - terragrunt
-    extends:
-      - ':semanticCommitType(chore)'
-    schedule:
-      - on monday
-    postUpdateOptions:
-      - terraformLockFile
+  # Terraform: refresh lockfiles weekly
+  - matchManagers: [terraform, terragrunt]
+    extends: [":semanticCommitType(chore)"]
+    schedule: ["on monday"]
+    postUpdateOptions: ["terraformLockFile"]
 
-# Regex manager to catch any stray "image: something:tag" lines in YAML
-regexManagers:
-  - description: Catch image tags in arbitrary YAML files under k8s/gitops
-    fileMatch:
-      - "(^|/)k8s/gitops/.+\\.ya?ml$"
-    matchStrings:
-      - "image:\\s*(?<depName>[^:\\s]+):(?<currentValue>[^\\s]+)"
-    datasourceTemplate: docker
+# Catch any stray "image: repo:tag" lines in YAML under gitops
+customManagers:
+  - customType: regex
+    description: Catch image tags i
