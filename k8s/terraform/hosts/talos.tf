@@ -49,6 +49,10 @@ data "talos_machine_configuration" "vm" {
             "api-audiences"          = "https://kubernetes.default.svc"
           }
         }
+        network = {
+          cni = { name = "none" }
+        }
+        proxy = { disabled = true } # use Cilium instead
       }
     })
   ]

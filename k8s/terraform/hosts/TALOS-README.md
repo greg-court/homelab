@@ -9,7 +9,8 @@ rm -f ~/.kube/config
 
 ```bash
 # in each config directory:
-talosctl config merge ./talosconfig
+cd ./cluster-dmz && talosctl config merge ./talosconfig
+cd ../cluster-trust && talosctl config merge ./talosconfig
 ```
 
 ## 2. Kubeconfig
