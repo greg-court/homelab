@@ -59,7 +59,7 @@ resource "helm_release" "cilium_trust" {
   atomic          = true
   cleanup_on_fail = true
 
-  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_trust]
+  depends_on = [local_file.kubeconfig_out["cluster-trust"], talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_trust]
 }
 
 resource "helm_release" "cilium_dmz" {
@@ -74,5 +74,5 @@ resource "helm_release" "cilium_dmz" {
   atomic          = true
   cleanup_on_fail = true
 
-  depends_on = [talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_dmz]
+  depends_on = [local_file.kubeconfig_out["cluster-dmz"], talos_cluster_kubeconfig.kc, time_sleep.after_bootstrap_dmz]
 }
