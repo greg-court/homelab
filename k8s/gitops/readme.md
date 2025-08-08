@@ -33,7 +33,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: charts/ingress-app
+    path: k8s/gitops/charts/ingress-app
     helm:
       values: |
         host: grafana.trust.k8s.internal
