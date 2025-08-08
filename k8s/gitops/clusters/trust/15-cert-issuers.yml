@@ -13,6 +13,6 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: charts/cert-issuers
+    path: k8s/gitops/charts/cert-issuers
   syncPolicy:
     automated: { prune: true, selfHeal: true }
