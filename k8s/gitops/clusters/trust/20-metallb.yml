@@ -14,6 +14,11 @@ spec:
     repoURL: https://metallb.github.io/metallb
     chart: metallb
     targetRevision: 0.15.2
+    helm:
+      values: |
+        speaker:
+          frr:
+            enabled: false
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     # Namespace is created by metallb-namespace app (with PSA labels)
