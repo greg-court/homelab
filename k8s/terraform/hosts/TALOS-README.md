@@ -1,8 +1,7 @@
 ## 0. Reset if desired
 
 ```bash
-rm -f ~/.talos/config
-rm -f ~/.kube/config
+rm -f ~/.talos/config && rm -f ~/.kube/config
 ```
 
 ## 1. Talosconfig

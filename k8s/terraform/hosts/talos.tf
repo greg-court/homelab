@@ -48,30 +48,30 @@ data "talos_machine_configuration" "vm" {
             "service-account-issuer" = "https://kubernetes.default.svc"
             "api-audiences"          = "https://kubernetes.default.svc"
           }
-          admissionControl = [
-            # as per https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
-            # to allow cilium to run tests
-            {
-              name = "PodSecurity"
-              configuration = {
-                apiVersion = "pod-security.admission.config.k8s.io/v1alpha1"
-                kind       = "PodSecurityConfiguration"
-                defaults = {
-                  enforce         = "baseline"
-                  enforce-version = "latest"
-                  audit           = "restricted"
-                  audit-version   = "latest"
-                  warn            = "restricted"
-                  warn-version    = "latest"
-                }
-                exemptions = {
-                  usernames      = []
-                  runtimeClasses = []
-                  namespaces     = ["kube-system", "cilium-test-1"] # 👈 add your test ns here
-                }
-              }
-            }
-          ]
+          # admissionControl = [
+          #   # as per https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
+          #   # to allow cilium to run tests
+          #   {
+          #     name = "PodSecurity"
+          #     configuration = {
+          #       apiVersion = "pod-security.admission.config.k8s.io/v1alpha1"
+          #       kind       = "PodSecurityConfiguration"
+          #       defaults = {
+          #         enforce         = "baseline"
+          #         enforce-version = "latest"
+          #         audit           = "restricted"
+          #         audit-version   = "latest"
+          #         warn            = "restricted"
+          #         warn-version    = "latest"
+          #       }
+          #       exemptions = {
+          #         usernames      = []
+          #         runtimeClasses = []
+          #         namespaces     = ["kube-system", "cilium-test-1"]
+          #       }
+          #     }
+          #   }
+          # ]
         }
         network = {
           cni = { name = "none" }
