@@ -27,13 +27,9 @@ data:
       forward_to = [loki.write.default.receiver]
     }
 
-    // Kubernetes events -> Loki
-    discovery.kubernetes "events" {
-      role = "event"
-    }
-
     loki.source.kubernetes_events "events" {
-      targets    = discovery.kubernetes.events.targets
+      job_name   = "kubernetes-events"   # optional
+      # namespaces = ["kube-system","default","monitoring"]  # optional filter
       forward_to = [loki.write.default.receiver]
     }
 
