@@ -1,6 +1,6 @@
 image:
   repository: docker.io/gr10/gh-packer-runner
-  tag: latest
+  tag: latest@sha256:5f9d957b99c49a5908d92ddd35a5da584afecedf839aa61c29ad41718651feb1
   pullPolicy: IfNotPresent
 
 count: 3 # how many runners
