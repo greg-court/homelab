@@ -12,7 +12,7 @@ spec:
     metadata:
       labels: { app: gh-docker-runner }
     spec:
-      serviceAccountName: gh-buildx # <— important
+      serviceAccountName: buildx # <— important
       securityContext:
         fsGroup: 1000
       containers:
