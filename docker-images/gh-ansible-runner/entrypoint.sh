@@ -3,7 +3,7 @@ set -euo pipefail
 
 : "${REPO_URL:?Must set REPO_URL}"
 : "${GH_PAT:?Must set GH_PAT}"
-: "${RUNNER_NAME:=ansible-runner-$(hostname)}"
+: "${RUNNER_NAME:=$(hostname)}"
 : "${RUNNER_LABELS:=self-hosted,ansible}"
 
 GH_PAT=$(echo -n "$GH_PAT" | xargs)

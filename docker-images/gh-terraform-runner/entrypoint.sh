@@ -3,7 +3,7 @@ set -euo pipefail
 
 : "${REPO_URL:?Must set REPO_URL (e.g. https://github.com/org/repo)}"
 : "${GH_PAT:?Must set GH_PAT}"
-: "${RUNNER_NAME:=terraform-runner}"
+: "${RUNNER_NAME:=$(hostname)}"
 : "${RUNNER_LABELS:=self-hosted,terraform}"
 
 GH_PAT=$(echo -n "${GH_PAT}" | xargs)
