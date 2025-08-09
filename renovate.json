@@ -1,12 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", ":rebaseStalePrs"],
+  "extends": [
+    "config:best-practices",
+    "default:pinDigestsDisabled",
+    ":rebaseStalePrs"
+  ],
   "labels": ["deps", "renovate"],
   "timezone": "Europe/London",
   "prConcurrentLimit": 10,
   "prHourlyLimit": 6,
   "dependencyDashboard": true,
   "rebaseWhen": "conflicted",
+
   "enabledManagers": [
     "helmv3",
     "helmfile",
@@ -22,6 +27,7 @@
     "ansible-galaxy",
     "custom.regex"
   ],
+
   "kubernetes": {
     "pinDigests": false,
     "managerFilePatterns": [
@@ -35,13 +41,13 @@
   "kustomize": {
     "pinDigests": false
   },
+
   "ignorePaths": [
-    "**/.terraform/**",
     "**/terraform.tfstate*",
     "**/terraform.tfvars",
-    "**/terraform/**/talosconfig",
     "**/k8s/terraform.tfstate*"
   ],
+
   "hostRules": [
     {
       "hostType": "docker",
@@ -49,40 +55,44 @@
       "username": "github",
       "password": "{{ env.GITHUB_TOKEN }}"
     },
-    {
-      "hostType": "helm",
-      "matchHost": "charts.jetstack.io"
-    },
-    {
-      "hostType": "helm",
-      "matchHost": "prometheus-community.github.io"
-    },
-    {
-      "hostType": "helm",
-      "matchHost": "grafana.github.io"
-    },
-    {
-      "hostType": "helm",
-      "matchHost": "traefik.github.io"
-    },
-    {
-      "hostType": "helm",
-      "matchHost": "metallb.github.io"
-    },
-    {
-      "hostType": "helm",
-      "matchHost": "charts.external-secrets.io"
-    }
+    { "hostType": "helm", "matchHost": "charts.jetstack.io" },
+    { "hostType": "helm", "matchHost": "prometheus-community.github.io" },
+    { "hostType": "helm", "matchHost": "grafana.github.io" },
+    { "hostType": "helm", "matchHost": "traefik.github.io" },
+    { "hostType": "helm", "matchHost": "metallb.github.io" },
+    { "hostType": "helm", "matchHost": "charts.external-secrets.io" }
   ],
+
   "packageRules": [
     {
-      "matchManagers": ["github-actions"],
+      "matchDatasources": ["docker"],
       "pinDigests": false
     },
     {
-      "matchCategories": ["docker"],
+      "matchManagers": [
+        "github-actions",
+        "helmv3",
+        "helmfile",
+        "helm-values",
+        "dockerfile",
+        "docker-compose",
+        "kubernetes",
+        "kustomize",
+        "argocd",
+        "custom.regex"
+      ],
       "pinDigests": false
     },
+    {
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "enabled": false
+    },
+
+    {
+      "matchManagers": ["helmv3", "helmfile"],
+      "rangeStrategy": "pin"
+    },
+
     {
       "matchManagers": ["helmv3", "helmfile", "helm-values"],
       "groupName": "helm charts"
@@ -105,18 +115,18 @@
     },
     {
       "matchManagers": ["kubernetes", "kustomize", "argocd"],
-      "matchFileNames": ["k8s/gitops/clusters/dmz/**"],
       "groupName": "platform (dmz)"
     },
     {
       "matchManagers": ["kubernetes", "kustomize", "argocd"],
-      "matchFileNames": ["k8s/gitops/clusters/trust/**"],
       "groupName": "platform (trust)"
     },
+
     {
       "matchDatasources": ["helm"],
       "minimumReleaseAge": "1 day"
     },
+
     {
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
@@ -127,6 +137,7 @@
       "matchUpdateTypes": ["patch"],
       "automerge": true
     },
+
     {
       "matchManagers": [
         "dockerfile",
@@ -137,6 +148,7 @@
       "matchUpdateTypes": ["digest"],
       "enabled": false
     },
+
     {
       "matchManagers": ["terraform", "terragrunt"],
       "extends": [":semanticCommitType(chore)"],
@@ -144,6 +156,7 @@
       "postUpdateOptions": ["terraformLockFile"]
     }
   ],
+
   "customManagers": [
     {
       "customType": "regex",
