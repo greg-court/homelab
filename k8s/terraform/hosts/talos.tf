@@ -98,15 +98,11 @@ data "talos_machine_configuration" "vm" {
     length(lookup(each.value, "mounts", [])) > 0 ? [
       yamlencode({
         machine = {
-          filesystems = [
+          # Talos will partition/format and mount each device under /var/mnt/...
+          disks = [
             for m in each.value.mounts : {
-              device = m.device
-              wipe   = coalesce(try(m.wipe, null), true)
-              format = { type = coalesce(try(m.fs, null), "xfs") }
-              mount = {
-                path    = m.mount
-                options = coalesce(try(m.options, null), ["noatime"])
-              }
+              device     = m.device
+              partitions = [{ mountpoint = m.mount }] # e.g. /var/mnt/prometheus
             }
           ]
         }
@@ -170,9 +166,10 @@ resource "talos_machine_configuration_apply" "mounts" {
     if length(lookup(v, "mounts", [])) > 0
   }
 
-  node                  = "${lower(each.value.host_id)}.internal"
-  client_configuration  = talos_machine_secrets.cluster[each.value.cluster_name].client_configuration
-  machine_configuration = data.talos_machine_configuration.vm[each.key].machine_configuration
+  node                 = "${lower(each.value.host_id)}.internal"
+  client_configuration = talos_machine_secrets.cluster[each.value.cluster_name].client_configuration
+
+  machine_configuration_input = data.talos_machine_configuration.vm[each.key].machine_configuration
 
   depends_on = [talos_machine_bootstrap.cluster]
 }
