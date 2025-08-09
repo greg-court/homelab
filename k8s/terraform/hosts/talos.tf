@@ -39,6 +39,10 @@ data "talos_machine_configuration" "vm" {
             # use DHCP by not specifying nameservers
             # nameservers = var.clusters[each.value.cluster_name].nameservers
           }
+          certSANs = [
+            lower(each.value.host_id),
+            "${lower(each.value.host_id)}.internal"
+          ]
           install = {
             disk  = "/dev/sda"
             image = var.install_image
@@ -141,7 +145,7 @@ resource "local_file" "talosconfig_out" {
 # Bootstrap the first CP node after VMs exist
 resource "talos_machine_bootstrap" "cluster" {
   for_each             = var.clusters
-  node                 = "${lower(element(keys(each.value.hosts), 0))}.internal"
+  node                 = "${lower(element(keys(each.value.hosts), 0))}"
   client_configuration = talos_machine_secrets.cluster[each.key].client_configuration
   depends_on           = [module.proxmox_vms]
 }
