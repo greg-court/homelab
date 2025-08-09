@@ -52,6 +52,10 @@ module "cluster_trust" {
     helm       = helm.trust
   }
 
+  azure_tenant_id     = var.azure_tenant_id
+  azure_client_id     = var.azure_client_id
+  azure_client_secret = var.azure_client_secret
+
   depends_on = [
     time_sleep.after_cilium_trust,
   ]
