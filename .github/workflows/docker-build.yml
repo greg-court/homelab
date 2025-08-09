@@ -89,7 +89,7 @@ jobs:
       - name: Load Docker build secrets from Azure Key Vault
         uses: ./.github/actions/fetch-akv-secrets
         with:
-          keyvault: my-keyvault-name
+          keyvault: kv-homelab-uks
           secrets: docker-user,docker-pat,repo-tagging-pat,discord-webhook-url
           azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
           azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
