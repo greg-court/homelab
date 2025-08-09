@@ -21,6 +21,19 @@ spec:
         kubeControllerManager: { enabled: false }
         kubeScheduler: { enabled: false }
 
+        prometheusOperator:
+          admissionWebhooks:
+            certManager:
+              enabled: true
+              issuerRef:
+                name: homelab-ca
+                kind: ClusterIssuer
+                group: cert-manager.io
+            createSecretJob:
+              enabled: false
+            patch:
+              enabled: false
+
         prometheus:
           prometheusSpec:
             retention: 14d
