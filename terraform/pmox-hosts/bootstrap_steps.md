@@ -110,7 +110,9 @@ pvecm add pve01
 ```
 
 ```bash
-## Add shared storage
+## Set local to accept only snippets
+
+pvesm set local --content snippets
 
 ### Backup storage etc
 

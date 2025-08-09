@@ -1,4 +1,5 @@
 endpoint = "https://pve02:8006/api2/json"
+ansible_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDJp/CC2LAbxlvjOWA9Op/mhtA0An/WLzb9cOYJT/r/ ansible-deploy-key"
 lxcs = {
   "NETBIRD-GREG" = {
     start_on_boot       = true
@@ -13,10 +14,10 @@ lxcs = {
       mac_address = "BC:24:11:63:AD:A1"
       vlan_id     = 20
     }
-    node_name = "pve01"
+    node_name = "pve03" # temp, change to pve01 later
     disk = {
       size         = 8
-      datastore_id = "remote-nfs"
+      datastore_id = "local-zfs"
     }
   }
 
@@ -36,7 +37,7 @@ lxcs = {
     node_name = "pve02"
     disk = {
       size         = 8
-      datastore_id = "remote-nfs"
+      datastore_id = "local-zfs"
     }
   }
 
@@ -57,76 +58,59 @@ lxcs = {
     node_name = "pve03"
     disk = {
       size         = 8
-      datastore_id = "remote-nfs"
+      datastore_id = "local-zfs"
     }
   }
 
-  "DDCLIENT" = {
+  # "ADGUARD-DNS-01" = {
+  #   start_on_boot = true
+  #   operating_system = {
+  #     type = "ubuntu"
+  #   }
+  #   cpu    = { cores = 1 }
+  #   memory = { dedicated = 512 }
+  #   network_interface = {
+  #     vlan_id     = 10
+  #   }
+  #   disk = {
+  #     size         = 16
+  #     datastore_id = "local-zfs"
+  #   }
+  #   node_name = "pve01"
+  # }
+
+  "ADGUARD-DNS-02" = {
     start_on_boot = true
     operating_system = {
       type = "ubuntu"
     }
     cpu    = { cores = 1 }
-    memory = { dedicated = 256 }
-    network_interface = {
-      vlan_id = 10
-    }
-    disk = {
-      size         = 8
-      datastore_id = "remote-nfs"
-    }
-    node_name = "pve02"
-  }
-
-  "ADGUARD-DNS" = {
-    start_on_boot = true
-    startup       = { order = 2 }
-    operating_system = {
-      type = "ubuntu"
-    }
-    cpu    = { cores = 1 }
-    memory = { dedicated = 1024 }
+    memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:E7:80:82"
       vlan_id     = 10
     }
     disk = {
       size         = 16
-      datastore_id = "remote-nfs"
+      datastore_id = "local-zfs"
     }
     node_name = "pve02"
   }
 
-  "DNS-TRAINER" = {
+  "ADGUARD-DNS-03" = {
     start_on_boot = true
-    cpu           = { cores = 1 }
-    clone = {
-      vm_id = 300
-    }
-    memory = { dedicated = 256 }
-    network_interface = {
-      vlan_id = 10
-    }
-    disk = {
-      size         = 8
-      datastore_id = "remote-nfs"
-    }
-    node_name = "pve01"
-  }
-
-  "DOCKER-DMZ" = { # to be deleted
-    start_on_boot = true
-    tags          = ["dmz"]
-    clone = {
-      vm_id = 301
+    operating_system = {
+      type = "ubuntu"
     }
     cpu    = { cores = 1 }
-    memory = { dedicated = 4096 }
+    memory = { dedicated = 512 }
     network_interface = {
-      mac_address = "BC:24:11:41:C6:77"
-      vlan_id     = 60
+      vlan_id     = 10
     }
-    disk      = { size = 8 }
+    disk = {
+      size         = 16
+      datastore_id = "local-zfs"
+    }
     node_name = "pve03"
   }
 }
