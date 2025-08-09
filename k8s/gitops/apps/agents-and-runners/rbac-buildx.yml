@@ -1,48 +1,39 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: gh-buildx
+  name: buildx
   namespace: agents-and-runners
 ---
+# Role that allows creating/maintaining the BuildKit deployment in this namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: buildx-controller
+  name: buildx-manager
   namespace: agents-and-runners
 rules:
-  # Buildx (driver=kubernetes) creates/controls pods & services and stores state in secrets/cm
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
   - apiGroups: ['']
     resources:
-      [
-        'pods',
-        'pods/log',
-        'services',
-        'secrets',
-        'configmaps',
-        'events',
-        'persistentvolumeclaims',
-      ]
-    verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
-  - apiGroups: ['apps']
-    resources: ['deployments', 'statefulsets', 'replicasets']
-    verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
+      ['pods', 'pods/log', 'services', 'configmaps', 'secrets', 'events']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
   - apiGroups: ['batch']
     resources: ['jobs']
-    verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
-  - apiGroups: ['coordination.k8s.io']
-    resources: ['leases']
-    verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
 ---
+# Bind the role to ALL service accounts in this namespace so whatever SA your
+# self-hosted runner uses can create the BuildKit deployment.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: buildx-controller
+  name: buildx-manager-to-namespace-sas
   namespace: agents-and-runners
+subjects:
+  - kind: Group
+    name: system:serviceaccounts:agents-and-runners
+    apiGroup: rbac.authorization.k8s.io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: buildx-controller
-subjects:
-  - kind: ServiceAccount
-    name: gh-buildx
-    namespace: agents-and-runners
+  name: buildx-manager
