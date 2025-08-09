@@ -1,10 +1,30 @@
----
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: prometheus-local
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-local-k8s-dmz-03
+spec:
+  capacity: { storage: 32Gi }
+  volumeMode: Filesystem
+  accessModes: ['ReadWriteOnce']
+  storageClassName: prometheus-local
+  local: { path: /var/lib/k8s/prometheus }
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ['k8s-dmz-03']
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions: ['noatime', 'nodiratime', 'discard']
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -12,43 +32,24 @@ metadata:
   name: loki-local
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-prometheus-local-01
+  name: loki-local-k8s-dmz-03
 spec:
-  storageClassName: prometheus-local
-  capacity: { storage: 32Gi }
-  accessModes: ['ReadWriteOnce']
-  persistentVolumeReclaimPolicy: Retain
-  volumeMode: Filesystem
-  local:
-    path: /var/lib/k8s/prometheus # create this on the node
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values: ['k8s-dmz-03'] # <- change if needed
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-loki-local-01
-spec:
-  storageClassName: loki-local
   capacity: { storage: 64Gi }
-  accessModes: ['ReadWriteOnce']
-  persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
-  local:
-    path: /var/lib/k8s/loki # create this on the node
+  accessModes: ['ReadWriteOnce']
+  storageClassName: loki-local
+  local: { path: /var/lib/k8s/loki }
   nodeAffinity:
     required:
       nodeSelectorTerms:
         - matchExpressions:
             - key: kubernetes.io/hostname
               operator: In
-              values: ['k8s-dmz-03'] # <- change if needed
+              values: ['k8s-dmz-03']
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions: ['noatime', 'nodiratime', 'discard']
