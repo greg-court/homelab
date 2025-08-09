@@ -42,7 +42,7 @@ module "proxmox_vms" {
 
 # below modules only run on 2nd pass to ensure the kubeconfig is available
 module "cluster_trust" {
-  count           = fileexists("${path.module}/configs/cluster-trust/kubeconfig") ? 1 : 0
+  count = fileexists("${path.module}/configs/cluster-trust/kubeconfig") ? 1 : 0
 
   source = "./clusters/cluster-trust"
   providers = {
@@ -56,7 +56,7 @@ module "cluster_trust" {
 }
 
 module "cluster_dmz" {
-  count           = fileexists("${path.module}/configs/cluster-dmz/kubeconfig") ? 1 : 0
+  count = fileexists("${path.module}/configs/cluster-dmz/kubeconfig") ? 1 : 0
 
   source = "./clusters/cluster-dmz"
   providers = {

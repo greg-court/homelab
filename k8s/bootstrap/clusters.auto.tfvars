@@ -22,7 +22,7 @@ clusters = {
         }
         mounts = [
           { device = "/dev/sdb", mount = "/var/mnt/prometheus", fs = "xfs", wipe = true, options = ["noatime"] },
-          { device = "/dev/sdc", mount = "/var/mnt/loki",       fs = "xfs", wipe = true, options = ["noatime"] }
+          { device = "/dev/sdc", mount = "/var/mnt/loki", fs = "xfs", wipe = true, options = ["noatime"] }
         ]
       }
     }
