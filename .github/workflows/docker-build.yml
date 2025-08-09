@@ -17,6 +17,7 @@ on:
         required: false
 
 permissions:
+  id-token: write # needed for azure/login OIDC
   contents: write
 
 jobs:
@@ -46,9 +47,7 @@ jobs:
           else
             DIFF_BASE="${{ github.event.before }}"
             DIFF_HEAD="${{ github.sha }}"
-
             CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "$DIFF_BASE" "$DIFF_HEAD" | grep '^docker-images/' || true)
-
             while read -r file; do
               [[ -z "$file" ]] && continue
               DIR=$(echo "$file" | cut -d/ -f2)
@@ -60,8 +59,6 @@ jobs:
 
           UNIQUE_DIRS=$(printf '%s\n' "${DIRS[@]}" | sort -u)
           MATRIX="[]"
-
-          # This prevents the matrix from ever becoming '[{"image": ""}]'
           if [[ -n "$UNIQUE_DIRS" ]]; then
             MATRIX=$(printf '%s\n' "${UNIQUE_DIRS[@]}" | jq -R . | jq -cs 'map({image: .})')
           fi
@@ -84,10 +81,19 @@ jobs:
         include: ${{ fromJson(needs.prep.outputs.matrix) }}
 
     steps:
-      - name: Check out full repository for tagging
+      - name: Checkout repo (full, includes local action)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for the semver-tagger action to get all tags/history
+          fetch-depth: 0
+
+      - name: Load Docker build secrets from Azure Key Vault
+        uses: ./.github/actions/fetch-akv-secrets
+        with:
+          keyvault: my-keyvault-name
+          secrets: docker-user,docker-pat,repo-tagging-pat,discord-webhook-url
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
@@ -95,8 +101,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: gr10
-          password: ${{ secrets.DOCKERHUB_PAT }}
+          username: ${{ env.DOCKER_USER }}
+          password: ${{ env.DOCKER_PAT }}
 
       - name: Determine version
         id: semver
@@ -126,7 +132,7 @@ jobs:
 
       - name: Create Git Tag via API
         env:
-          GH_TOKEN: ${{ secrets.REPO_TAGGING_PAT }}
+          GH_TOKEN: ${{ env.REPO_TAGGING_PAT }} # from AKV
           VERSION: ${{ github.event.inputs.custom_version || steps.semver.outputs.version_tag }}
           SHA: ${{ github.sha }}
         run: |
@@ -137,14 +143,14 @@ jobs:
 
       - name: Notify Discord
         if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ env.DISCORD_WEBHOOK_URL }} # from AKV
         run: |
-          # Your Discord notification curl command is fine as is
-          # Using new_version and new_tag from the semver step for consistency
           curl -H "Content-Type: application/json" \
               -X POST \
               -d '{
                 "username": "CI Bot",
                 "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                "content": "**🚀 Docker Build Complete**\n**Image:** `${{ matrix.image }}`\n**Version:** `${{ steps.semver.outputs.version }}`\n**Git tag:** `${{ steps.semver.outputs.version_tag }}`\n✅ Success!"
+                "content": "**🚀 Docker Build Complete**\n**Image:** `"${{ matrix.image }}"`\n**Version:** `"${{ steps.semver.outputs.version }}"`\n**Git tag:** `"${{ steps.semver.outputs.version_tag }}"`\n✅ Success!"
               }' \
-              ${{ secrets.DISCORD_WEBHOOK_URL }}
+              "$DISCORD_WEBHOOK_URL"

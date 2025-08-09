@@ -38,10 +38,8 @@ runs:
             --name "$name" \
             --query value -o tsv)
 
-          # mask in logs
           echo "::add-mask::$val"
 
-          # export to job env (NAME -> NAME; hyphen -> underscore; uppercased)
           key=$(echo "$name" | tr '[:lower:]-' '[:upper:]_')
           printf '%s<<EOF\n%s\nEOF\n' "$key" "$val" >> "$GITHUB_ENV"
         done
