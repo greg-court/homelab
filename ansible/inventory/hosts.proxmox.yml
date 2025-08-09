@@ -20,12 +20,10 @@ groups:
   linux: >-
     ((proxmox_vmtype == 'lxc') or (proxmox_ostype == 'l26'))
     and ('no-ansible' not in (proxmox_tags | default([])))
-  test: >-
-    inventory_hostname in ['ITADM-UBU24']
-  kubernetes_controller: inventory_hostname == 'K8S-CTRL'
-  kubernetes_nodes: inventory_hostname in ['K8S-GREG', 'K8S-DMZ']
-  kubernetes: >-
-    inventory_hostname in ['K8S-CTRL', 'K8S-GREG', 'K8S-DMZ']
+  adguard_home: >-
+    'adguard-home' in (proxmox_tags | default([]))
+  netbird: >-
+    'netbird' in (proxmox_tags | default([]))
 
 compose:
   ansible_host: 'agent_interfaces[0].ip_addresses[0].ip_address'

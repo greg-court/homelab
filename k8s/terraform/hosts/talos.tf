@@ -145,7 +145,7 @@ resource "local_file" "talosconfig_out" {
 # Bootstrap the first CP node after VMs exist
 resource "talos_machine_bootstrap" "cluster" {
   for_each             = var.clusters
-  node                 = "${lower(element(keys(each.value.hosts), 0))}"
+  node                 = lower(element(keys(each.value.hosts), 0))
   client_configuration = talos_machine_secrets.cluster[each.key].client_configuration
   depends_on           = [module.proxmox_vms]
 }

@@ -1,8 +1,9 @@
-endpoint = "https://pve02:8006/api2/json"
+endpoint           = "https://pve02:8006/api2/json"
 ansible_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDJp/CC2LAbxlvjOWA9Op/mhtA0An/WLzb9cOYJT/r/ ansible-deploy-key"
 lxcs = {
-  "NETBIRD-GREG" = {
+  "NETBIRD-GREG-01" = {
     start_on_boot       = true
+    tags                = ["netbird"]
     custom_conf_options = "lxc.cgroup2.devices.allow: c 10:200 rwm,lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file"
     features            = { nesting = true }
     operating_system = {
@@ -21,8 +22,9 @@ lxcs = {
     }
   }
 
-  "NETBIRD-FAM" = {
+  "NETBIRD-FAM-01" = {
     start_on_boot       = true
+    tags                = ["netbird"]
     custom_conf_options = "lxc.cgroup2.devices.allow: c 10:200 rwm,lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file"
     features            = { nesting = true }
     operating_system = {
@@ -41,9 +43,9 @@ lxcs = {
     }
   }
 
-  "NETBIRD-DMZ" = {
+  "NETBIRD-DMZ-01" = {
     start_on_boot       = true
-    tags                = ["dmz"]
+    tags                = ["dmz", "netbird"]
     custom_conf_options = "lxc.cgroup2.devices.allow: c 10:200 rwm,lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file"
     features            = { nesting = true }
     operating_system = {
@@ -81,6 +83,7 @@ lxcs = {
 
   "ADGUARD-DNS-02" = {
     start_on_boot = true
+    tags          = ["adguard"]
     operating_system = {
       type = "ubuntu"
     }
@@ -99,13 +102,14 @@ lxcs = {
 
   "ADGUARD-DNS-03" = {
     start_on_boot = true
+    tags          = ["adguard"]
     operating_system = {
       type = "ubuntu"
     }
     cpu    = { cores = 1 }
     memory = { dedicated = 512 }
     network_interface = {
-      vlan_id     = 3
+      vlan_id = 3
     }
     disk = {
       size         = 16

@@ -1,0 +1,73 @@
+name: Ansible | Run Selected Playbook
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'What to install/run?'
+        type: choice
+        required: true
+        options:
+          - default-config
+          - install-adguard
+          - install-netbird
+          - updates
+
+jobs:
+  run:
+    runs-on: [self-hosted, ansible]
+    defaults:
+      run:
+        working-directory: ./ansible
+
+    env:
+      PLAY_default-config: playbook.default-config.yml
+      PLAY_install-adguard: playbook.install-adguard.yml
+      PLAY_install-netbird: playbook.install-netbird.yml
+      PLAY_updates: playbook.updates.yml
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            ansible
+
+      - name: Load secrets from Azure Key Vault
+        uses: ./.github/actions/fetch-akv-secrets
+        with:
+          keyvault: my-keyvault-name
+          secrets: ansible-ssh-private-key,ansible-proxmox-api-user,ansible-proxmox-api-token-id,ansible-proxmox-api-token-secret
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: Python libs for Proxmox modules
+        run: |
+          python3 -m pip install --break-system-packages --upgrade pip
+          python3 -m pip install --break-system-packages proxmoxer requests
+
+      - name: Set up SSH key
+        env:
+          ANSIBLE_SSH_KEY: ${{ env.ANSIBLE_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$ANSIBLE_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Prepare Proxmox env vars (AKV)
+        run: |
+          {
+            echo "PROXMOX_URL=https://pve02.internal:8006/api2/json"
+            echo "PROXMOX_HOST=pve02.internal:8006"
+            echo "PROXMOX_USER=${ANSIBLE_PROXMOX_API_USER}"
+            echo "PROXMOX_TOKEN_ID=${ANSIBLE_PROXMOX_API_TOKEN_ID}"
+            echo "PROXMOX_TOKEN_SECRET=${ANSIBLE_PROXMOX_API_TOKEN_SECRET}"
+          } >> "$GITHUB_ENV"
+
+      - name: Run selected playbook
+        run: |
+          PLAY_VAR="PLAY_${{ github.event.inputs.target }}"
+          PLAYBOOK="${!PLAY_VAR}"
+          echo "Running $PLAYBOOK"
+          ansible-playbook "$PLAYBOOK" -v

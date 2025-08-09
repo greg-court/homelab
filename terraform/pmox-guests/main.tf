@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_file" "ansible_hook" {
 
   source_raw {
     file_name = "ansible-bootstrap.sh"
-    data = <<HOOK
+    data      = <<HOOK
 #!/usr/bin/env bash
 vmid="$1"; phase="$2"
 # Run a few seconds after post-start so the CT is unlocked & networking is up
