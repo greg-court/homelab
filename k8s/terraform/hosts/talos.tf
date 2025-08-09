@@ -173,7 +173,6 @@ resource "talos_machine_configuration_apply" "mounts" {
   node                  = "${lower(each.value.host_id)}.internal"
   client_configuration  = talos_machine_secrets.cluster[each.value.cluster_name].client_configuration
   machine_configuration = data.talos_machine_configuration.vm[each.key].machine_configuration
-  reboot                = true
 
   depends_on = [talos_machine_bootstrap.cluster]
 }

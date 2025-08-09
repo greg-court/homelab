@@ -29,7 +29,6 @@ clusters = {
   cluster-dmz = {
     vlan_id     = 4
     zone        = "dmz"
-    cpu         = { cores = 2 }
     extra_tags  = ["dmz"]
     hosts = {
       k8s-dmz-01 = {
