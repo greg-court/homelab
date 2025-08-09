@@ -57,7 +57,7 @@ lxcs = {
       mac_address = "BC:24:11:E6:58:5F"
       vlan_id     = 4
     }
-    node_name = "pve03"
+    node_name = "pve02"
     disk = {
       size         = 8
       datastore_id = "local-zfs"
