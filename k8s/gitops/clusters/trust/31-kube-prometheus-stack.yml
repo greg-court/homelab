@@ -38,7 +38,7 @@ spec:
                   storageClassName: prometheus-local
                   resources:
                     requests:
-                      storage: 64Gi
+                      storage: 32Gi
         alertmanager:
           enabled: true
           alertmanagerSpec:
