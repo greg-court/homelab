@@ -12,7 +12,6 @@ metadata:
   annotations:
     metallb.io/address-pool: trust-pool
     metallb.io/allow-shared-ip: {{ $shareKey | quote }}
-    metallb.io/loadBalancerIPs: {{ $vip | quote }}
   labels:
     app: gh-packer-runner
     instance: "{{ $suffix }}"
