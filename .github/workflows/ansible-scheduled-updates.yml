@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/fetch-akv-secrets
         with:
           keyvault: my-keyvault-name
-          secrets: ansible-ssh-private-key,ansible-proxmox-api-token-id,ansible-proxmox-api-token-secret
+          secrets: ansible-ssh-private-key,ansible-proxmox-api-user,ansible-proxmox-api-token-id,ansible-proxmox-api-token-secret
 
       - name: Install Ansible collections
         run: ansible-galaxy collection install -r requirements.yml
@@ -45,19 +45,9 @@ jobs:
 
       - name: Run the state-aware update playbook
         env:
-          # full URL for the inventory plugin
-          PROXMOX_URL: 'https://pve02.internal:8006/api2/json'
-
-          # host[:port] for the modules
-          PROXMOX_HOST: 'pve02.internal:8006'
-
-          # token user!id and secret come from secrets
-          PROXMOX_USER_TOKEN_INPUT: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_ID }}
-          PROXMOX_SECRET_INPUT: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_SECRET }}
-        run: |
-          # Split the "user!tokenid" secret into its parts
-          export PROXMOX_USER=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f1)
-          export PROXMOX_TOKEN_ID=$(echo "$PROXMOX_USER_TOKEN_INPUT" | cut -d'!' -f2)
-          export PROXMOX_TOKEN_SECRET="$PROXMOX_SECRET_INPUT"
-          # Nothing else needed; inventory + modules now get what they expect
-          ansible-playbook playbook.updates.yml -v
+          PROXMOX_URL: 'https://pve02.internal:8006/api2/json' # inventory plugin
+          PROXMOX_HOST: 'pve02.internal:8006' # modules
+          PROXMOX_USER: ${{ env.ANSIBLE_PROXMOX_API_USER }}
+          PROXMOX_TOKEN_ID: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_ID }}
+          PROXMOX_TOKEN_SECRET: ${{ env.ANSIBLE_PROXMOX_API_TOKEN_SECRET }}
+        run: ansible-playbook playbook.updates.yml -v

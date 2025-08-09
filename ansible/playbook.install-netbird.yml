@@ -1,0 +1,20 @@
+---
+- name: Install NetBird on tagged containers
+  hosts: netbird
+  gather_facts: true
+  become: true
+  serial: 1
+
+  pre_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: start
+
+  roles:
+    - role: netbird
+      tags: [install]
+
+  post_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: stop

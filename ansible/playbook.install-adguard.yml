@@ -1,0 +1,20 @@
+---
+- name: Install AdGuard Home on tagged containers
+  hosts: adguard_home
+  gather_facts: true
+  become: true
+  serial: 1
+
+  pre_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: start
+
+  roles:
+    - role: adguard_home
+      tags: [install]
+
+  post_tasks:
+    - import_role:
+        name: power_cycle
+        tasks_from: stop

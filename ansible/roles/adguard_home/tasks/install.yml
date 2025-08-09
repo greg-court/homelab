@@ -1,0 +1,51 @@
+---
+- name: Ensure deps for download
+  ansible.builtin.apt:
+    name: [curl, tar]
+    state: present
+    update_cache: yes
+
+- name: Derive AdGuard Home download url (linux amd64 by default)
+  ansible.builtin.set_fact:
+    _agh_version: "{{ adguard_home_version | default('latest') }}"
+    _agh_arch: "{{ adguard_home_arch_map[ansible_architecture] | default('amd64') }}"
+    _agh_url: >-
+      {{ (adguard_home_version is defined and adguard_home_version != 'latest')
+         | ternary(
+            'https://static.adguard-dns.com/AdGuardHome/release/AdGuardHome_linux_' ~ _agh_arch ~ '.tar.gz',
+            'https://static.adguard-dns.com/AdGuardHome/release/AdGuardHome_linux_' ~ _agh_arch ~ '.tar.gz'
+         ) }}
+
+# NOTE: AdGuardHome releases ship as a single "latest" URL above; pin by checksum/version later if desired.
+
+- name: Create install dir
+  ansible.builtin.file:
+    path: /opt/adguardhome
+    state: directory
+    mode: '0755'
+
+- name: Download AdGuard Home tarball
+  ansible.builtin.get_url:
+    url: '{{ _agh_url }}'
+    dest: /tmp/AdGuardHome.tar.gz
+    mode: '0644'
+
+- name: Extract binary
+  ansible.builtin.unarchive:
+    src: /tmp/AdGuardHome.tar.gz
+    dest: /opt/adguardhome
+    remote_src: true
+    extra_opts: [--strip-components=1]
+
+- name: Install as service (idempotent)
+  ansible.builtin.shell: |
+    set -e
+    /opt/adguardhome/AdGuardHome -s status >/dev/null 2>&1 || /opt/adguardhome/AdGuardHome -s install
+  args:
+    creates: /etc/systemd/system/AdGuardHome.service
+
+- name: Enable and start service
+  ansible.builtin.systemd:
+    name: AdGuardHome
+    enabled: true
+    state: started
