@@ -37,7 +37,7 @@ spec:
         prometheus:
           prometheusSpec:
             retention: 14d
-            retentionSize: "28Gi"   # keep comfortably below the 32Gi PV
+            retentionSize: "28GiB"   # keep comfortably below the 32Gi PV
             walCompression: true
             storageSpec:
               volumeClaimTemplate:
