@@ -1,21 +1,3 @@
-{{- $count := int .Values.count -}}
-{{- $replicas := .Values.replicas | default 1 -}}
-{{- $image := .Values.image -}}
-{{- $domain := .Values.external.domain -}}
-{{- $basePort := int .Values.external.basePort -}}
-{{- range $i, $_ := until $count }}
-{{- $idx := add $i 1 -}}
-{{- $suffix := printf "%02d" $idx -}}
-{{- if gt $i 0 }}
----
-{{- end }}
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: gh-packer-runner-{{ $suffix }}
-  labels:
-    app: gh-packer-runner
-    instance: "{{ $suffix }}"
 spec:
   replicas: {{ $replicas }}
   selector:
@@ -31,6 +13,10 @@ spec:
       annotations: {{ toYaml $.Values.podAnnotations | nindent 8 | trim }}
 {{- end }}
     spec:
+{{- if $.Values.podSecurityContext }}
+      securityContext:
+{{ toYaml $.Values.podSecurityContext | nindent 8 }}
+{{- end }}
       containers:
         - name: gh-packer-runner
           image: "{{ $image.repository }}:{{ $image.tag }}"
@@ -59,25 +45,7 @@ spec:
                 name: {{ . }}
 {{- end }}
 {{- end }}
+{{- if $.Values.containerSecurityContext }}
           securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            capabilities: { drop: ["ALL"] }
-{{- if $.Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml $.Values.nodeSelector | nindent 8 }}
-{{- end }}
-{{- if $.Values.tolerations }}
-      tolerations:
-{{ toYaml $.Values.tolerations | nindent 8 }}
-{{- end }}
-{{- if $.Values.affinity }}
-      affinity:
-{{ toYaml $.Values.affinity | nindent 8 }}
-{{- end }}
-{{- if $.Values.topologySpreadConstraints }}
-      topologySpreadConstraints:
-{{ toYaml $.Values.topologySpreadConstraints | nindent 8 }}
-{{- end }}
+{{ toYaml $.Values.containerSecurityContext | nindent 12 }}
 {{- end }}
