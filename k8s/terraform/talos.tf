@@ -119,7 +119,7 @@ data "talos_machine_configuration" "vm" {
 resource "proxmox_virtual_environment_file" "vm_snippet" {
   for_each     = data.talos_machine_configuration.vm
   content_type = "snippets"
-  datastore_id = "nfs-hdd"
+  datastore_id = "local"
   node_name    = local.hosts[each.key].node_name
 
   source_raw {
