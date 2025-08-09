@@ -15,7 +15,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: rebind
-          image: bitnami/kubectl:1.30
+          image: bitnami/kubectl:1.33
           command: ['/bin/sh', '-c']
           args:
             - |
