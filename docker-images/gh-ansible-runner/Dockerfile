@@ -1,64 +1,52 @@
-# Use the latest stable Debian slim image as the base
+# GitHub Actions self-hosted runner for Ansible (+ Azure CLI)
 FROM debian:stable-slim
 
-# Set ENV for non-interactive installs
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install prerequisites using a single RUN layer to reduce image size
+# Base tooling
 RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends \
-        curl \
-        jq \
-        ca-certificates \
-        git \
-        openssh-client \
-        sudo \
-        python3 \
-        python3-pip \
-        less \
-    && rm -rf /var/lib/apt/lists/*
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+      curl jq ca-certificates git openssh-client sudo \
+      python3 python3-pip less \
+      gnupg lsb-release apt-transport-https \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install the latest versions of Ansible and ansible-lint from PyPI
-RUN echo "--- Installing latest Ansible and Ansible-Lint ---" \
-    && pip3 install --break-system-packages --no-cache-dir --upgrade pip \
-    && pip3 install --break-system-packages --no-cache-dir \
-        ansible \
-        ansible-lint \
-        pywinrm \
-        proxmoxer \
-        requests
+# Azure CLI (official repo)
+RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+      | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
+ && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" \
+      > /etc/apt/sources.list.d/azure-cli.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends azure-cli \
+ && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user for the runner and give it passwordless sudo
+# Ansible + tools
+RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip \
+ && pip3 install --break-system-packages --no-cache-dir \
+      ansible ansible-lint pywinrm proxmoxer requests
+
+# Runner user
 RUN useradd --create-home --shell /bin/bash runner \
-    && echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+ && echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Switch to the runner's home directory for the download
 WORKDIR /home/runner
 
-# Dynamically find the latest GitHub Actions Runner, download, and install it
-RUN echo "--- Fetching latest GitHub Actions Runner ---" \
-    && LATEST_VERSION_TAG=$(curl --silent -L -H "Accept: application/vnd.github+json" https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name') \
-    && LATEST_VERSION=$(echo "$LATEST_VERSION_TAG" | sed 's/v//') \
-    && echo "Latest runner version is: ${LATEST_VERSION}" \
-    && RUNNER_URL="https://github.com/actions/runner/releases/download/${LATEST_VERSION_TAG}/actions-runner-linux-x64-${LATEST_VERSION}.tar.gz" \
-    && curl -o runner.tar.gz -L "${RUNNER_URL}" \
-    && tar xzf ./runner.tar.gz \
-    && rm ./runner.tar.gz
+# Latest GitHub Actions runner
+RUN LATEST_VERSION_TAG=$(curl -sL -H "Accept: application/vnd.github+json" \
+      https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name') \
+ && LATEST_VERSION=${LATEST_VERSION_TAG#v} \
+ && curl -fsSL -o runner.tar.gz \
+      "https://github.com/actions/runner/releases/download/${LATEST_VERSION_TAG}/actions-runner-linux-x64-${LATEST_VERSION}.tar.gz" \
+ && tar xzf runner.tar.gz && rm runner.tar.gz \
+ && chown -R runner:runner /home/runner
 
-# Change ownership of the extracted files to the 'runner' user first.
-RUN chown -R runner:runner /home/runner
-
-# NOW, switch to the non-root 'runner' user for all subsequent commands.
 USER runner
 
-# As the 'runner' user, install collections and dependencies
-RUN ansible-galaxy collection install community.general \
-    && sudo /home/runner/bin/installdependencies.sh
+# Install runner deps script (as provided by actions runner)
+RUN sudo /home/runner/bin/installdependencies.sh
 
-# Copy the entrypoint script (already as the 'runner' user)
 COPY --chown=runner:runner entrypoint.sh /home/runner/entrypoint.sh
 RUN chmod +x /home/runner/entrypoint.sh
 
-# The entrypoint will be started by the container runtime
 ENTRYPOINT ["/home/runner/entrypoint.sh"]
