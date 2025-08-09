@@ -3,22 +3,25 @@ kind: Deployment
 metadata:
   name: gh-docker-runner
   namespace: agents-and-runners
+  labels: { app: gh-docker-runner }
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels: { app: gh-docker-runner }
   template:
     metadata:
       labels: { app: gh-docker-runner }
     spec:
+      serviceAccountName: gh-buildx # <— important
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: runner
           image: docker.io/gr10/gh-docker-runner:latest
+          imagePullPolicy: IfNotPresent
           envFrom:
-            - secretRef:
-                name: gh-runners-env
-            - configMapRef:
-                name: gh-runners-config
+            - secretRef: { name: gh-runners-env } # REPO_URL, GH_PAT, etc.
+            - configMapRef: { name: gh-runners-config } # optional
           env:
             - name: RUNNER_LABELS
               value: 'self-hosted,docker'

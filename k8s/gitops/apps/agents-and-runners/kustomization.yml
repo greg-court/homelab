@@ -8,3 +8,4 @@ resources:
   - deployment-gh-terraform.yml
   - deployment-tfc.yml
   - configmap.yml
+  - rbac-buildx.yml

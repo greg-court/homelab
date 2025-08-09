@@ -24,7 +24,7 @@ spec:
         prometheus:
           prometheusSpec:
             retention: 14d
-            retentionSize: "28Gi"   # keep comfortably below a 32Gi PV
+            retentionSize: "28Gi"   # keep comfortably below the 32Gi PV
             walCompression: true
             storageSpec:
               volumeClaimTemplate:
@@ -37,7 +37,7 @@ spec:
         alertmanager:
           enabled: true
           alertmanagerSpec:
-            storage: {}   # ephemeral is fine
+            storage: {}
 
         grafana:
           enabled: true
@@ -51,3 +51,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
