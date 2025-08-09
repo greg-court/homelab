@@ -10,6 +10,16 @@ variable "clusters" {
     hosts = map(object({
       mac_address = string
       node_name   = string
+      # optional extra disks per host (e.g., { scsi1 = { size = 32 }, scsi2 = { size = 64 } })
+      disks = optional(map(object({ size = number })), {})
+      # optional filesystem mounts managed by Talos
+      mounts = optional(list(object({
+        device  = string
+        mount   = string
+        fs      = optional(string)       # default xfs
+        wipe    = optional(bool)         # default true
+        options = optional(list(string)) # default ["noatime"]
+      })), [])
     }))
   }))
 }

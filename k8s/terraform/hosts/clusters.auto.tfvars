@@ -15,6 +15,14 @@ clusters = {
       k8s-trust-03 = {
         mac_address = "BC:24:11:CC:92:00"
         node_name   = "pve03"
+        disks = {
+          scsi1 = { size = 32 } # Prometheus
+          scsi2 = { size = 64 } # Loki
+        }
+        mounts = [
+          { device = "/dev/sdb", mount = "/var/lib/k8s/prometheus", fs = "xfs", wipe = true, options = ["noatime"] },
+          { device = "/dev/sdc", mount = "/var/lib/k8s/loki", fs = "xfs", wipe = true, options = ["noatime"] }
+        ]
       }
     }
   }
@@ -35,6 +43,14 @@ clusters = {
       k8s-dmz-03 = {
         mac_address = "BC:24:11:B2:65:81"
         node_name   = "pve03"
+        disks = {
+          scsi1 = { size = 32 } # Prometheus
+          scsi2 = { size = 64 } # Loki
+        }
+        mounts = [
+          { device = "/dev/sdb", mount = "/var/lib/k8s/prometheus", fs = "xfs", wipe = true, options = ["noatime"] },
+          { device = "/dev/sdc", mount = "/var/lib/k8s/loki", fs = "xfs", wipe = true, options = ["noatime"] }
+        ]
       }
     }
   }

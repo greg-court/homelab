@@ -29,70 +29,90 @@ data "talos_machine_configuration" "vm" {
   machine_secrets  = talos_machine_secrets.cluster[each.value.cluster_name].machine_secrets
 
   # All per-node tweaks go here
-  config_patches = [
-    yamlencode({
-      machine = {
-        network = {
-          hostname = lower("${each.value.host_id}.internal")
-          # use DHCP by not specifying nameservers
-          # nameservers = var.clusters[each.value.cluster_name].nameservers
-        }
-        install = {
-          disk  = "/dev/sda"
-          image = var.install_image
-        }
-        nodeLabels = { zone = each.value.zone }
-        features = {
-          # - Talos HostDNS normally forwards CoreDNS upstream lookups to 169.254.116.108.
-          # - With Cilium bpf.masquerade=true, pods hitting that link-local IP time out.
-          # - So we disable forwarding so CoreDNS queries go straight to machine.network.nameservers.
-          # - kubePrism stays enabled to match cilium’s k8sServiceHost=localhost / k8sServicePort=7445.
-          kubePrism = { enabled = true, port = 7445 }
-          hostDNS   = { enabled = true, forwardKubeDNSToHost = false } # without this, external DNS resolution is broken with Cilium
-        }
-      }
-      cluster = {
-        allowSchedulingOnControlPlanes = true
-        apiServer = {
-          extraArgs = {
-            # "service-account-issuer" = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
-            # "api-audiences"          = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
-            "service-account-issuer" = "https://kubernetes.default.svc"
-            "api-audiences"          = "https://kubernetes.default.svc"
+  config_patches = concat(
+    [
+      yamlencode({
+        machine = {
+          network = {
+            # hostname = lower("${each.value.host_id}.internal")
+            hostname = lower(each.value.host_id)
+            # use DHCP by not specifying nameservers
+            # nameservers = var.clusters[each.value.cluster_name].nameservers
           }
-          admissionControl = [
-            # as per https://www.talos.dev/v1.10/kubernetes-guides/network/deploying-cilium/
-            # and https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
-            # to allow cilium to run tests
-            {
-              name = "PodSecurity"
-              configuration = {
-                apiVersion = "pod-security.admission.config.k8s.io/v1alpha1"
-                kind       = "PodSecurityConfiguration"
-                defaults = {
-                  enforce         = "baseline"
-                  enforce-version = "latest"
-                  audit           = "restricted"
-                  audit-version   = "latest"
-                  warn            = "restricted"
-                  warn-version    = "latest"
+          install = {
+            disk  = "/dev/sda"
+            image = var.install_image
+          }
+          nodeLabels = { zone = each.value.zone }
+          features = {
+            # - Talos HostDNS normally forwards CoreDNS upstream lookups to 169.254.116.108.
+            # - With Cilium bpf.masquerade=true, pods hitting that link-local IP time out.
+            # - So we disable forwarding so CoreDNS queries go straight to machine.network.nameservers.
+            # - kubePrism stays enabled to match cilium’s k8sServiceHost=localhost / k8sServicePort=7445.
+            kubePrism = { enabled = true, port = 7445 }
+            hostDNS   = { enabled = true, forwardKubeDNSToHost = false } # without this, external DNS resolution is broken with Cilium
+          }
+        }
+        cluster = {
+          allowSchedulingOnControlPlanes = true
+          apiServer = {
+            extraArgs = {
+              # "service-account-issuer" = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+              # "api-audiences"          = "https://kubernetes.default.svc,${lower(each.value.host_id)}.internal:6443"
+              "service-account-issuer" = "https://kubernetes.default.svc"
+              "api-audiences"          = "https://kubernetes.default.svc"
+            }
+            admissionControl = [
+              # as per https://www.talos.dev/v1.10/kubernetes-guides/network/deploying-cilium/
+              # and https://www.talos.dev/v1.10/kubernetes-guides/configuration/pod-security/
+              # to allow cilium to run tests
+              {
+                name = "PodSecurity"
+                configuration = {
+                  apiVersion = "pod-security.admission.config.k8s.io/v1alpha1"
+                  kind       = "PodSecurityConfiguration"
+                  defaults = {
+                    enforce         = "baseline"
+                    enforce-version = "latest"
+                    audit           = "restricted"
+                    audit-version   = "latest"
+                    warn            = "restricted"
+                    warn-version    = "latest"
+                  }
+                  exemptions = {
+                    usernames      = []
+                    runtimeClasses = []
+                    namespaces     = ["cilium-test-1"]
+                  }
                 }
-                exemptions = {
-                  usernames      = []
-                  runtimeClasses = []
-                  namespaces     = ["cilium-test-1"]
-                }
+              }
+            ]
+          }
+          network = {
+            cni = { name = "none" }
+          }
+          proxy = { disabled = true } # use Cilium instead
+        }
+      })
+    ],
+    length(lookup(each.value, "mounts", [])) > 0 ? [
+      yamlencode({
+        machine = {
+          filesystems = [
+            for m in each.value.mounts : {
+              device = m.device
+              wipe   = coalesce(try(m.wipe, null), true)
+              format = { type = coalesce(try(m.fs, null), "xfs") }
+              mount = {
+                path    = m.mount
+                options = coalesce(try(m.options, null), ["noatime"])
               }
             }
           ]
         }
-        network = {
-          cni = { name = "none" }
-        }
-        proxy = { disabled = true } # use Cilium instead
-      }
-    })
-  ]
+      })
+    ] : []
+  )
 }
 
 # 3.  Upload **one** snippet per VM
@@ -142,4 +162,18 @@ resource "local_file" "kubeconfig_out" {
   for_each = talos_cluster_kubeconfig.kc
   content  = each.value.kubeconfig_raw
   filename = "${path.module}/configs/${each.key}/kubeconfig"
+}
+
+resource "talos_machine_configuration_apply" "mounts" {
+  for_each = {
+    for k, v in local.hosts : k => v
+    if length(lookup(v, "mounts", [])) > 0
+  }
+
+  node                  = "${lower(each.value.host_id)}.internal"
+  client_configuration  = talos_machine_secrets.cluster[each.value.cluster_name].client_configuration
+  machine_configuration = data.talos_machine_configuration.vm[each.key].machine_configuration
+  reboot                = true
+
+  depends_on = [talos_machine_bootstrap.cluster[each.value.cluster_name]]
 }

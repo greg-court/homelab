@@ -8,12 +8,33 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: agents-and-runners
-  source:
-    repoURL: https://github.com/greg-court/homelab.git
-    targetRevision: main
-    path: k8s/gitops/apps/agents-and-runners
+  sources:
+    - repoURL: https://github.com/greg-court/homelab.git
+      targetRevision: main
+      path: k8s/gitops/apps/agents-and-runners
+    - repoURL: https://github.com/greg-court/homelab.git
+      targetRevision: main
+      path: k8s/gitops/charts/packer-runners
+      helm:
+        values: |
+          image:
+            repository: docker.io/gr10/gh-packer-runner
+            tag: latest
+          count: 3
+          external:
+            vip: 192.168.3.251
+            shareKey: packer-251
+            basePort: 8081
+            domain: packer.trust.k8s.internal
+          envFromSecrets:
+            - gh-runners-env
+          envFromConfigMaps:
+            - gh-runners-config
+          extraEnv:
+            - name: RUNNER_LABELS
+              value: "self-hosted,packer"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
-      - SkipDryRunOnMissingResource=true
       - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
