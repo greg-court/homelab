@@ -39,7 +39,7 @@ metadata:
   name: pv-loki-local-01
 spec:
   storageClassName: loki-local
-  capacity: { storage: 32Gi }
+  capacity: { storage: 64Gi }
   accessModes: ['ReadWriteOnce']
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
