@@ -21,7 +21,7 @@ spec:
             metallb.io/address-pool: trust-pool
           spec:
             loadBalancerIP: "192.168.3.250"
-            externalTrafficPolicy: Local
+            externalTrafficPolicy: Local # keep real client IPs and avoid an extra hop
 
         deployment:
           kind: DaemonSet
