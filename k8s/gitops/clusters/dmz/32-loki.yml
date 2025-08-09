@@ -13,6 +13,8 @@ spec:
     targetRevision: 6.35.1 # chart version (app is Loki 3.5.x)
     helm:
       values: |
+        deploymentMode: SingleBinary
+
         loki:
           auth_enabled: false
           server:
@@ -32,15 +34,31 @@ spec:
                 period: 24h
           limits_config:
             retention_period: 336h    # 14d
+
         singleBinary:
           replicas: 1
           persistence:
             enabled: true
             storageClass: loki-local
             size: 64Gi
+
+        read:            { replicas: 0 }
+        write:           { replicas: 0 }
+        backend:         { replicas: 0 }
+        distributor:     { replicas: 0 }
+        ingester:        { replicas: 0 }
+        querier:         { replicas: 0 }
+        queryFrontend:   { replicas: 0 }
+        queryScheduler:  { replicas: 0 }
+        compactor:       { replicas: 0 }
+        indexGateway:    { replicas: 0 }
+        bloomCompactor:  { replicas: 0 }
+        bloomGateway:    { replicas: 0 }
+
         monitoring:
           selfMonitoring:
-            enabled: false      # we'll use KPS for metrics
+            enabled: false
+
         test:
           enabled: false
   syncPolicy:
