@@ -3,7 +3,7 @@ namespace: metallb-system
 addressPool:
   name: pool
   protocol: layer2
-  addresses: [] # e.g. ["192.168.3.250-192.168.3.250"]
+  addresses: []
   autoAssign: true
   avoidBuggyIPs: false
 

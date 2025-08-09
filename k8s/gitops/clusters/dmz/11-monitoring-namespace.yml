@@ -14,5 +14,9 @@ spec:
     helm:
       values: |
         name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: "baseline"
+          pod-security.kubernetes.io/warn:    "restricted"
+          pod-security.kubernetes.io/audit:   "restricted"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
