@@ -20,7 +20,7 @@ spec:
         values: |
           image:
             repository: docker.io/gr10/gh-packer-runner
-            tag: latest
+            tag: 2.0.0
           count: 3
           external:
             vip: 192.168.3.251
