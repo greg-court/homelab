@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${RUNNER_NAME:=packer-runner}"
+: "${RUNNER_NAME:=$(hostname)}"
 : "${RUNNER_LABELS:=self-hosted,packer}"
 : "${EXTERNAL_HTTP_PORT:?Must set EXTERNAL_HTTP_PORT to match Docker internal port}"
 : "${RUNNER_HOSTNAME:=}"
