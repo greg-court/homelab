@@ -75,6 +75,7 @@
     }
   ],
   "packageRules": [
+    { "matchManagers": ["github-actions"], "pinDigests": false },
     {
       "matchCategories": ["docker"],
       "pinDigests": false
