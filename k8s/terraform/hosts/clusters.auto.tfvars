@@ -21,8 +21,8 @@ clusters = {
           scsi2 = { size = 64 } # Loki
         }
         mounts = [
-          { device = "/dev/sdb", mount = "/var/lib/k8s/prometheus", fs = "xfs", wipe = true, options = ["noatime"] },
-          { device = "/dev/sdc", mount = "/var/lib/k8s/loki", fs = "xfs", wipe = true, options = ["noatime"] }
+          { device = "/dev/sdb", mount = "/var/lib/k8s/prometheus", fs = "ext4", wipe = true, options = ["noatime"] },
+          { device = "/dev/sdc", mount = "/var/lib/k8s/loki", fs = "ext4", wipe = true, options = ["noatime"] }
         ]
       }
     }
