@@ -1,0 +1,26 @@
+image:
+  repository: docker.io/gr10/gh-packer-runner
+  tag: latest
+  pullPolicy: IfNotPresent
+
+count: 3 # how many runners
+replicas: 1 # per runner
+
+external:
+  vip: 192.168.3.251 # dedicated VIP for packer
+  shareKey: packer-251 # any string; same on all services
+  basePort: 8081 # runner-1=8081, runner-2=8082, ...
+  domain: packer.trust.k8s.internal
+
+envFromSecrets: [] # e.g. ["gh-runners-env"]
+envFromConfigMaps: [] # e.g. ["gh-runners-config"]
+
+extraEnv:
+  - name: RUNNER_LABELS
+    value: 'self-hosted,packer'
+
+podAnnotations: {}
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

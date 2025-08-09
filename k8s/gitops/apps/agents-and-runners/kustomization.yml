@@ -5,7 +5,6 @@ resources:
   - externalsecrets-tfc.yml
   - deployment-gh-ansible.yml
   - deployment-gh-docker.yml
-  - deployment-gh-packer.yml
   - deployment-gh-terraform.yml
   - deployment-tfc.yml
   - configmap.yml

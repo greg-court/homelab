@@ -1,0 +1,57 @@
+{{- $count := int .Values.count -}}
+{{- $replicas := .Values.replicas | default 1 -}}
+{{- $image := .Values.image -}}
+{{- $domain := .Values.external.domain -}}
+{{- $basePort := int .Values.external.basePort -}}
+{{- range $i, $_ := until $count }}
+{{- $idx := add $i 1 -}}
+{{- $suffix := printf "%02d" $idx -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-packer-runner-{{ $suffix }}
+  labels:
+    app: gh-packer-runner
+    instance: "{{ $suffix }}"
+spec:
+  replicas: {{ $replicas }}
+  selector:
+    matchLabels:
+      app: gh-packer-runner
+      instance: "{{ $suffix }}"
+  template:
+    metadata:
+      labels:
+        app: gh-packer-runner
+        instance: "{{ $suffix }}"
+      annotations:
+{{- toYaml $.Values.podAnnotations | nindent 8 }}
+    spec:
+      containers:
+        - name: gh-packer-runner
+          image: "{{ $image.repository }}:{{ $image.tag }}"
+          imagePullPolicy: {{ $image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: EXTERNAL_HTTP_PORT
+              value: "{{ add $basePort $i }}"
+            - name: RUNNER_HOSTNAME
+              value: "{{ $domain }}"
+            - name: RUNNER_NAME
+              value: "packer-runner-{{ $suffix }}"
+{{- range $.Values.extraEnv }}
+            - name: {{ .name }}
+              value: "{{ .value }}"
+{{- end }}
+{{- if or $.Values.envFromSecrets $.Values.envFromConfigMaps }}
+          envFrom:
+{{- range $.Values.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+{{- end }}
+{{- range $.Values.envFromConfigMaps }}
+            - configMapRef:
+                name: {{ . }}
+{{- end }}
+{{- end }}

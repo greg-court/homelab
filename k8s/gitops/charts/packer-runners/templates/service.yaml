@@ -1,0 +1,31 @@
+{{- $count := int .Values.count -}}
+{{- $basePort := int .Values.external.basePort -}}
+{{- $vip := .Values.external.vip -}}
+{{- $shareKey := .Values.external.shareKey -}}
+{{- range $i, $_ := until $count }}
+{{- $idx := add $i 1 -}}
+{{- $suffix := printf "%02d" $idx -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: gh-packer-runner-{{ $suffix }}
+  annotations:
+    metallb.io/address-pool: trust-pool
+    metallb.io/allow-shared-ip: {{ $shareKey | quote }}
+    metallb.io/loadBalancerIPs: {{ $vip | quote }}
+  labels:
+    app: gh-packer-runner
+    instance: "{{ $suffix }}"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  selector:
+    app: gh-packer-runner
+    instance: "{{ $suffix }}"
+  ports:
+    - name: http
+      port: {{ add $basePort $i }}
+      targetPort: 8080
+      protocol: TCP
+---
+{{- end }}
