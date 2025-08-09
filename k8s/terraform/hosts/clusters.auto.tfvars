@@ -3,6 +3,7 @@ clusters = {
     vlan_id = 3
     zone    = "infra"
     cpu     = { cores = 4 }
+    memory  = { dedicated = 6144 }
     hosts = {
       k8s-trust-01 = {
         mac_address = "BC:24:11:D2:72:43"

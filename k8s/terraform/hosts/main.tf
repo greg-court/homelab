@@ -23,6 +23,7 @@ locals {
           network_devices = [{ vlan_id = c.vlan_id, mac_address = h.mac_address }]
           node_name       = h.node_name
           cpu             = coalesce(try(h.cpu, null), try(c.cpu, null), local.base_vm.cpu)
+          memory          = coalesce(try(h.memory, null), try(c.memory, null), local.base_vm.memory)
           disks           = merge(local.base_vm.disks, lookup(h, "disks", {}))
           initialization = {
             datastore_id      = "local-zfs"
