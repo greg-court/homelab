@@ -183,6 +183,7 @@ resource "proxmox_virtual_environment_vm" "fleet" {
       hostpci,
       cdrom[0].enabled,
       cdrom[0].file_id,
+      initialization
     ]
   }
 }
