@@ -61,12 +61,10 @@ resource "helm_release" "argocd_root_apps" {
   namespace  = kubernetes_namespace.argocd.metadata[0].name
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-apps"
-  # (optionally pin a version later)
 
   values = [yamlencode({
-    applications = [
-      {
-        name      = "root-apps"
+    applications = {
+      root-apps = {
         namespace = kubernetes_namespace.argocd.metadata[0].name
         project   = "default"
         source = {
@@ -84,7 +82,7 @@ resource "helm_release" "argocd_root_apps" {
           syncOptions = ["CreateNamespace=true"]
         }
       }
-    ]
+    }
   })]
 
   depends_on = [helm_release.argocd]
