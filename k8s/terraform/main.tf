@@ -40,12 +40,9 @@ module "proxmox_vms" {
   vms    = local.vms
 }
 
-resource "time_sleep" "after_cilium_trust" {
-  create_duration = "120s"
-  depends_on      = [helm_release.cilium_trust]
-}
-
 module "cluster_trust" {
+  count           = fileexists("${path.module}/configs/cluster-trust/kubeconfig") ? 1 : 0
+
   source = "./clusters/cluster-trust"
   providers = {
     kubernetes = kubernetes.trust
@@ -55,25 +52,14 @@ module "cluster_trust" {
   azure_tenant_id     = var.azure_tenant_id
   azure_client_id     = var.azure_client_id
   azure_client_secret = var.azure_client_secret
-
-  depends_on = [
-    time_sleep.after_cilium_trust,
-  ]
 }
 
-# resource "time_sleep" "after_cilium_dmz" {
-#   create_duration = "120s"
-#   depends_on      = [helm_release.cilium_dmz]
-# }
+module "cluster_dmz" {
+  count           = fileexists("${path.module}/configs/cluster-dmz/kubeconfig") ? 1 : 0
 
-# module "cluster_dmz" {
-#   source = "./clusters/cluster-dmz"
-#   providers = {
-#     kubernetes = kubernetes.dmz
-#     helm       = helm.dmz
-#   }
-
-#   depends_on = [
-#     time_sleep.after_cilium_dmz,
-#   ]
-# }
+  source = "./clusters/cluster-dmz"
+  providers = {
+    kubernetes = kubernetes.dmz
+    helm       = helm.dmz
+  }
+}
