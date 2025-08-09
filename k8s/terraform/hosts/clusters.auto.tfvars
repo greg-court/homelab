@@ -1,8 +1,8 @@
 clusters = {
   cluster-trust = {
-    vlan_id     = 3
-    zone        = "infra"
-    cpu         = { cores = 4 }
+    vlan_id = 3
+    zone    = "infra"
+    cpu     = { cores = 4 }
     hosts = {
       k8s-trust-01 = {
         mac_address = "BC:24:11:D2:72:43"
@@ -27,9 +27,9 @@ clusters = {
     }
   }
   cluster-dmz = {
-    vlan_id     = 4
-    zone        = "dmz"
-    extra_tags  = ["dmz"]
+    vlan_id    = 4
+    zone       = "dmz"
+    extra_tags = ["dmz"]
     hosts = {
       k8s-dmz-01 = {
         mac_address = "BC:24:11:A5:DF:59"
