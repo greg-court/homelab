@@ -13,6 +13,7 @@ spec:
     targetRevision: 6.35.1 # chart version (app is Loki 3.5.x)
     helm:
       values: |
+        # Explicitly choose the deployment mode for clarity and to avoid validation errors.
         deploymentMode: SingleBinary
 
         loki:
@@ -35,13 +36,21 @@ spec:
           limits_config:
             retention_period: 336h    # 14d
 
+        # Single-binary is the simple, small-cluster friendly mode.
         singleBinary:
           replicas: 1
           persistence:
             enabled: true
             storageClass: loki-local
             size: 64Gi
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
 
+        # Be explicit: ensure *no* scalable targets run alongside SingleBinary.
         read:            { replicas: 0 }
         write:           { replicas: 0 }
         backend:         { replicas: 0 }
@@ -57,10 +66,30 @@ spec:
 
         monitoring:
           selfMonitoring:
-            enabled: false
+            enabled: false      # we'll use KPS for metrics
 
         test:
           enabled: false
+
+        chunksCache:
+          enabled: true
+          allocatedMemory: 256 # MB; chart derives ~1.2x this for mem limit (~307Mi)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 300Mi
+            limits:
+              memory: 300Mi
+
+        resultsCache:
+          enabled: true
+          allocatedMemory: 128 # MB; mem limit ~154Mi
+          resources:
+            requests:
+              cpu: 50m
+              memory: 160Mi
+            limits:
+              memory: 160Mi
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
