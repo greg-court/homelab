@@ -19,7 +19,7 @@ metadata:
   name: pv-prometheus-local-01
 spec:
   storageClassName: prometheus-local
-  capacity: { storage: 64Gi }
+  capacity: { storage: 32Gi }
   accessModes: ['ReadWriteOnce']
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
@@ -39,7 +39,7 @@ metadata:
   name: pv-loki-local-01
 spec:
   storageClassName: loki-local
-  capacity: { storage: 128Gi }
+  capacity: { storage: 32Gi }
   accessModes: ['ReadWriteOnce']
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem

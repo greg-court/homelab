@@ -37,7 +37,7 @@ spec:
           persistence:
             enabled: true
             storageClass: loki-local
-            size: 128Gi
+            size: 64Gi
         monitoring:
           selfMonitoring:
             enabled: false      # we'll use KPS for metrics
