@@ -43,6 +43,12 @@ spec:
             enabled: true
             storageClass: loki-local
             size: 64Gi
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
 
         # Be explicit: ensure *no* scalable targets run alongside SingleBinary.
         read:            { replicas: 0 }
@@ -64,6 +70,26 @@ spec:
 
         test:
           enabled: false
+
+        chunksCache:
+          enabled: true
+          allocatedMemory: 256 # MB; chart derives ~1.2x this for mem limit (~307Mi)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 300Mi
+            limits:
+              memory: 300Mi
+
+        resultsCache:
+          enabled: true
+          allocatedMemory: 128 # MB; mem limit ~154Mi
+          resources:
+            requests:
+              cpu: 50m
+              memory: 160Mi
+            limits:
+              memory: 160Mi
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
