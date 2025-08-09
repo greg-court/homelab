@@ -1,2 +1,3 @@
 resources:
-  - sc-pv.yml
+  - rbac.yml
+  - presync-job.yml
