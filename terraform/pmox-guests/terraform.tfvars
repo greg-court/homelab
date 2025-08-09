@@ -111,7 +111,7 @@ lxcs = {
     memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:7F:1C:BD"
-      vlan_id = 3
+      vlan_id     = 3
     }
     disk = {
       size         = 16
