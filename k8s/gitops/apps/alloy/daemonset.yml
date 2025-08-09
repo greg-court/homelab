@@ -11,14 +11,12 @@ spec:
       labels: { app: alloy }
     spec:
       serviceAccountName: alloy
-      # Tolerate control-plane so you also ship control-plane pod logs
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
       containers:
         - name: alloy
-          # Choose a recent Alloy (adjust if you know a newer tag)
           image: grafana/alloy:v1.10.1
           args:
             [
@@ -48,6 +46,6 @@ spec:
           configMap:
             name: alloy-config
             items: [{ key: config.river, path: config.river }]
-      dnsPolicy: ClusterFirstWithHostNet
+      dnsPolicy: ClusterFirst
       hostNetwork: false
   updateStrategy: { type: RollingUpdate }
