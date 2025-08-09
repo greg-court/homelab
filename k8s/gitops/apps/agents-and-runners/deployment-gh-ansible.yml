@@ -22,4 +22,10 @@ spec:
           env:
             - name: RUNNER_LABELS
               value: 'self-hosted,ansible'
-          resources: {}
+          resources:
+            requests:
+              cpu: '200m'
+              memory: '256Mi'
+            limits:
+              cpu: '2'
+              memory: '2Gi'

@@ -11,3 +11,4 @@ resources:
   - deployment-gh-ansible.yml
   - deployment-tfc.yml
   - rbac-buildx.yml
+  - hpa.yml
