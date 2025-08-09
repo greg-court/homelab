@@ -19,6 +19,7 @@ metadata:
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Cluster
+  loadBalancerIP: {{ $vip }}
   selector:
     app: gh-packer-runner
     instance: "{{ $suffix }}"

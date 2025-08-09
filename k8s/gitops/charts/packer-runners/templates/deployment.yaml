@@ -40,6 +40,11 @@ spec:
               value: "{{ $domain }}"
             - name: RUNNER_NAME
               value: "packer-runner-{{ $suffix }}"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities: { drop: ["ALL"] }
 {{- range $.Values.extraEnv }}
             - name: {{ .name }}
               value: "{{ .value }}"
@@ -54,4 +59,20 @@ spec:
             - configMapRef:
                 name: {{ . }}
 {{- end }}
+{{- end }}
+{{- if $.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml $.Values.nodeSelector | nindent 8 }}
+{{- end }}
+{{- if $.Values.tolerations }}
+      tolerations:
+{{ toYaml $.Values.tolerations | nindent 8 }}
+{{- end }}
+{{- if $.Values.affinity }}
+      affinity:
+{{ toYaml $.Values.affinity | nindent 8 }}
+{{- end }}
+{{- if $.Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml $.Values.topologySpreadConstraints | nindent 8 }}
 {{- end }}
