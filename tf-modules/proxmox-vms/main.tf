@@ -181,7 +181,8 @@ resource "proxmox_virtual_environment_vm" "fleet" {
       timeout_stop_vm,
       started,
       hostpci,
-      cdrom[0].enabled
+      cdrom[0].enabled,
+      cdrom[0].file_id,
     ]
   }
 }
