@@ -1,24 +1,23 @@
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: alloy
-  namespace: monitoring
+  namespace: observability
+
 ---
+# Minimal, standard permissions for k8s discovery + pod metadata
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: alloy
 rules:
   - apiGroups: ['']
-    resources: ['pods', 'namespaces']
+    resources: ['pods', 'namespaces', 'nodes', 'endpoints']
     verbs: ['get', 'list', 'watch']
-  - apiGroups: ['events.k8s.io']
-    resources: ['events']
-    verbs: ['get', 'list', 'watch']
-  - apiGroups: ['']
-    resources: ['events']
-    verbs: ['get', 'list', 'watch']
+
 ---
+# Bind the SA (in observability) to the ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -30,4 +29,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: alloy
-    namespace: monitoring
+    namespace: observability
