@@ -15,7 +15,7 @@ spec:
   volumeMode: Filesystem
   accessModes: ['ReadWriteOnce']
   storageClassName: prometheus-local
-  local: { path: /var/lib/k8s/prometheus }
+  local: { path: /var/mnt/prometheus } # <-- CHANGED
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -43,7 +43,7 @@ spec:
   volumeMode: Filesystem
   accessModes: ['ReadWriteOnce']
   storageClassName: loki-local
-  local: { path: /var/lib/k8s/loki }
+  local: { path: /var/mnt/loki }
   nodeAffinity:
     required:
       nodeSelectorTerms:

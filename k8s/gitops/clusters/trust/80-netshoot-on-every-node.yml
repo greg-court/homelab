@@ -3,7 +3,7 @@ kind: DaemonSet
 metadata:
   name: netshoot-on-every-node
   namespace: debug
-annotations: { argocd.argoproj.io/sync-wave: '80' }
+  annotations: { argocd.argoproj.io/sync-wave: '80' }
 spec:
   selector:
     matchLabels: { app: netshoot-on-every-node }
