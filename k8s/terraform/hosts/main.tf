@@ -4,7 +4,6 @@ locals {
     on_boot          = true
     agent            = true
     bios             = "seabios"
-    cpu              = { cores = 2 }
     memory           = { dedicated = 4096 }
     operating_system = { type = "l26" }
     disks            = { "scsi0" = { size = 16 } }
@@ -22,6 +21,7 @@ locals {
           tags            = distinct(concat(local.base_vm.tags, lookup(c, "extra_tags", [])))
           network_devices = [{ vlan_id = c.vlan_id, mac_address = h.mac_address }]
           node_name       = h.node_name
+          cpu             = h.cpu
           disks           = merge(local.base_vm.disks, lookup(h, "disks", {}))
           initialization = {
             datastore_id      = "local-zfs"
