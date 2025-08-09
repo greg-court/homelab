@@ -3,6 +3,7 @@ kind: Application
 metadata:
   name: agents-and-runners
   namespace: argocd
+annotations: { argocd.argoproj.io/sync-wave: '20' }
 spec:
   project: platform
   destination:
