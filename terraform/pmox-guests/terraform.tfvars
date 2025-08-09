@@ -12,7 +12,7 @@ lxcs = {
     memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:63:AD:A1"
-      vlan_id     = 20
+      vlan_id     = 5
     }
     node_name = "pve03" # temp, change to pve01 later
     disk = {
@@ -32,7 +32,7 @@ lxcs = {
     memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:AF:EB:5D"
-      vlan_id     = 30
+      vlan_id     = 6
     }
     node_name = "pve02"
     disk = {
@@ -53,7 +53,7 @@ lxcs = {
     memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:E6:58:5F"
-      vlan_id     = 60
+      vlan_id     = 4
     }
     node_name = "pve03"
     disk = {
@@ -88,7 +88,7 @@ lxcs = {
     memory = { dedicated = 512 }
     network_interface = {
       mac_address = "BC:24:11:E7:80:82"
-      vlan_id     = 10
+      vlan_id     = 3
     }
     disk = {
       size         = 16
@@ -105,7 +105,7 @@ lxcs = {
     cpu    = { cores = 1 }
     memory = { dedicated = 512 }
     network_interface = {
-      vlan_id     = 10
+      vlan_id     = 3
     }
     disk = {
       size         = 16
