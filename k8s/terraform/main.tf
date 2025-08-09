@@ -36,6 +36,40 @@ locals {
 }
 
 module "proxmox_vms" {
-  source = "../../../tf-modules/proxmox-vms"
+  source = "../../tf-modules/proxmox-vms"
   vms    = local.vms
 }
+
+resource "time_sleep" "after_cilium_trust" {
+  create_duration = "120s"
+  depends_on      = [helm_release.cilium_trust]
+}
+
+module "cluster_trust" {
+  source = "./clusters/cluster-trust"
+  providers = {
+    kubernetes = kubernetes.trust
+    helm       = helm.trust
+  }
+
+  depends_on = [
+    time_sleep.after_cilium_trust,
+  ]
+}
+
+# resource "time_sleep" "after_cilium_dmz" {
+#   create_duration = "120s"
+#   depends_on      = [helm_release.cilium_dmz]
+# }
+
+# module "cluster_dmz" {
+#   source = "./clusters/cluster-dmz"
+#   providers = {
+#     kubernetes = kubernetes.dmz
+#     helm       = helm.dmz
+#   }
+
+#   depends_on = [
+#     time_sleep.after_cilium_dmz,
+#   ]
+# }
