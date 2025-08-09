@@ -53,6 +53,8 @@ module "cluster_trust" {
   azure_tenant_id     = var.azure_tenant_id
   azure_client_id     = var.azure_client_id
   azure_client_secret = var.azure_client_secret
+
+  depends_on = [module.proxmox_vms]
 }
 
 module "cluster_dmz" {
@@ -63,4 +65,6 @@ module "cluster_dmz" {
     kubernetes = kubernetes.dmz
     helm       = helm.dmz
   }
+
+  depends_on = [module.proxmox_vms]
 }
