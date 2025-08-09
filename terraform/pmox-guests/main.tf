@@ -5,8 +5,9 @@ locals {
 resource "proxmox_virtual_environment_file" "ansible_hook" {
   for_each     = local.lxc_nodes
   node_name    = each.key
-  datastore_id = "nfs-hdd"
+  datastore_id = "local"
   content_type = "snippets"
+  file_mode    = "0755"
 
   source_raw {
     file_name = "ansible-bootstrap.sh"

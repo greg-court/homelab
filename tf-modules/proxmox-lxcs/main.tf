@@ -6,8 +6,8 @@
 
 locals {
   os_templates = {
-    ubuntu = "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
-    debian = "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
+    ubuntu = "nfs-hdd:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+    debian = "nfs-hdd:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
   }
 
   vlan_to_nameserver_map = {
