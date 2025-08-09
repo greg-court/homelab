@@ -7,52 +7,47 @@ metadata:
 spec:
   project: platform
   destination: { server: https://kubernetes.default.svc, namespace: monitoring }
-  sources:
-    # 1) PreSync hook bundle (runs once, then cleans up itself)
-    - repoURL: https://github.com/greg-court/homelab.git
-      targetRevision: main
-      path: k8s/gitops/apps/prometheus-storage-hooks
-    # 2) The actual chart
-    - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: kube-prometheus-stack
-      targetRevision: 76.2.0
-      helm:
-        values: |
-          defaultRules:
-            create: true
-          kubeProxy:
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 76.2.0
+    helm:
+      values: |
+        defaultRules:
+          create: true
+
+        kubeProxy: { enabled: false }
+        kubeEtcd: { enabled: false }
+        kubeControllerManager: { enabled: false }
+        kubeScheduler: { enabled: false }
+
+        prometheus:
+          prometheusSpec:
+            retention: 14d
+            retentionSize: "28Gi"   # keep comfortably below a 32Gi PV
+            walCompression: true
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: prometheus-local
+                  resources:
+                    requests:
+                      storage: 32Gi
+
+        alertmanager:
+          enabled: true
+          alertmanagerSpec:
+            storage: {}   # ephemeral is fine
+
+        grafana:
+          enabled: true
+          defaultDashboardsTimezone: browser
+          service:
+            type: ClusterIP
+          persistence:
             enabled: false
-          kubeEtcd:
-            enabled: false
-          kubeControllerManager:
-            enabled: false
-          kubeScheduler:
-            enabled: false
-          prometheus:
-            prometheusSpec:
-              retention: 14d
-              walCompression: true
-              storageSpec:
-                volumeClaimTemplate:
-                  spec:
-                    storageClassName: prometheus-local
-                    resources:
-                      requests:
-                        storage: 32Gi
-          alertmanager:
-            enabled: true
-            alertmanagerSpec:
-              storage: {}
-          grafana:
-            enabled: true
-            defaultDashboardsTimezone: browser
-            service:
-              type: ClusterIP
-            persistence:
-              enabled: false
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - SkipDryRunOnMissingResource=true
