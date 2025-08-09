@@ -24,7 +24,7 @@ spec:
         prometheus:
           prometheusSpec:
             retention: 14d
-            retentionSize: "28Gi"
+            retentionSize: "28GiB"
             walCompression: true
             storageSpec:
               volumeClaimTemplate:
