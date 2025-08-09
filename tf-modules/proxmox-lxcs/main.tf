@@ -33,6 +33,8 @@ locals {
 resource "proxmox_virtual_environment_container" "fleet" {
   for_each = local.processed_lxc_containers
 
+  hook_script_file_id = lookup(each.value, "hook_script_file_id", null)
+
   node_name    = lookup(each.value, "node_name", null)
   description  = lookup(each.value, "description", null)
   tags         = lookup(each.value, "tags", null)
