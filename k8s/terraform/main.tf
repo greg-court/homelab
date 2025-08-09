@@ -40,6 +40,7 @@ module "proxmox_vms" {
   vms    = local.vms
 }
 
+# below modules only run on 2nd pass to ensure the kubeconfig is available
 module "cluster_trust" {
   count           = fileexists("${path.module}/configs/cluster-trust/kubeconfig") ? 1 : 0
 
