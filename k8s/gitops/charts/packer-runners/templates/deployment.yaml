@@ -6,7 +6,8 @@
 {{- range $i, $_ := until $count }}
 {{- $idx := add $i 1 -}}
 {{- $suffix := printf "%02d" $idx -}}
-{{- if gt $i 0 }}---
+{{- if gt $i 0 }}
+---
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
@@ -26,8 +27,9 @@ spec:
       labels:
         app: gh-packer-runner
         instance: "{{ $suffix }}"
-      annotations:
-{{- toYaml $.Values.podAnnotations | nindent 8 }}
+{{- if $.Values.podAnnotations }}
+      annotations: {{ toYaml $.Values.podAnnotations | nindent 8 | trim }}
+{{- end }}
     spec:
       containers:
         - name: gh-packer-runner
