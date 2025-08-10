@@ -4,7 +4,7 @@ metadata:
   name: gh-ansible-runner
   namespace: agents-and-runners
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels: { app: gh-ansible-runner }
   template:
