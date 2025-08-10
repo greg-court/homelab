@@ -16,7 +16,5 @@ spec:
         name: monitoring
         labels:
           pod-security.kubernetes.io/enforce: "privileged"
-          pod-security.kubernetes.io/warn:    "baseline"
-          pod-security.kubernetes.io/audit:   "baseline"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
