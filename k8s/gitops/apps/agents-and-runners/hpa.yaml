@@ -22,7 +22,7 @@ spec:
         name: memory
         target:
           type: AverageValue
-          averageValue: '200Mi'
+          averageValue: '150Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
@@ -61,7 +61,7 @@ spec:
         name: memory
         target:
           type: AverageValue
-          averageValue: '200Mi'
+          averageValue: '150Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
@@ -100,7 +100,7 @@ spec:
         name: memory
         target:
           type: AverageValue
-          averageValue: '200Mi'
+          averageValue: '150Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
