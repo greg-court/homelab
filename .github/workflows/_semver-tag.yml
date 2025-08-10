@@ -12,11 +12,11 @@ on:
       major_pattern:
         required: false
         type: string
-        default: '(MAJOR)'
+        default: 'major'
       minor_pattern:
         required: false
         type: string
-        default: '(MINOR)'
+        default: 'minor'
       create_release:
         required: false
         type: boolean
