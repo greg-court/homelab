@@ -7,7 +7,7 @@ locals {
     cpu              = { cores = 2 }
     memory           = { dedicated = 4096 }
     operating_system = { type = "l26" }
-    disks            = { "scsi0" = { size = 16 } }
+    disks            = { "scsi0" = { size = 64 } }
     cdrom            = { file_id = "nfs-hdd:iso/talos-nocloud-amd64-qemu.iso" }
   }
 }
