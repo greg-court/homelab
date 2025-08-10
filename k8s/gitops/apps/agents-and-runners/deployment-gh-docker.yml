@@ -17,7 +17,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: runner
-          image: docker.io/gr10/gh-docker-runner:3.0.1
+          image: docker.io/gr10/gh-docker-runner:3.0.2
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef: { name: gh-runners-env } # REPO_URL, GH_PAT, etc.
