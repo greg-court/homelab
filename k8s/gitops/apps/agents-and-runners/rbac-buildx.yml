@@ -40,9 +40,9 @@ metadata:
   name: buildx-manager-to-namespace-sas
   namespace: agents-and-runners
 subjects:
-  - kind: Group
-    name: system:serviceaccounts:agents-and-runners
-    apiGroup: rbac.authorization.k8s.io
+  - kind: ServiceAccount
+    name: buildx
+    namespace: agents-and-runners
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
