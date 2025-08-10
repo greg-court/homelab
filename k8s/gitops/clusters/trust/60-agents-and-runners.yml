@@ -9,6 +9,19 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: agents-and-runners
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: gh-docker-runner
+      jsonPointers: ['/spec/replicas']
+    - group: apps
+      kind: Deployment
+      name: gh-terraform-runner
+      jsonPointers: ['/spec/replicas']
+    - group: apps
+      kind: Deployment
+      name: gh-ansible-runner
+      jsonPointers: ['/spec/replicas']
   sources:
     - repoURL: https://github.com/greg-court/homelab.git
       targetRevision: main
@@ -38,3 +51,4 @@ spec:
     automated: { prune: true, selfHeal: true }
     syncOptions:
       - SkipDryRunOnMissingResource=true
+      - RespectIgnoreDifferences=true

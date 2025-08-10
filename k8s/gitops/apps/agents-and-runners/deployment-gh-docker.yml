@@ -6,11 +6,6 @@ metadata:
   labels: { app: gh-docker-runner }
 spec:
   replicas: 1
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas
   selector:
     matchLabels: { app: gh-docker-runner }
   template:
