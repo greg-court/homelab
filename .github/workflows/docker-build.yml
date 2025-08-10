@@ -29,7 +29,6 @@ jobs:
       - name: Check out docker-images only
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
           sparse-checkout: docker-images
 
       - id: set
@@ -123,9 +122,9 @@ jobs:
         with:
           tag_prefix: 'docker-images/${{ matrix.image }}/v'
           change_path: 'docker-images/${{ matrix.image }}'
-          namespace: '${{ matrix.image }}'
           major_pattern: 'major'
           minor_pattern: 'minor'
+          version_format: '${major}.${minor}.${patch}'
 
       - name: Set IMAGE_VERSION
         id: setver
@@ -158,16 +157,13 @@ jobs:
       - name: Summary
         run: echo "✅ Published ${{ steps.push.outputs.published }}"
 
-      - name: Create Git Tag via API
-        env:
-          GH_TOKEN: ${{ env.REPO_TAGGING_PAT }} # from AKV
-          VERSION: ${{ github.event.inputs.custom_version || steps.semver.outputs.version_tag }}
-          SHA: ${{ github.sha }}
-        run: |
-          echo "Creating tag: $VERSION"
-          gh api repos/${{ github.repository }}/git/refs \
-            -f ref="refs/tags/$VERSION" \
-            -f sha="$SHA"
+      - name: Create Git Tag
+        uses: ./.github/actions/create-tag
+        with:
+          tag_prefix: docker-images/${{ matrix.image }}/v
+          custom_version: ${{ github.event.inputs.custom_version }}
+          fallback_tag: ${{ steps.semver.outputs.version_tag }}
+          token: ${{ env.REPO_TAGGING_PAT }} # from AKV
 
       - name: Notify Discord
         if: success()
