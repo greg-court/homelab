@@ -27,7 +27,7 @@ spec:
           resources:
             requests: # minimum guaranteed
               cpu: '250m'
-              memory: '256Mi'
+              memory: '512Mi'
             limits: # maximum allowed
               cpu: '2'
               memory: '2Gi'
