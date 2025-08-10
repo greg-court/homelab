@@ -3,7 +3,7 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-count: 1 # how many runners
+count: 2 # how many runners
 replicas: 1 # per runner
 
 external:
@@ -20,7 +20,6 @@ extraEnv:
     value: 'self-hosted,packer'
 
 podAnnotations: {}
-resources: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
