@@ -7,13 +7,11 @@ data:
   buildkitd.toml: |
     debug = false
 
-    # OCI worker enabled (default). Keep cache under control.
     [worker.oci]
       enabled = true
       gc = true
-      gckeepstorage = 8_000_000_000  # ~8 GiB per pod
-
-    # Optional: tweak GC policy more aggressively if you want
-    #[[worker.oci.gcpolicy]]
-    #all = true
-    #keepBytes = 8_000_000_000
+      # Keep at least 2Gi free on the node disk and cap builder usage around 10Gi
+      reservedSpace = "2Gi"
+      maxUsedSpace  = "10Gi"
+      # Optional: tame per-pod build parallelism if you see thrash on 4‑core nodes
+      max-parallelism = 2
