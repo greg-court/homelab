@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/charts/namespace-psa
+    path: k8s/gitops/charts/namespace-privileged
     helm:
       values: |
         name: monitoring
