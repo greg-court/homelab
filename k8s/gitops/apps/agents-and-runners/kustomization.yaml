@@ -10,7 +10,6 @@ resources:
   - deployment-gh-terraform.yaml
   - deployment-gh-ansible.yaml
   - deployment-tfc.yaml
-  - rbac-buildx.yaml
   - hpa.yaml
   - buildkit-config.yaml
   - buildkit-deployment.yaml

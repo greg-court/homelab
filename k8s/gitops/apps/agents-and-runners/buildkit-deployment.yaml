@@ -49,9 +49,26 @@ spec:
               cpu: '3'
               memory: '8Gi'
               ephemeral-storage: '32Gi'
+          livenessProbe:
+            tcpSocket: { port: grpc }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket: { port: grpc }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket: { port: grpc }
+            failureThreshold: 30
+            periodSeconds: 2
           securityContext:
-            # Rootful: simplest and fastest; your namespace is privileged
             privileged: true
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app: buildkitd }
       volumes:
         - name: cfg
           configMap:
