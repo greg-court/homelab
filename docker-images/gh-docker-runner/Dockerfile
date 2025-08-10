@@ -1,5 +1,5 @@
 # GitHub Actions self-hosted runner with Docker CLI/Buildx (+ Azure CLI)
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Base

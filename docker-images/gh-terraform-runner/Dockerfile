@@ -1,5 +1,5 @@
 # GitHub Actions self-hosted runner for Terraform (+ Azure CLI)
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Base + Azure CLI deps + Node.js (you had this)

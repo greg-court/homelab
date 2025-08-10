@@ -1,5 +1,5 @@
 # GitHub Actions self-hosted runner for Ansible (+ Azure CLI)
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
