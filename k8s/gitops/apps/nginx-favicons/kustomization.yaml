@@ -1,6 +1,6 @@
 resources:
-  - deployment.yml
-  - service.yml
+  - deployment.yaml
+  - service.yaml
 
 images:
   - name: DOCKER_IMAGE_PLACEHOLDER

@@ -1,0 +1,58 @@
+defaultRules: { create: true }
+
+kubeProxy: { enabled: false }
+kubeEtcd: { enabled: false }
+kubeControllerManager: { enabled: false }
+kubeScheduler: { enabled: false }
+
+prometheusOperator:
+  admissionWebhooks:
+    certManager:
+      enabled: true
+      issuerRef:
+        { name: homelab-ca, kind: ClusterIssuer, group: cert-manager.io }
+    createSecretJob: { enabled: false }
+    patch: { enabled: false }
+
+prometheus:
+  prometheusSpec:
+    retention: 14d
+    retentionSize: '28GiB'
+    walCompression: true
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: prometheus-local
+          resources:
+            requests: { storage: 32Gi }
+
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    storage: {}
+
+grafana:
+  enabled: true
+  defaultDashboardsTimezone: browser
+  persistence: { enabled: false }
+  service: { type: ClusterIP }
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      isDefault: false
+    - name: Alertmanager
+      type: alertmanager
+      uid: alertmanager
+      access: proxy
+      url: http://kube-prometheus-stack-alertmanager.monitoring.svc:9093
+      jsonData: { implementation: prometheus }
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: homelab-ca
+    # these are overridden per cluster
+    hosts: []
+    tls: []
