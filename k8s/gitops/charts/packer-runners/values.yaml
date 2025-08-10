@@ -20,6 +20,13 @@ extraEnv:
     value: 'self-hosted,packer'
 
 podAnnotations: {}
+resources:
+  requests:
+    cpu: '200m'
+    memory: '256Mi'
+  limits:
+    cpu: '2'
+    memory: '2Gi'
 nodeSelector: {}
 tolerations: []
 affinity: {}
