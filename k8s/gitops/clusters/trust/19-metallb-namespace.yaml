@@ -13,13 +13,9 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/charts/empty # Using the empty chart (see below)
+    path: k8s/gitops/charts/empty
     helm:
       values: |
         name: metallb-system
-        labels:
-          pod-security.kubernetes.io/enforce: "privileged"
-          pod-security.kubernetes.io/audit: "baseline"
-          pod-security.kubernetes.io/warn:  "baseline"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
