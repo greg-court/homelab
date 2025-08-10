@@ -1,3 +1,3 @@
 apiVersion: v2
-name: empty
+name: namespace-psa
 version: 0.1.0

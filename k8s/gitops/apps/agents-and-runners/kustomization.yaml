@@ -12,3 +12,7 @@ resources:
   - deployment-tfc.yaml
   - rbac-buildx.yaml
   - hpa.yaml
+  - buildkit-config.yaml
+  - buildkit-deployment.yaml
+  - buildkit-service.yaml
+  - buildkit-hpa.yaml

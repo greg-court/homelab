@@ -101,18 +101,13 @@ jobs:
           username: ${{ env.DOCKER_USER }}
           password: ${{ env.DOCKER_PAT }}
 
-      - name: Set up Buildx (Kubernetes driver, rootful)
+      - name: Set up Buildx (remote -> cluster BuildKit)
         uses: docker/setup-buildx-action@v3
         with:
-          driver: kubernetes
-          driver-opts: |
-            namespace=agents-and-runners
-            serviceaccount=buildx
-            image=moby/buildkit:v0.23.1
-            rootless=false
-            replicas=1
-          buildkitd-flags: --allow-insecure-entitlement=security.insecure --allow-insecure-entitlement=network.host
-          cleanup: true
+          driver: remote
+          endpoint: tcp://buildkitd.agents-and-runners.svc.cluster.local:1234
+          # We are not creating anything; just wiring the client.
+          cleanup: false
           version: v0.16.2
 
       # Work out the image version (supports manual runs)
