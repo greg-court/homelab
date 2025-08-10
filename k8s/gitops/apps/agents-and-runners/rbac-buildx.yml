@@ -4,7 +4,7 @@ metadata:
   name: buildx
   namespace: agents-and-runners
 ---
-# Role that allows creating/maintaining the BuildKit deployment in this namespace
+# Permissions for Buildx (Kubernetes driver + rootful BuildKit)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -14,16 +14,26 @@ rules:
   - apiGroups: ['apps']
     resources: ['deployments', 'replicasets']
     verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
   - apiGroups: ['']
     resources:
-      ['pods', 'pods/log', 'services', 'configmaps', 'secrets', 'events']
+      - pods
+      - pods/log
+      - pods/exec # <— needed to exec into buildkitd pod
+      - pods/attach # optional but common
+      - pods/portforward # optional but common
+      - services
+      - configmaps
+      - secrets
+      - events
+    # exec/attach/portforward need "create"; others use the full set
     verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
   - apiGroups: ['batch']
     resources: ['jobs']
     verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
 ---
-# Bind the role to ALL service accounts in this namespace so whatever SA your
-# self-hosted runner uses can create the BuildKit deployment.
+# Bind to all SAs in the namespace (matches your current setup)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
