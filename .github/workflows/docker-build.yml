@@ -181,6 +181,6 @@ jobs:
               -d '{
                 "username": "CI Bot",
                 "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                "content": "**🚀 Docker Build Complete**\n**Image:** `"${{ matrix.image }}"`\n**Version:** `"${{ env.IMAGE_VERSION }}"`\n**Git tag:** `"${{ env.VERSION_TAG }}"`\n✅ Success!"
+                "content": "**🚀 Docker Build Complete**\n**Image:** `${{ matrix.image }}`\n**Version:** `${{ env.IMAGE_VERSION }}`\n**Git tag:** `${{ env.VERSION_TAG }}`\n✅ Success!"
               }' \
               "$DISCORD_WEBHOOK_URL"
