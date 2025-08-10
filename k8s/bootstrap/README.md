@@ -35,4 +35,10 @@ talosctl get services
 talosctl dashboard --nodes k8s-trust-01.internal
 ```
 
+```bash
+# Get all passwords
+kubectl get secrets --all-namespaces -o json \
+  | jq -r '.items[] | select(.data | has("password")) | "\(.metadata.namespace) \(.metadata.name): " + (.data.password | @base64d)'
+```
+
 ---
