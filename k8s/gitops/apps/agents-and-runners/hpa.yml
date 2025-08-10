@@ -57,23 +57,3 @@ spec:
         target:
           type: Utilization
           averageUtilization: 60
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: tfc-agent
-  namespace: agents-and-runners
-spec:
-  minReplicas: 1
-  maxReplicas: 6
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: tfc-agent
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 60
