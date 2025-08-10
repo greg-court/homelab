@@ -16,7 +16,13 @@ spec:
         name: cpu
         target:
           type: AverageValue
-          averageValue: '600m'
+          averageValue: '100m'
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: '200Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
@@ -49,7 +55,13 @@ spec:
         name: cpu
         target:
           type: AverageValue
-          averageValue: '400m'
+          averageValue: '100m'
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: '200Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
@@ -82,7 +94,13 @@ spec:
         name: cpu
         target:
           type: AverageValue
-          averageValue: '400m'
+          averageValue: '100m'
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: '200Mi'
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
