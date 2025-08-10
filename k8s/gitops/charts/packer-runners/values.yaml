@@ -3,7 +3,7 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-count: 3 # how many runners
+count: 1 # how many runners
 replicas: 1 # per runner
 
 external:
