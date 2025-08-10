@@ -13,8 +13,7 @@ spec:
     targetRevision: 76.2.0
     helm:
       values: |
-        defaultRules:
-          create: true
+        defaultRules: { create: true }
 
         kubeProxy: { enabled: false }
         kubeEtcd: { enabled: false }
@@ -25,27 +24,21 @@ spec:
           admissionWebhooks:
             certManager:
               enabled: true
-              issuerRef:
-                name: homelab-ca
-                kind: ClusterIssuer
-                group: cert-manager.io
-            createSecretJob:
-              enabled: false
-            patch:
-              enabled: false
+              issuerRef: { name: homelab-ca, kind: ClusterIssuer, group: cert-manager.io }
+            createSecretJob: { enabled: false }
+            patch: { enabled: false }
 
         prometheus:
           prometheusSpec:
             retention: 14d
-            retentionSize: "28GiB"   # keep comfortably below the 32Gi PV
+            retentionSize: "28GiB"
             walCompression: true
             storageSpec:
               volumeClaimTemplate:
                 spec:
                   storageClassName: prometheus-local
                   resources:
-                    requests:
-                      storage: 32Gi
+                    requests: { storage: 32Gi }
 
         alertmanager:
           enabled: true
@@ -55,10 +48,8 @@ spec:
         grafana:
           enabled: true
           defaultDashboardsTimezone: browser
-          service:
-            type: ClusterIP
-          persistence:
-            enabled: false
+          persistence: { enabled: false }
+          service: { type: ClusterIP }
           additionalDataSources:
             - name: Loki
               type: loki
@@ -70,8 +61,16 @@ spec:
               uid: alertmanager
               access: proxy
               url: http://kube-prometheus-stack-alertmanager.monitoring.svc:9093
-              jsonData:
-                implementation: prometheus
+              jsonData: { implementation: prometheus }
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: homelab-ca
+            hosts: [ "grafana.trust.k8s.internal" ]
+            tls:
+              - secretName: grafana-tls
+                hosts: [ "grafana.trust.k8s.internal" ]
 
   syncPolicy:
     automated: { prune: true, selfHeal: true }
