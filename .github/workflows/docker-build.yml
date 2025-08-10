@@ -124,6 +124,8 @@ jobs:
           tag_prefix: 'docker-images/${{ matrix.image }}/v'
           change_path: 'docker-images/${{ matrix.image }}'
           namespace: '${{ matrix.image }}'
+          major_pattern: 'major'
+          minor_pattern: 'minor'
 
       - name: Set IMAGE_VERSION
         id: setver
