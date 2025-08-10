@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkitd-config
+  namespace: agents-and-runners
+data:
+  buildkitd.toml: |
+    debug = false
+
+    # OCI worker enabled (default). Keep cache under control.
+    [worker.oci]
+      enabled = true
+      gc = true
+      gckeepstorage = 8_000_000_000  # ~8 GiB per pod
+
+    # Optional: tweak GC policy more aggressively if you want
+    #[[worker.oci.gcpolicy]]
+    #all = true
+    #keepBytes = 8_000_000_000

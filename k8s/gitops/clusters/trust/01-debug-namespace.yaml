@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/charts/empty
+    path: k8s/gitops/charts/namespace-psa
     helm:
       values: |
         name: debug
