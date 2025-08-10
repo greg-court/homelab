@@ -101,19 +101,16 @@ jobs:
           username: ${{ env.DOCKER_USER }}
           password: ${{ env.DOCKER_PAT }}
 
-      # Buildx on Kubernetes (rootful). Uses the RBAC and namespace you applied above.
       - name: Set up Buildx (Kubernetes driver, rootful)
         uses: docker/setup-buildx-action@v3
         with:
           driver: kubernetes
-          # Rootful: privileged pods, so no Talos/kernel tweaks needed.
-          driver-opts: >
-            namespace=agents-and-runners,
-            serviceaccount=buildx,
-            image=moby/buildkit:v0.23.1,
-            rootless=false,
+          driver-opts: |
+            namespace=agents-and-runners
+            serviceaccount=buildx
+            image=moby/buildkit:v0.23.1
+            rootless=false
             replicas=1
-          # Allow docker buildx to pass through insecure entitlements when requested
           buildkitd-flags: --allow-insecure-entitlement=security.insecure --allow-insecure-entitlement=network.host
           cleanup: true
           version: v0.16.2
