@@ -1,0 +1,88 @@
+name: 'Create Tag (idempotent)'
+description: 'Create a lightweight git tag via GitHub API (no-op if it exists).'
+inputs:
+  tag:
+    description: 'Full tag, e.g. docker-images/foo/v1.2.3. If set, other selector inputs are ignored.'
+    required: false
+    default: ''
+  tag_prefix:
+    description: "Prefix like 'docker-images/foo/v' used with custom_version."
+    required: false
+    default: ''
+  custom_version:
+    description: 'Exact version (X.Y.Z). If provided with tag_prefix, builds the full tag.'
+    required: false
+    default: ''
+  fallback_tag:
+    description: 'Use this when custom_version is empty (e.g. from a semver step).'
+    required: false
+    default: ''
+  sha:
+    description: 'Commit SHA to tag. Defaults to current commit.'
+    required: false
+    default: ''
+  token:
+    description: 'GitHub token or PAT. Defaults to github.token.'
+    required: false
+    default: ''
+outputs:
+  tag:
+    description: 'The tag we ensured'
+    value: ${{ steps.mk.outputs.tag }}
+  created:
+    description: 'true if created, false if already existed'
+    value: ${{ steps.mk.outputs.created }}
+runs:
+  using: 'composite'
+  steps:
+    - id: mk
+      shell: bash
+      env:
+        IN_TAG: ${{ inputs.tag }}
+        IN_PREFIX: ${{ inputs.tag_prefix }}
+        IN_CUSTOM: ${{ inputs.custom_version }}
+        IN_FALLBACK: ${{ inputs.fallback_tag }}
+        IN_SHA: ${{ inputs.sha }}
+        REPO: ${{ github.repository }}
+        GH_TOKEN: ${{ inputs.token || github.token }}
+      run: |
+        set -euo pipefail
+
+        TAG="$IN_TAG"
+        if [[ -z "$TAG" ]]; then
+          if [[ -n "$IN_CUSTOM" && -n "$IN_PREFIX" ]]; then
+            TAG="${IN_PREFIX}${IN_CUSTOM}"
+          elif [[ -n "$IN_FALLBACK" ]]; then
+            TAG="$IN_FALLBACK"
+          else
+            echo "create-tag: need 'tag' OR ('tag_prefix' + 'custom_version') OR 'fallback_tag'." >&2
+            exit 1
+          fi
+        fi
+
+        SHA="${IN_SHA:-$GITHUB_SHA}"
+        API="https://api.github.com/repos/$REPO"
+
+        # If exists, no-op
+        STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          "$API/git/ref/tags/$TAG" || true)
+
+        if [[ "$STATUS" == "200" ]]; then
+          echo "Tag exists: $TAG"
+          echo "created=false" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Create lightweight tag
+        curl -sS -f \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          -X POST "$API/git/refs" \
+          -d "{\"ref\":\"refs/tags/$TAG\",\"sha\":\"$SHA\"}"
+
+        echo "Created: $TAG -> $SHA"
+        echo "created=true" >> "$GITHUB_OUTPUT"
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
