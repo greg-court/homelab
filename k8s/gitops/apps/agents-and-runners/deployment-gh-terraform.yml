@@ -5,6 +5,11 @@ metadata:
   namespace: agents-and-runners
 spec:
   replicas: 1
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
   selector:
     matchLabels: { app: gh-terraform-runner }
   template:
