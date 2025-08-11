@@ -39,7 +39,7 @@ spec:
             vip: 192.168.3.251
             shareKey: packer-251
             basePort: 8081
-            domain: packer.trust.k8s.internal
+            domain: packer.k8s.internal
           envFromSecrets:
             - gh-runners-env
           envFromConfigMaps:
