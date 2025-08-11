@@ -18,7 +18,7 @@ data:
 
     // Label / filter pod logs
     loki.process "pods" {
-      stage.static_labels { values = { cluster = "homelab" } }
+      stage.static_labels { values = { cluster = "trust" } }
       // Example drop:
       // stage.drop { expression = "namespace = \"kube-system\" and container = \"kube-proxy\"" }
       forward_to = [loki.write.default.receiver]
@@ -33,7 +33,7 @@ data:
 
     // Label events the same way
     loki.process "events" {
-      stage.static_labels { values = { cluster = "homelab" } }
+      stage.static_labels { values = { cluster = "trust" } }
       forward_to = [loki.write.default.receiver]
     }
 
