@@ -1,0 +1,53 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: prometheus-local
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-local-k8s-trust-03
+spec:
+  capacity: { storage: 32Gi }
+  volumeMode: Filesystem
+  accessModes: ['ReadWriteOnce']
+  storageClassName: prometheus-local
+  local: { path: /var/mnt/prometheus }
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ['k8s-trust-03']
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: loki-local
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: loki-local-k8s-trust-03
+spec:
+  capacity: { storage: 64Gi }
+  volumeMode: Filesystem
+  accessModes: ['ReadWriteOnce']
+  storageClassName: loki-local
+  local: { path: /var/mnt/loki }
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ['k8s-trust-03']
+  persistentVolumeReclaimPolicy: Retain

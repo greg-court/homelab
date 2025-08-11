@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkitd-config
+  namespace: agents-and-runners
+data:
+  buildkitd.toml: |
+    debug = false
+
+    [worker.oci]
+      enabled = true
+      gc = true
+      # Keep at least 2GB free on the node disk and cap builder usage around 10Gi
+      reservedSpace = "2GB"
+      maxUsedSpace  = "10GB"
+      # Optional: tame per-pod build parallelism if you see thrash on 4‑core nodes
+      max-parallelism = 2
