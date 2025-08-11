@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: monitoring
+data:
+  config.river: |
+    // Discover pods (for container logs)
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    // Tail pod logs
+    loki.source.kubernetes "pods" {
+      targets    = discovery.kubernetes.pods.targets
+      forward_to = [loki.process.pods.receiver]
+    }
+
+    // Label / filter pod logs
+    loki.process "pods" {
+      stage.static_labels { values = { cluster = "trust" } }
+      // Example drop:
+      // stage.drop { expression = "namespace = \"kube-system\" and container = \"kube-proxy\"" }
+      forward_to = [loki.write.default.receiver]
+    }
+
+    // Kubernetes Events -> Loki (no targets here)
+    loki.source.kubernetes_events "events" {
+      job_name   = "kubernetes-events"  // required, non-empty
+      // namespaces = ["kube-system","default","monitoring"]  // optional
+      forward_to = [loki.process.events.receiver]
+    }
+
+    // Label events the same way
+    loki.process "events" {
+      stage.static_labels { values = { cluster = "trust" } }
+      forward_to = [loki.write.default.receiver]
+    }
+
+    // Ship to your single-binary Loki
+    loki.write "default" {
+      endpoint { url = "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push" }
+    }

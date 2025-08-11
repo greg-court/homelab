@@ -1,0 +1,14 @@
+namespace: metallb-system
+
+addressPool:
+  name: pool
+  protocol: layer2
+  addresses: []
+  autoAssign: true
+  avoidBuggyIPs: false
+
+l2Advertisement:
+  enabled: true
+  name: l2
+  interfaces:
+    - eth0

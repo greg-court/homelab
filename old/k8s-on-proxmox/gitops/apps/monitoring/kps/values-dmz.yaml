@@ -1,0 +1,6 @@
+grafana:
+  ingress:
+    hosts: ['grafana.dmz.k8s.internal']
+    tls:
+      - secretName: grafana-tls
+        hosts: ['grafana.dmz.k8s.internal']

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-19'
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: k8s/gitops/charts/metallb-config
+    helm:
+      values: |
+        namespace: metallb-system
+        addressPool:
+          name: trust-pool
+          protocol: layer2
+          addresses:
+            - 192.168.3.250-192.168.3.251
+        l2Advertisement:
+          enabled: true
+          name: trust-l2
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }

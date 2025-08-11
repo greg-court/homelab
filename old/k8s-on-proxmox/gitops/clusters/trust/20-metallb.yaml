@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-20'
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://metallb.github.io/metallb
+    chart: metallb
+    targetRevision: 0.15.2
+    helm:
+      values: |
+        speaker:
+          frr:
+            enabled: false
+          ignoreExcludeLB: true # CRITICAL FIX!
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    # Namespace is created by metallb-namespace app (with PSA labels)
