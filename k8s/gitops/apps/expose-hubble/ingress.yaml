@@ -8,10 +8,10 @@ metadata:
 spec:
   ingressClassName: traefik
   tls:
-    - hosts: ['hubble.trust.k8s.internal']
+    - hosts: ['hubble.k8s.internal']
       secretName: hubble-tls
   rules:
-    - host: hubble.trust.k8s.internal
+    - host: hubble.k8s.internal
       http:
         paths:
           - path: /

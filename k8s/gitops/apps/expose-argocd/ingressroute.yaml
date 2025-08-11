@@ -4,9 +4,9 @@ metadata:
   name: argocd
   namespace: argocd
 spec:
-  entryPoints: [ "websecure" ]
+  entryPoints: ['websecure']
   routes:
-    - match: Host(`argocd.trust.k8s.internal`)
+    - match: Host(`argocd.k8s.internal`)
       kind: Rule
       services:
         - name: argocd-server
@@ -14,4 +14,4 @@ spec:
           scheme: https
           serversTransport: https-insecure
   tls:
-    secretName: argocd-trust-tls
+    secretName: argocd-tls

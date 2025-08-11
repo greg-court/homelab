@@ -9,7 +9,7 @@ reclaimPolicy: Retain
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: prometheus-local-k8s-trust-03
+  name: prometheus-local-k8s-03
 spec:
   capacity: { storage: 32Gi }
   volumeMode: Filesystem
@@ -22,7 +22,7 @@ spec:
         - matchExpressions:
             - key: kubernetes.io/hostname
               operator: In
-              values: ['k8s-trust-03']
+              values: ['k8s-03']
   persistentVolumeReclaimPolicy: Retain
 ---
 apiVersion: storage.k8s.io/v1
@@ -36,7 +36,7 @@ reclaimPolicy: Retain
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: loki-local-k8s-trust-03
+  name: loki-local-k8s-03
 spec:
   capacity: { storage: 64Gi }
   volumeMode: Filesystem
@@ -49,5 +49,5 @@ spec:
         - matchExpressions:
             - key: kubernetes.io/hostname
               operator: In
-              values: ['k8s-trust-03']
+              values: ['k8s-03']
   persistentVolumeReclaimPolicy: Retain
