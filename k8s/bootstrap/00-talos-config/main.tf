@@ -25,8 +25,7 @@ locals {
       proxy                          = { disabled = true }
       apiServer = {
         certSANs = [
-          "h1", "h2", "h3",
-          "h1.klab.internal", "h2.klab.internal", "h3.klab.internal",
+          var.cluster_endpoint,
         ]
         extraArgs = {
           "service-account-issuer" = "https://kubernetes.default.svc"
