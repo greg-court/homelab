@@ -1,16 +1,20 @@
-variable "namespace"               { default = "argocd" }
-variable "bootstrap_repo_url"      {}
-variable "bootstrap_repo_path"     {}
+variable "namespace" { default = "argocd" }
+variable "bootstrap_repo_url" {}
+variable "bootstrap_repo_path" {}
 variable "bootstrap_repo_revision" { default = "main" }
 
 terraform {
   required_providers {
     kubernetes = { source = "hashicorp/kubernetes", version = ">=2" }
-    helm       = { source = "hashicorp/helm",       version = ">=3" }
+    helm       = { source = "hashicorp/helm", version = ">=3" }
   }
 }
 
-resource "kubernetes_namespace" "argocd" { metadata { name = var.namespace } }
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = var.namespace
+  }
+}
 
 locals {
   base_values = yamlencode({
@@ -23,11 +27,11 @@ locals {
 }
 
 resource "helm_release" "argocd" {
-  name       = "argocd"
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = "argo-cd"
-  version    = "8.2.5"
+  name             = "argocd"
+  namespace        = kubernetes_namespace.argocd.metadata[0].name
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  version          = "8.2.5"
   create_namespace = false
   values           = [local.base_values]
   wait             = true

@@ -9,11 +9,13 @@ terraform {
   }
 
   required_providers {
-    talos  = { source = "siderolabs/talos", version = ">= 0.6.0" }
-    local  = { source = "hashicorp/local",  version = ">= 2.4.0" }
+    talos   = { source = "siderolabs/talos", version = ">= 0.6.0" }
+    local   = { source = "hashicorp/local", version = ">= 2.4.0" }
     azurerm = { source = "hashicorp/azurerm", version = ">= 3.100.0" }
   }
 }
 
 provider "talos" {}
-provider "azurerm" { features {} }
+provider "azurerm" {
+  features {}
+}
