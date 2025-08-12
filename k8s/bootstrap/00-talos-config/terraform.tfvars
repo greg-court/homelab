@@ -1,6 +1,6 @@
 cluster_name         = "homelab"
-cluster_endpoint     = "https://k8s-01:6443"
-bootstrap_node       = "k8s-01"
+cluster_endpoint     = "https://k8s02:6443"
+bootstrap_node       = "k8s02"
 install_disk         = "/dev/sda"
 storage_account_name = "sthomelabuks"
 container_name       = "k8s"
