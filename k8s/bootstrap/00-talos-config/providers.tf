@@ -1,0 +1,19 @@
+terraform {
+  backend "azurerm" {
+    subscription_id      = "f01a5d70-cf46-4291-80de-336ee2a894d4"
+    resource_group_name  = "rg-homelab-uks"
+    storage_account_name = "sthomelabuks"
+    container_name       = "k8s"
+    key                  = "homelab/talos-config.tfstate"
+    use_azuread_auth     = true
+  }
+
+  required_providers {
+    talos  = { source = "siderolabs/talos", version = ">= 0.6.0" }
+    local  = { source = "hashicorp/local",  version = ">= 2.4.0" }
+    azurerm = { source = "hashicorp/azurerm", version = ">= 3.100.0" }
+  }
+}
+
+provider "talos" {}
+provider "azurerm" { features {} }
