@@ -25,7 +25,7 @@ locals {
       proxy                          = { disabled = true }
       apiServer = {
         certSANs = [
-          var.cluster_endpoint,
+          var.api_server,
         ]
         extraArgs = {
           "service-account-issuer" = "https://kubernetes.default.svc"
