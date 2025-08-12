@@ -78,7 +78,8 @@ resource "azurerm_storage_blob" "talosconfig" {
   storage_container_name = var.container_name
   type                   = "Block"
   content_type           = "text/plain"
-  content                = data.talos_client_configuration.client.talos_config
+
+  source_content         = data.talos_client_configuration.client.talos_config
 }
 
 data "talos_machine_configuration" "controlplane" {
