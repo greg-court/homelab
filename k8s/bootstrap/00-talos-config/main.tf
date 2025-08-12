@@ -59,7 +59,6 @@ locals {
   tmp_dir = "${path.module}/tmp"
 }
 
-# ⬇️ fix depends_on target name
 resource "null_resource" "mkdir_tmp" {
   provisioner "local-exec" { command = "mkdir -p ${local.tmp_dir}" }
 }
