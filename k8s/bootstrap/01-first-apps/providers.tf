@@ -9,13 +9,13 @@ terraform {
   }
 
   required_providers {
-    helm       = { source = "hashicorp/helm",       version = ">= 3" }
+    helm       = { source = "hashicorp/helm", version = ">= 3" }
     kubernetes = { source = "hashicorp/kubernetes", version = ">= 2" }
   }
 }
 
-variable "cluster_name"   { type = string  default = "homelab" }
-variable "kubeconfig_path"{ type = string  default = "../tmp/kubeconfig" }
+variable "cluster_name" { default = "homelab" }
+variable "kubeconfig_path" { default = "../${path.module}/tmp/kubeconfig" }
 
 provider "kubernetes" { config_path = var.kubeconfig_path }
-provider "helm"       { kubernetes = { config_path = var.kubeconfig_path } }
+provider "helm" { kubernetes = { config_path = var.kubeconfig_path } }
