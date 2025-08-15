@@ -1,8 +1,10 @@
 resource "kubernetes_namespace" "external_secrets" {
+  depends_on = [talos_machine_bootstrap.cluster]
   metadata { name = "external-secrets" }
 }
 
 resource "kubernetes_secret" "azure_kv_creds" {
+  depends_on = [talos_machine_bootstrap.cluster]
   metadata {
     name      = "azure-kv-creds"
     namespace = kubernetes_namespace.external_secrets.metadata[0].name
