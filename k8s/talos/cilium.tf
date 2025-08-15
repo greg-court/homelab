@@ -41,4 +41,5 @@ resource "helm_release" "cilium" {
   timeout         = 600
   atomic          = true
   cleanup_on_fail = true
+  depends_on      = [talos_machine_bootstrap.cluster]
 }
