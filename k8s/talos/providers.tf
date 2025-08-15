@@ -4,7 +4,7 @@ terraform {
     resource_group_name  = "rg-homelab-uks"
     storage_account_name = "sthomelabuks"
     container_name       = "k8s"
-    key                  = "homelab/talos-config.tfstate"
+    key                  = "klab/talos.tfstate"
     use_azuread_auth     = true
   }
 
