@@ -3,13 +3,6 @@ variable "bootstrap_repo_url" {}
 variable "bootstrap_repo_path" {}
 variable "bootstrap_repo_revision" { default = "main" }
 
-terraform {
-  required_providers {
-    kubernetes = { source = "hashicorp/kubernetes", version = ">=2" }
-    helm       = { source = "hashicorp/helm", version = ">=3" }
-  }
-}
-
 resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.namespace
