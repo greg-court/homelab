@@ -37,14 +37,14 @@ resource "helm_release" "argocd" {
 resource "helm_release" "argocd_root_apps" {
   count      = var.bootstrap ? 1 : 0
   name       = "argocd-root-apps"
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
+  namespace  = kubernetes_namespace.argocd[0].metadata[0].name
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-apps"
 
   values = [yamlencode({
     applications = {
       root-apps = {
-        namespace = kubernetes_namespace.argocd.metadata[0].name
+        namespace = kubernetes_namespace.argocd[0].metadata[0].name
         project   = "default"
         source = {
           repoURL        = var.bootstrap_repo_url
@@ -54,7 +54,7 @@ resource "helm_release" "argocd_root_apps" {
         }
         destination = {
           server    = "https://kubernetes.default.svc"
-          namespace = kubernetes_namespace.argocd.metadata[0].name
+          namespace = kubernetes_namespace.argocd[0].metadata[0].name
         }
         syncPolicy = {
           automated   = { prune = true, selfHeal = true }
