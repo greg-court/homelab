@@ -5,3 +5,5 @@ api_server           = "api.klab.internal"
 install_disk         = "/dev/sda"
 storage_account_name = "sthomelabuks"
 container_name       = "k8s"
+
+bootstrap = "false"
