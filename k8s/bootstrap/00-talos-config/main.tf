@@ -59,6 +59,16 @@ locals {
       }
     }
   })
+  ephemeral_patch = yamlencode({
+    apiVersion = "v1alpha1"
+    kind       = "VolumeConfig"
+    name       = "EPHEMERAL"
+    provisioning = {
+      diskSelector = { match = "system_disk" }
+      maxSize      = "64GiB"
+      grow         = false
+    }
+  })
   tmp_dir = "${path.module}/tmp"
 }
 
@@ -81,7 +91,7 @@ resource "azurerm_storage_blob" "talosconfig" {
   type                   = "Block"
   content_type           = "text/plain"
 
-  source_content         = data.talos_client_configuration.client.talos_config
+  source_content = data.talos_client_configuration.client.talos_config
 }
 
 data "talos_machine_configuration" "controlplane" {
