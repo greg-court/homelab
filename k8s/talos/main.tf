@@ -10,6 +10,12 @@ locals {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
+      network = {
+        interfaces = [{
+          interface = "enp0s31f6" # temp - dell laptop
+          dhcp      = true
+        }]
+      }
       # network = {
       #   interfaces = [{
       #     interface = "bond0"
