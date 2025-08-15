@@ -1,7 +1,11 @@
 locals {
   base_patch = yamlencode({
     machine = {
-      install = { disk = var.install_disk }
+      install = {
+        # disk = var.install_disk
+        disk  = "/dev/disk/by-id/wwn-0x5001b448b45dbd16" # temp - dell laptop
+        wipe  = true
+      }
       features = {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
