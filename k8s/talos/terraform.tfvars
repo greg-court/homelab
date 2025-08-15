@@ -1,6 +1,6 @@
 cluster_name         = "homelab"
 cluster_endpoint     = "https://api.klab.internal:6443"
-bootstrap_node       = "h2.klab.internal"
+bootstrap_node       = "n1.klab.internal"
 api_server           = "api.klab.internal"
 install_disk         = "/dev/sda"
 storage_account_name = "sthomelabuks"
