@@ -20,6 +20,7 @@ locals {
 }
 
 resource "helm_release" "argocd" {
+  count            = var.bootstrap ? 1 : 0
   name             = "argocd"
   namespace        = kubernetes_namespace.argocd.metadata[0].name
   repository       = "https://argoproj.github.io/argo-helm"
@@ -33,6 +34,7 @@ resource "helm_release" "argocd" {
 }
 
 resource "helm_release" "argocd_root_apps" {
+  count      = var.bootstrap ? 1 : 0
   name       = "argocd-root-apps"
   namespace  = kubernetes_namespace.argocd.metadata[0].name
   repository = "https://argoproj.github.io/argo-helm"
