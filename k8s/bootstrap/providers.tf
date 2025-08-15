@@ -9,9 +9,9 @@ terraform {
   }
 
   required_providers {
-    talos   = { source = "siderolabs/talos", version = ">= 0.6.0" }
-    local   = { source = "hashicorp/local", version = ">= 2.4.0" }
-    azurerm = { source = "hashicorp/azurerm", version = ">= 3.100.0" }
+    talos      = { source = "siderolabs/talos", version = ">= 0.6.0" }
+    local      = { source = "hashicorp/local", version = ">= 2.4.0" }
+    azurerm    = { source = "hashicorp/azurerm", version = ">= 3.100.0" }
     kubernetes = { source = "hashicorp/kubernetes", version = ">=2" }
     helm       = { source = "hashicorp/helm", version = ">=3" }
   }

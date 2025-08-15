@@ -110,11 +110,11 @@ resource "local_file" "controlplane_local" {
 
 # Apply machine config to all CP nodes BEFORE bootstrap
 resource "talos_machine_configuration_apply" "controlplanes" {
-  for_each                    = toset(["h1.klab.internal","h2.klab.internal","h3.klab.internal"])
+  for_each = toset(["h1.klab.internal", "h2.klab.internal", "h3.klab.internal"])
 
   # Hit EACH node’s Talos API directly (pre-bootstrap there’s no proxying)
-  endpoint                    = each.value
-  node                        = each.value
+  endpoint = each.value
+  node     = each.value
 
   client_configuration        = talos_machine_secrets.cluster.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
