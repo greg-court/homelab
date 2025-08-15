@@ -7,3 +7,6 @@ storage_account_name = "sthomelabuks"
 container_name       = "k8s"
 
 bootstrap = "false"
+
+bootstrap_repo_url  = "https://github.com/greg-court/homelab.git"
+bootstrap_repo_path = "k8s/gitops/clusters/homelab"
