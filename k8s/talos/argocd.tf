@@ -4,6 +4,7 @@ variable "bootstrap_repo_path" {}
 variable "bootstrap_repo_revision" { default = "main" }
 
 resource "kubernetes_namespace" "argocd" {
+  count = var.bootstrap ? 1 : 0
   metadata {
     name = var.namespace
   }
@@ -22,7 +23,7 @@ locals {
 resource "helm_release" "argocd" {
   count            = var.bootstrap ? 1 : 0
   name             = "argocd"
-  namespace        = kubernetes_namespace.argocd.metadata[0].name
+  namespace        = kubernetes_namespace.argocd[0].metadata[0].name
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
   version          = "8.2.5"
