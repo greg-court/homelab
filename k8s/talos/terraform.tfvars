@@ -1,4 +1,4 @@
-cluster_name         = "homelab"
+cluster_name         = "klab"
 cluster_endpoint     = "https://api.klab.internal:6443"
 bootstrap_node       = "n1.klab.internal"
 api_server           = "api.klab.internal"
