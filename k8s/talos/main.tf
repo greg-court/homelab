@@ -6,18 +6,18 @@ locals {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
-      network = {
-        interfaces = [{
-          interface = "bond0"
-          dhcp      = true
-          bond = {
-            mode           = "802.3ad"
-            lacpRate       = "fast"
-            xmitHashPolicy = "layer3+4"
-            interfaces     = ["enp1s0", "enp2s0"] # putting NIC with DHCP reservation FIRST
-          }
-        }]
-      }
+      # network = {
+      #   interfaces = [{
+      #     interface = "bond0"
+      #     dhcp      = true
+      #     bond = {
+      #       mode           = "802.3ad"
+      #       lacpRate       = "fast"
+      #       xmitHashPolicy = "layer3+4"
+      #       interfaces     = ["enp1s0", "enp2s0"] # putting NIC with DHCP reservation FIRST
+      #     }
+      #   }]
+      # }
     }
     cluster = {
       allowSchedulingOnControlPlanes = true
