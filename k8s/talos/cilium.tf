@@ -31,7 +31,6 @@ locals {
 
 resource "helm_release" "cilium" {
   count           = var.bootstrap ? 1 : 0
-  depends_on      = [talos_machine_bootstrap.cluster]
   name            = "cilium"
   namespace       = "kube-system"
   repository      = "https://helm.cilium.io"
