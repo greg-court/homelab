@@ -104,6 +104,11 @@ resource "azurerm_storage_blob" "talosconfig" {
   source_content = data.talos_client_configuration.client.talos_config
 }
 
+resource "local_file" "talosconfig_local" {
+  filename = "${local.tmp_dir}/talosconfig"
+  content  = data.talos_client_configuration.client.talos_config
+}
+
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
