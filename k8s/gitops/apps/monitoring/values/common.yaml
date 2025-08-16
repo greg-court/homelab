@@ -17,14 +17,14 @@ prometheusOperator:
 prometheus:
   prometheusSpec:
     retention: 14d
-    retentionSize: '28GiB'
+    retentionSize: '24GiB'
     walCompression: true
     storageSpec:
       volumeClaimTemplate:
         spec:
           storageClassName: local-path
           resources:
-            requests: { storage: 16Gi }
+            requests: { storage: 32Gi }
 
 alertmanager:
   enabled: true

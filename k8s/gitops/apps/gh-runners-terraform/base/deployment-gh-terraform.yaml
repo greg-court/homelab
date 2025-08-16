@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gh-terraform-runner
-  namespace: agents-and-runners
+  namespace: gh-runners
 spec:
   replicas: 1
   selector:
