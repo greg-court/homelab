@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkitd-config
+  namespace: agents-and-runners
+data:
+  buildkitd.toml: |
+    debug = false
+    [worker.oci]
+      enabled = true
+      gc = true
+      reservedSpace = "2GB"
+      maxUsedSpace  = "10GB"
+      max-parallelism = 2
