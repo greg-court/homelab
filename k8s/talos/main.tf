@@ -18,7 +18,7 @@ locals {
           {
             interface = "enp0s31f6" # temp - dell laptop
             dhcp      = true
-            vip = {
+            vip = { # works AFTER boostrap!? initially comment out...
               ip = "192.168.2.240"
             }
             vlans = [
