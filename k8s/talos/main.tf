@@ -34,6 +34,11 @@ locals {
             }
           ]
         }]
+        kubernetes = {
+          virtualIP = {
+            ip = "192.168.2.240"
+          }
+        }
       }
       # network = {
       #   interfaces = [{
@@ -62,6 +67,11 @@ locals {
       #       }
       #     ]
       #   }]
+      #   kubernetes = {
+      #     virtualIP = {
+      #       ip = "192.168.2.240"
+      #     }
+      #   }
       # }
     }
     cluster = {
