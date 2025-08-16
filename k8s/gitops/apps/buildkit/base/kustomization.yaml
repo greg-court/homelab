@@ -4,4 +4,4 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  # - hpa.yaml  # uncomment if you added the HPA
+  - hpa.yaml
