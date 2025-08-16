@@ -1,26 +1,26 @@
 # VLAN 3 pool (trust)
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: vlan3
 spec:
-  cidrs:
+  blocks:
     - cidr: 192.168.3.240/32
     - cidr: 192.168.3.241/32
 
 ---
 # VLAN 4 pool (dmz)
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: vlan4
 spec:
-  cidrs:
+  blocks:
     - cidr: 192.168.4.240/32
 
 ---
 # L2 announce on VLAN 3
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumL2AnnouncementPolicy
 metadata:
   name: l2-vlan3
@@ -33,7 +33,7 @@ spec:
 
 ---
 # L2 announce on VLAN 4
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumL2AnnouncementPolicy
 metadata:
   name: l2-vlan4
