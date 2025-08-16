@@ -1,4 +1,4 @@
-# VLAN 3 pool (trust)
+# VLAN 3 pool (trust) -- ADD 192.168.3.251
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
@@ -6,9 +6,10 @@ metadata:
 spec:
   cidrs:
     - cidr: 192.168.3.240/32
+    - cidr: 192.168.3.251/32
 
 ---
-# VLAN 4 pool (dmz)
+# VLAN 4 pool (dmz) -- keep as-is
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
@@ -18,25 +19,27 @@ spec:
     - cidr: 192.168.4.240/32
 
 ---
-# Announce LB IPs on VLAN 3 interface
+# L2 announce on VLAN 3
 apiVersion: cilium.io/v2alpha1
 kind: CiliumL2AnnouncementPolicy
 metadata:
   name: l2-vlan3
 spec:
-  interfaces:
-    - enp0s31f6.3
-  externalIPs: false
   loadBalancerIPs: true
+  externalIPs: false
+  interfaces:
+    - "^enp.*\\.3$"
+    - "^bond0\\.3$"
 
 ---
-# Announce LB IPs on VLAN 4 interface
+# L2 announce on VLAN 4
 apiVersion: cilium.io/v2alpha1
 kind: CiliumL2AnnouncementPolicy
 metadata:
   name: l2-vlan4
 spec:
-  interfaces:
-    - enp0s31f6.4
-  externalIPs: false
   loadBalancerIPs: true
+  externalIPs: false
+  interfaces:
+    - "^enp.*\\.4$"
+    - "^bond0\\.4$"

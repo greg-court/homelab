@@ -7,7 +7,7 @@ count: 2 # how many runners
 replicas: 1 # per runner
 
 external:
-  vip: 192.168.3.251 # dedicated VIP for packer
+  vip: 192.168.3.241 # dedicated VIP for packer
   shareKey: packer-251 # any string; same on all services
   basePort: 8081 # runner-1=8081, runner-2=8082, ...
   domain: packer.trust.klab.internal
