@@ -4,5 +4,4 @@ resources:
   - namespace.yaml
   - secretstore.yaml
   - externalsecrets-gh.yaml
-  - externalsecrets-tfc.yaml
   - configmap.yaml

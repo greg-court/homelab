@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gh-packer-runner-01
+  name: gh-packer-runner-02
   namespace: gh-runners
   annotations:
-    metallb.io/address-pool: trust-pool
+    metallb.io/address-pool: klab-pool
     metallb.io/allow-shared-ip: packer-251
 spec:
   type: LoadBalancer
