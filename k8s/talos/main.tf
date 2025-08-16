@@ -18,9 +18,6 @@ locals {
           {
             interface = "enp0s31f6" # temp - dell laptop
             dhcp      = true
-            vip = { # works AFTER boostrap!? initially comment out...
-              ip = "192.168.2.240"
-            }
             vlans = [
               { vlanId = 3, dhcp = false, addresses = [] },
               { vlanId = 4, dhcp = false, addresses = [] }
@@ -32,9 +29,6 @@ locals {
       #   interfaces = [{
       #     interface = "bond0"
       #     dhcp      = true
-      #     vip = {
-      #       ip = "192.168.2.240"
-      #     }
       #     bond = {
       #       mode           = "802.3ad"
       #       lacpRate       = "fast"
@@ -103,6 +97,15 @@ locals {
       grow         = false
     }
   })
+  post_bootstrap_patch = yamlencode({
+    machine = {
+      network = {
+        interfaces = [{ # add VIP AFTER bootstrap
+          vip       = { ip = "192.168.2.240" }
+        }]
+      }
+    }
+  })
   tmp_dir = "${path.module}/tmp"
 }
 
@@ -141,6 +144,14 @@ data "talos_machine_configuration" "controlplane" {
   config_patches   = [local.base_patch, local.ephemeral_patch]
 }
 
+data "talos_machine_configuration" "controlplane_vip" {
+  cluster_name     = var.cluster_name
+  machine_type     = "controlplane"
+  cluster_endpoint = var.cluster_endpoint
+  machine_secrets  = talos_machine_secrets.cluster.machine_secrets
+  config_patches   = [local.base_patch, local.ephemeral_patch, local.post_bootstrap_patch]
+}
+
 resource "local_file" "controlplane_local" {
   depends_on = [null_resource.mkdir_tmp]
   filename   = "${local.tmp_dir}/controlplane.yaml"
@@ -165,6 +176,24 @@ resource "talos_machine_configuration_apply" "controlplanes" {
 
   # make sure the rendered file/data exists first (not strictly required, but sane)
   depends_on = [local_file.controlplane_local]
+}
+
+resource "talos_machine_configuration_apply" "controlplanes_vip" {
+  # only run this “second apply” on bootstrap runs
+  for_each = var.bootstrap ? toset([
+    "n1.klab.internal",
+    # "n2.klab.internal",
+    # "n3.klab.internal"
+  ]) : toset([])
+
+  endpoint                     = each.value
+  node                         = each.value
+  client_configuration         = talos_machine_secrets.cluster.client_configuration
+  machine_configuration_input  = data.talos_machine_configuration.controlplane_vip.machine_configuration
+  apply_mode                   = "auto"
+
+  # make sure bootstrap finished before we add the VIP
+  depends_on = [talos_machine_bootstrap.cluster]
 }
 
 # Bootstrap the cluster (Talos provider) — runs only when bootstrap=true
