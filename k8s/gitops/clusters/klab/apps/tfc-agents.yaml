@@ -6,7 +6,9 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '25' }
 spec:
   project: apps
-  destination: { server: https://kubernetes.default.svc, namespace: gh-runners }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tfc-agents
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main

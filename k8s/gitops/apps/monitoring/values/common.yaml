@@ -22,9 +22,9 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: prometheus-local
+          storageClassName: local-path
           resources:
-            requests: { storage: 32Gi }
+            requests: { storage: 16Gi }
 
 alertmanager:
   enabled: true
