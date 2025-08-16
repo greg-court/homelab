@@ -1,13 +1,4 @@
 locals {
-  iface_vip  = var.bootstrap ? { vip = { ip = "192.168.2.240" } } : {}
-  iface_base = {
-    interface = "enp0s31f6"
-    dhcp      = true
-    vlans = [
-      { vlanId = 3, dhcp = false, addresses = [] },
-      { vlanId = 4, dhcp = false, addresses = [] }
-    ]
-  }
   base_patch = yamlencode({
     machine = {
       certSANs = [
@@ -22,8 +13,20 @@ locals {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
-      network  = {
-        interfaces = [ merge(local.iface_base, local.iface_vip) ]
+      network = {
+        interfaces = [
+          {
+            interface = "enp0s31f6" # temp - dell laptop
+            dhcp      = true
+            vip = { # works AFTER boostrap!? initially comment out...
+              ip = "192.168.2.240"
+            }
+            vlans = [
+              { vlanId = 3, dhcp = false, addresses = [] },
+              { vlanId = 4, dhcp = false, addresses = [] }
+            ]
+          }
+        ]
       }
       # network = {
       #   interfaces = [{
