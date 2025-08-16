@@ -18,9 +18,8 @@ spec:
         service:
           type: LoadBalancer
           annotations:
-            metallb.io/address-pool: trust-pool
+            lbipam.cilium.io/ips: "192.168.3.240"
           spec:
-            loadBalancerIP: "192.168.3.240"
             externalTrafficPolicy: Cluster
 
         deployment:
