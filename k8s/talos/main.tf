@@ -14,36 +14,27 @@ locals {
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
       network = {
-        interfaces = [{
-          interface = "enp0s31f6" # temp - dell laptop
-          dhcp      = true
-          vlans = [
-            # VLAN 3 subinterface
-            {
-              vlanId    = 3
-              vlan      = { rawDevice = "enp0s31f6" } # parent
-              dhcp      = false
-              addresses = [] # link up, no IP
-            },
-            # VLAN 4 subinterface
-            {
-              vlanId    = 4
-              vlan      = { rawDevice = "enp0s31f6" }
-              dhcp      = false
-              addresses = []
+        interfaces = [
+          {
+            interface = "enp0s31f6" # temp - dell laptop
+            dhcp      = true
+            vip = {
+              ip = "192.168.2.240"
             }
-          ]
-        }]
-        kubernetes = {
-          virtualIP = {
-            ip = "192.168.2.240"
+            vlans = [
+              { vlanId = 3, dhcp = false, addresses = [] },
+              { vlanId = 4, dhcp = false, addresses = [] }
+            ]
           }
-        }
+        ]
       }
       # network = {
       #   interfaces = [{
       #     interface = "bond0"
       #     dhcp      = true
+      #     vip = {
+      #       ip = "192.168.2.240"
+      #     }
       #     bond = {
       #       mode           = "802.3ad"
       #       lacpRate       = "fast"
@@ -51,20 +42,8 @@ locals {
       #       interfaces     = ["enp1s0", "enp2s0"] # putting NIC with DHCP reservation FIRST
       #     }
       #     vlans = [
-      #       # VLAN 3 subinterface
-      #       {
-      #         vlanId    = 3
-      #         vlan      = { rawDevice = "bond0" } # parent
-      #         dhcp      = false
-      #         addresses = [] # link up, no IP
-      #       },
-      #       # VLAN 4 subinterface
-      #       {
-      #         vlanId    = 4
-      #         vlan      = { rawDevice = "bond0" }
-      #         dhcp      = false
-      #         addresses = []
-      #       }
+      #       { vlanId = 3, dhcp = false, addresses = [] },
+      #       { vlanId = 4, dhcp = false, addresses = [] }
       #     ]
       #   }]
       #   kubernetes = {
