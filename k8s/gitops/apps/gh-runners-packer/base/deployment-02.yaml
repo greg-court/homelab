@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gh-packer-runner-02
-  namespace: agents-and-runners
+  namespace: gh-runners
   labels: { app: gh-packer-runner, instance: '02' }
 spec:
   replicas: 1

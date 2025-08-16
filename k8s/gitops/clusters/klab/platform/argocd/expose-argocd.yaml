@@ -3,13 +3,13 @@ kind: Application
 metadata:
   name: expose-argocd
   namespace: argocd
-  annotations: { argocd.argoproj.io/sync-wave: "10" }
+  annotations: { argocd.argoproj.io/sync-wave: '10' }
 spec:
   project: platform
   destination: { server: https://kubernetes.default.svc, namespace: argocd }
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/apps/expose-argocd
+    path: k8s/gitops/apps/expose-argocd/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }

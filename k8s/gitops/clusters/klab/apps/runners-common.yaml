@@ -6,11 +6,13 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '-30' }
 spec:
   project: apps
-  destination: { server: https://kubernetes.default.svc, namespace: argocd }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gh-runners
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: apps/runners-common/overlays/klab
+    path: k8s/gitops/apps/gh-runners-common/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']

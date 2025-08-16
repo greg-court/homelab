@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: apps
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-100'
+spec:
+  description: Workload applications (runners, buildkit, tfc)
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: '*'
+  sourceRepos:
+    - https://github.com/greg-court/homelab.git
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

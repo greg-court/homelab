@@ -13,8 +13,8 @@ spec:
       targetRevision: 76.2.0
       helm:
         valueFiles:
-          - $values/k8s/gitops/apps/monitoring/kps/values-common.yaml
-          - $values/k8s/gitops/apps/monitoring/kps/values-trust.yaml
+          - $values/k8s/gitops/apps/monitoring/values/common.yaml
+          - $values/k8s/gitops/apps/monitoring/values/klab.yaml
     - repoURL: https://github.com/greg-court/homelab.git
       targetRevision: main
       ref: values

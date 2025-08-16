@@ -11,9 +11,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: apps/gh-packer-runners/overlays/klab
+    path: k8s/gitops/apps/gh-runners-packer/overlays/klab
   syncPolicy:
-    {
-      automated: { prune: true, selfHeal: true },
-      syncOptions: ['ServerSideApply=true'],
-    }
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['ServerSideApply=true']

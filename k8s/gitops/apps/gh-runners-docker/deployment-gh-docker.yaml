@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gh-docker-runner
-  namespace: agents-and-runners
+  namespace: gh-runners
   labels: { app: gh-docker-runner }
 spec:
   replicas: 1
