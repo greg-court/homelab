@@ -25,7 +25,8 @@ locals {
       }
     }
 
-    hubble = { enabled = true, relay = { enabled = true }, ui = { enabled = true } }
+    hubble          = { enabled = true, relay = { enabled = true }, ui = { enabled = true } }
+    l2announcements = { enabled = true }
   })]
 }
 

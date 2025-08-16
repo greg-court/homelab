@@ -6,7 +6,7 @@ metadata:
 spec:
   entryPoints: ['websecure']
   routes:
-    - match: Host(`argocd.k8s.internal`)
+    - match: Host(`argocd.trust.klab.internal`)
       kind: Rule
       services:
         - name: argocd-server

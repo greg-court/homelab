@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-10' }
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  source:
+    repoURL: https://traefik.github.io/charts
+    chart: traefik
+    targetRevision: 37.0.0
+    helm:
+      values: |
+        service:
+          type: LoadBalancer
+          annotations:
+            metallb.io/address-pool: trust-pool
+          spec:
+            loadBalancerIP: "192.168.3.240"
+            externalTrafficPolicy: Cluster
+
+        deployment:
+          kind: DaemonSet
+
+        additionalArguments:
+          - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+          - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['CreateNamespace=true']
