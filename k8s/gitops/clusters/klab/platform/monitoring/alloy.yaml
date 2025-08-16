@@ -11,7 +11,5 @@ spec:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
     path: k8s/gitops/apps/alloy/overlays/klab
-    kustomize:
-      namespace: monitoring
   syncPolicy:
     automated: { prune: true, selfHeal: true }
