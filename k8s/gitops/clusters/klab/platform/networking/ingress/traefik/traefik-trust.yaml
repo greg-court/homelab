@@ -13,30 +13,31 @@ spec:
     repoURL: https://traefik.github.io/charts
     chart: traefik
     targetRevision: 37.0.0
-  helm:
-    values: |
-      ingressClass:
-        enabled: true
-        isDefaultClass: true
-        name: traefik
+    helm:
+      values: |
+        ingressClass:
+          enabled: true
+          isDefaultClass: true
+          name: traefik
 
-      service:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: "192.168.3.240"
-        spec:
-          externalTrafficPolicy: Local
+        service:
+          type: LoadBalancer
+          annotations:
+            lbipam.cilium.io/ips: '192.168.3.240'
+          spec:
+            loadBalancerClass: io.cilium/l2-announcer
+            externalTrafficPolicy: Local
 
-      deployment:
-        kind: DaemonSet
-      tolerations:
-        - key: 'node-role.kubernetes.io/control-plane'
-          operator: 'Exists'
-          effect: 'NoSchedule'
+        deployment:
+          kind: DaemonSet
+        tolerations:
+          - key: 'node-role.kubernetes.io/control-plane'
+            operator: 'Exists'
+            effect: 'NoSchedule'
 
-      additionalArguments:
-        - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
-        - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+        additionalArguments:
+          - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
+          - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
 
   syncPolicy:
     automated: { prune: true, selfHeal: true }
