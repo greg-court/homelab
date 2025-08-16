@@ -17,7 +17,7 @@ spec:
           ports: [{ containerPort: 8080 }]
           env:
             - { name: EXTERNAL_HTTP_PORT, value: '8082' }
-            - { name: RUNNER_HOSTNAME, value: 'packer.k8s.internal' }
+            - { name: RUNNER_HOSTNAME, value: 'packer.klab.trust.internal' }
             - { name: RUNNER_NAME, value: 'packer-runner-02' }
             - { name: RUNNER_LABELS, value: 'self-hosted,packer' }
           envFrom:

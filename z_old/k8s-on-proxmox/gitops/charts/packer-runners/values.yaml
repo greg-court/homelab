@@ -10,8 +10,8 @@ external:
   vip: 192.168.3.251 # dedicated VIP for packer
   shareKey: packer-251 # any string; same on all services
   basePort: 8081 # runner-1=8081, runner-2=8082, ...
-  domain: packer.trust.k8s.internal
-  addressPool: klab-pool
+  domain: packer.trust.klab.internal
+  addressPool: trust-pool
 
 envFromSecrets: [] # e.g. ["gh-runners-env"]
 envFromConfigMaps: [] # e.g. ["gh-runners-config"]
