@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-provisioner
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-28' }
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: local-path-storage
+  source:
+    repoURL: https://charts.rancher.io
+    chart: local-path-provisioner
+    targetRevision: 0.0.32
+    helm:
+      values: |
+        storageClass:
+          defaultClass: false
+          name: local-path
+          reclaimPolicy: Delete      # delete PV on PVC delete
+        nodePathMap:
+          - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+            paths: ["/var/local-path-provisioner"] # lives on the node's rootfs
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['CreateNamespace=true']

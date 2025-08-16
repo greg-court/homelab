@@ -29,6 +29,10 @@ spec:
 
         deployment:
           kind: DaemonSet
+        tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists" # deploy on control-plane nodes
+            effect: "NoSchedule"
 
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
