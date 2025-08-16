@@ -1,4 +1,4 @@
-# VLAN 3 pool (trust) -- ADD 192.168.3.251
+# VLAN 3 pool (trust)
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
@@ -6,10 +6,10 @@ metadata:
 spec:
   cidrs:
     - cidr: 192.168.3.240/32
-    - cidr: 192.168.3.251/32
+    - cidr: 192.168.3.241/32
 
 ---
-# VLAN 4 pool (dmz) -- keep as-is
+# VLAN 4 pool (dmz)
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
