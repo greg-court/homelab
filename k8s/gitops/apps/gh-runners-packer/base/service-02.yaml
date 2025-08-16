@@ -6,7 +6,7 @@ metadata:
     lbipam.cilium.io/sharing-key: 'packer-241' # share the same IP across N Services
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
   selector: { app: gh-packer-runner, instance: '02' }
   ports:
     - name: http
