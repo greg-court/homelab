@@ -4,6 +4,7 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: vlan3
 spec:
+  allowFirstLastIPs: 'Yes'
   blocks:
     - cidr: 192.168.3.240/32
     - cidr: 192.168.3.241/32
@@ -15,6 +16,7 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: vlan4
 spec:
+  allowFirstLastIPs: 'Yes'
   blocks:
     - cidr: 192.168.4.240/32
 
