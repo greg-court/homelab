@@ -12,7 +12,5 @@ spec:
     targetRevision: main
     path: apps/tfc-agents/overlays/klab
   syncPolicy:
-    {
-      automated: { prune: true, selfHeal: true },
-      syncOptions: ['ServerSideApply=true'],
-    }
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']
