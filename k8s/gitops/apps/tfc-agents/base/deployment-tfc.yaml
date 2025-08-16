@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tfc-agent
-  namespace: agents-and-runners
+  name: tfc-agents
+  namespace: tfc-agents
 spec:
   replicas: 1
   selector:
-    matchLabels: { app: tfc-agent }
+    matchLabels: { app: tfc-agents }
   template:
     metadata:
-      labels: { app: tfc-agent }
+      labels: { app: tfc-agents }
     spec:
       containers:
-        - name: tfc-agent
-          image: hashicorp/tfc-agent:1.23
+        - name: tfc-agents
+          image: hashicorp/tfc-agents:1.23
           envFrom:
             - secretRef:
-                name: tfc-agent-env
+                name: tfc-agents-env
           resources: {}

@@ -25,7 +25,7 @@ spec:
           annotations:
             lbipam.cilium.io/ips: "192.168.4.240"
           spec:
-            externalTrafficPolicy: Cluster
+            externalTrafficPolicy: Local
 
         deployment:
           kind: DaemonSet
