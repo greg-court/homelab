@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tfc-agents
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '25' }
+spec:
+  project: apps
+  destination:
+    { server: https://kubernetes.default.svc, namespace: agents-and-runners }
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: apps/tfc-agents/overlays/klab
+  syncPolicy:
+    {
+      automated: { prune: true, selfHeal: true },
+      syncOptions: ['ServerSideApply=true'],
+    }

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-packer-runner-01
+  namespace: agents-and-runners
+  labels: { app: gh-packer-runner, instance: '01' }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: gh-packer-runner, instance: '01' } }
+  template:
+    metadata: { labels: { app: gh-packer-runner, instance: '01' } }
+    spec:
+      containers:
+        - name: gh-packer-runner
+          resources: {}
+          image: docker.io/gr10/gh-packer-runner:2.0.0
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: EXTERNAL_HTTP_PORT, value: '8081' }
+            - { name: RUNNER_HOSTNAME, value: 'packer.k8s.internal' }
+            - { name: RUNNER_NAME, value: 'packer-runner-01' }
+            - { name: RUNNER_LABELS, value: 'self-hosted,packer' }
+          envFrom:
+            - secretRef: { name: gh-runners-env }
+            - configMapRef: { name: gh-runners-config }

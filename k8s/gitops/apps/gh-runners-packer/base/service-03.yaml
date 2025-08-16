@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gh-packer-runner-01
+  namespace: gh-runners-packer
+  annotations:
+    metallb.io/address-pool: trust-pool
+    metallb.io/allow-shared-ip: packer-251
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.251
+  externalTrafficPolicy: Cluster
+  selector: { app: gh-packer-runner, instance: '01' }
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8080
+      protocol: TCP
