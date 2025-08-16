@@ -53,7 +53,7 @@ resource "helm_release" "cilium_trust" {
   namespace       = "kube-system"
   repository      = "https://helm.cilium.io"
   chart           = "cilium"
-  version         = "1.18.0"
+  version         = "1.18.1"
   values          = local.cilium_config
   timeout         = 600
   atomic          = true
@@ -68,7 +68,7 @@ resource "helm_release" "cilium_dmz" {
   namespace       = "kube-system"
   repository      = "https://helm.cilium.io"
   chart           = "cilium"
-  version         = "1.18.0"
+  version         = "1.18.1"
   values          = local.cilium_config
   timeout         = 600
   atomic          = true
