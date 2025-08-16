@@ -18,10 +18,16 @@ spec:
         storageClass:
           defaultClass: false
           name: local-path
-          reclaimPolicy: Delete      # delete PV on PVC delete
+          reclaimPolicy: Delete              # delete PV when PVC is deleted
+          volumeBindingMode: WaitForFirstConsumer
         nodePathMap:
           - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
-            paths: ["/var/local-path-provisioner"] # lives on the node's rootfs
+            paths: ["/var/local-path-provisioner"]
+        # DaemonSet scheduling on control-planes too
+        tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']
