@@ -12,6 +12,7 @@ spec:
       labels: { app: vip-pbr }
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - key: 'node-role.kubernetes.io/control-plane'
           operator: 'Exists'
@@ -19,48 +20,75 @@ spec:
       containers:
         - name: pbr
           image: nicolaka/netshoot:latest
-          securityContext: { privileged: true } # needs NET_ADMIN to touch routes/iptables
+          securityContext:
+            privileged: true # needs CAP_NET_ADMIN for routes/iptables
           command: ['/bin/sh', '-c']
           args:
             - |
-              set -eu
+              set -eux
 
-              ############ Routing tables: 102/103/104 = VLAN 2/3/4 ############
-              # VLAN 2
+              ############ Routing tables (IDs = VLAN) ############
+              # VLAN 2 -> table 102
               ip -4 route replace 192.168.2.0/24 dev enp0s31f6    scope link table 102
               ip -4 route replace default via 192.168.2.1 dev enp0s31f6           table 102
               ip -4 rule  del pref 102 fwmark 0x102 2>/dev/null || true
               ip -4 rule  add pref 102 fwmark 0x102 lookup 102
 
-              # VLAN 3
+              # VLAN 3 -> table 103
               ip -4 route replace 192.168.3.0/24 dev enp0s31f6.3  scope link table 103
               ip -4 route replace default via 192.168.3.1 dev enp0s31f6.3         table 103
               ip -4 rule  del pref 103 fwmark 0x103 2>/dev/null || true
               ip -4 rule  add pref 103 fwmark 0x103 lookup 103
 
-              # VLAN 4
+              # VLAN 4 -> table 104
               ip -4 route replace 192.168.4.0/24 dev enp0s31f6.4  scope link table 104
               ip -4 route replace default via 192.168.4.1 dev enp0s31f6.4         table 104
               ip -4 rule  del pref 104 fwmark 0x104 2>/dev/null || true
               ip -4 rule  add pref 104 fwmark 0x104 lookup 104
 
+              ############ VIP source rules (safety net) ############
+              # Ensures anything *sourced* from a VIP /32 uses its table even if
+              # the mangle marking is bypassed by the datapath.
+              ip -4 rule del pref 302 from 192.168.2.240/32 2>/dev/null || true
+              ip -4 rule add pref 302 from 192.168.2.240/32 lookup 102
+
+              ip -4 rule del pref 303 from 192.168.3.240/32 2>/dev/null || true
+              ip -4 rule add pref 303 from 192.168.3.240/32 lookup 103
+
+              ip -4 rule del pref 304 from 192.168.4.240/32 2>/dev/null || true
+              ip -4 rule add pref 304 from 192.168.4.240/32 lookup 104
+
               ############ Connmark on ingress → fwmark on replies ############
-              # Make a tiny chain so re-applying is clean/idempotent
+              # Tiny chain for idempotent re-apply
               iptables -t mangle -N VIP_PBR 2>/dev/null || true
               iptables -t mangle -F VIP_PBR
 
-              # Mark ANY connection that targets a LOCAL address (node IPs or VIPs)
-              # based on the VLAN interface the SYN arrived on. No per-VIP list.
-              iptables -t mangle -A VIP_PBR -i enp0s31f6   -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x102
-              iptables -t mangle -A VIP_PBR -i enp0s31f6.3 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x103
-              iptables -t mangle -A VIP_PBR -i enp0s31f6.4 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x104
+              # 1) Restore any existing connmark early on PREROUTING so routing
+              #    decisions for forwarded packets (pod replies) see the mark.
+              iptables -t mangle -C PREROUTING -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark 2>/dev/null || \
+              iptables -t mangle -A PREROUTING -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark
 
-              # Hook the chain once (idempotent)
-              iptables -t mangle -C PREROUTING -j VIP_PBR 2>/dev/null || iptables -t mangle -A PREROUTING -j VIP_PBR
+              # 2) On NEW flows, set connmark based on ingress interface (no LOCAL check).
+              iptables -t mangle -A VIP_PBR -i enp0s31f6   -m conntrack --ctstate NEW -j CONNMARK --set-mark 0x102
+              iptables -t mangle -A VIP_PBR -i enp0s31f6.3 -m conntrack --ctstate NEW -j CONNMARK --set-mark 0x103
+              iptables -t mangle -A VIP_PBR -i enp0s31f6.4 -m conntrack --ctstate NEW -j CONNMARK --set-mark 0x104
 
-              # On locally-generated replies, restore the connmark to the skb mark
+              # Hook our chain into PREROUTING (once)
+              iptables -t mangle -C PREROUTING -j VIP_PBR 2>/dev/null || \
+              iptables -t mangle -A PREROUTING -j VIP_PBR
+
+              # 3) For locally-generated replies (node daemons), also restore in OUTPUT.
               iptables -t mangle -C OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark 2>/dev/null || \
               iptables -t mangle -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark
 
-              # Keep pod alive so rules persist until reboot (K8s will reapply on boot anyway)
+              # Diagnostics on startup (shows up in pod logs)
+              echo "== ip rule =="; ip -4 rule show || true
+              echo "== table 102 =="; ip -4 route show table 102 || true
+              echo "== table 103 =="; ip -4 route show table 103 || true
+              echo "== table 104 =="; ip -4 route show table 104 || true
+              echo "== mangle: PREROUTING =="; iptables -t mangle -vnL PREROUTING || true
+              echo "== mangle: VIP_PBR =="; iptables -t mangle -vnL VIP_PBR || true
+              echo "== mangle: OUTPUT =="; iptables -t mangle -vnL OUTPUT || true
+
+              # Keep pod alive so rules persist; k8s will re-apply on reboot
               sleep infinity
