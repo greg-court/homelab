@@ -44,6 +44,19 @@ spec:
             operator: "Exists" # deploy on control-plane nodes
             effect: "NoSchedule"
 
+        podSecurityContext:
+          seccompProfile:
+            type: RuntimeDefault
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
