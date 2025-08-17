@@ -1,20 +1,11 @@
 locals {
   iface_vip = var.bootstrap ? { vip = { ip = "192.168.2.240" } } : {}
   iface_base = {
-    interface   = "enp0s31f6"
-    dhcp        = true
+    interface = "enp0s31f6"
+    dhcp      = true
     vlans = [
-      {
-        vlanId      = 3,
-        dhcp        = true,
-        routes = [
-          { network = "192.168.0.0/16", gateway = "192.168.3.1" }
-        ]
-      },
-      {
-        vlanId      = 4,
-        dhcp        = true,
-      }
+      { vlanId = 3, dhcp = true },
+      { vlanId = 4, dhcp = true }
     ]
   }
   base_patch = yamlencode({
