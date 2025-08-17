@@ -1,9 +1,0 @@
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: argocd-trust-tls-cert
-  namespace: argocd
-spec:
-  secretName: argocd-trust-tls
-  dnsNames: [ "argocd.trust.k8s.internal" ]
-  issuerRef: { kind: ClusterIssuer, name: homelab-ca }

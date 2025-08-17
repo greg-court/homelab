@@ -1,4 +1,0 @@
-reminder to self
-put tfstate in azure blob
-and reference kv secrets instead of local tfvars
-best regards
