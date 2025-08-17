@@ -4,3 +4,7 @@ githubConfigSecret: 'gh-arc-credentials'
 
 minRunners: 0
 maxRunners: 5
+
+controllerServiceAccount:
+  namespace: arc-system
+  name: arc-controller-gha-rs-controller
