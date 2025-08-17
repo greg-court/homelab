@@ -1,13 +1,4 @@
 locals {
-  iface_vip = var.bootstrap ? { vip = { ip = "192.168.2.240" } } : {}
-  iface_base = {
-    interface = "enp0s31f6"
-    dhcp      = true
-    vlans = [
-      { vlanId = 3, dhcp = true },
-      { vlanId = 4, dhcp = true }
-    ]
-  }
   base_patch = yamlencode({
     machine = {
       sysctls = { # leniency on multi-homed reverse path during bring-up
@@ -28,7 +19,15 @@ locals {
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
       network = {
-        interfaces = [merge(local.iface_base, local.iface_vip)]
+        interfaces = {
+          vip = { ip = "192.168.2.240" }
+          interface = "enp0s31f6"
+          dhcp      = true
+          vlans = [
+            { vlanId = 3, dhcp = true },
+            { vlanId = 4, dhcp = true }
+          ]
+        }
       }
       # network = {
       #   interfaces = [{
@@ -171,14 +170,12 @@ resource "talos_machine_configuration_apply" "controlplanes" {
 
 # Bootstrap the cluster (Talos provider) — runs only when bootstrap=true
 resource "talos_machine_bootstrap" "cluster" {
-  count                = var.bootstrap ? 1 : 0
   node                 = var.bootstrap_node
   client_configuration = talos_machine_secrets.cluster.client_configuration
 }
 
 # Get kubeconfig after bootstrap
 resource "talos_cluster_kubeconfig" "kc" {
-  count                = var.bootstrap ? 1 : 0
   node                 = var.bootstrap_node
   client_configuration = talos_machine_secrets.cluster.client_configuration
   depends_on           = [talos_machine_bootstrap.cluster]
@@ -186,8 +183,7 @@ resource "talos_cluster_kubeconfig" "kc" {
 
 # Write kubeconfig locally (only when bootstrap=true)
 resource "local_file" "kubeconfig_local" {
-  count      = var.bootstrap ? 1 : 0
   depends_on = [null_resource.mkdir_tmp, talos_cluster_kubeconfig.kc]
   filename   = "${local.tmp_dir}/kubeconfig"
-  content    = talos_cluster_kubeconfig.kc[0].kubeconfig_raw
+  content    = talos_cluster_kubeconfig.kc.kubeconfig_raw
 }

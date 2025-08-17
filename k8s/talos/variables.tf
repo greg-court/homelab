@@ -6,9 +6,6 @@ variable "bootstrap_node" { type = string }   # "k8s-01"
 variable "storage_account_name" { type = string }
 variable "container_name" { type = string }
 
-# Do bootstrap & fetch kubeconfig when true
-variable "bootstrap" { default = false }
-
 variable "azure_tenant_id" { sensitive = true }
 variable "azure_client_id" { sensitive = true }
 variable "azure_client_secret" { sensitive = true }
