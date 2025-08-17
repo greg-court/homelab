@@ -4,8 +4,8 @@ locals {
     interface = "enp0s31f6"
     dhcp      = true
     vlans = [
-      { vlanId = 3, dhcp = false, addresses = [] },
-      { vlanId = 4, dhcp = false, addresses = [] }
+      { vlanId = 3, dhcp = true, addresses = [] },
+      { vlanId = 4, dhcp = true, addresses = [] }
     ]
   }
   base_patch = yamlencode({
