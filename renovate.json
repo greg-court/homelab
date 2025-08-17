@@ -5,13 +5,15 @@
     ":pinDigestsDisabled",
     ":rebaseStalePrs"
   ],
-  "labels": ["deps", "renovate"],
+  "labels": [
+    "deps",
+    "renovate"
+  ],
   "timezone": "Europe/London",
   "prConcurrentLimit": 10,
   "prHourlyLimit": 6,
   "dependencyDashboard": true,
   "rebaseWhen": "conflicted",
-
   "enabledManagers": [
     "helmv3",
     "helmfile",
@@ -25,11 +27,12 @@
     "terraform",
     "terragrunt",
     "ansible-galaxy",
-    "regex"
+    "custom.regex"
   ],
-
-  "ignorePaths": ["**/terraform.tfstate*", "**/terraform.tfvars"],
-
+  "ignorePaths": [
+    "**/terraform.tfstate*",
+    "**/terraform.tfvars"
+  ],
   "hostRules": [
     {
       "hostType": "docker",
@@ -37,18 +40,40 @@
       "username": "github",
       "password": "{{ env.GITHUB_TOKEN }}"
     },
-    { "hostType": "helm", "matchHost": "charts.jetstack.io" },
-    { "hostType": "helm", "matchHost": "prometheus-community.github.io" },
-    { "hostType": "helm", "matchHost": "grafana.github.io" },
-    { "hostType": "helm", "matchHost": "traefik.github.io" },
-    { "hostType": "helm", "matchHost": "metallb.github.io" },
-    { "hostType": "helm", "matchHost": "charts.external-secrets.io" },
-    { "hostType": "helm", "matchHost": "helm.cilium.io" }
+    {
+      "hostType": "helm",
+      "matchHost": "charts.jetstack.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "prometheus-community.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "grafana.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "traefik.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "metallb.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "charts.external-secrets.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "helm.cilium.io"
+    }
   ],
-
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": [
+        "docker"
+      ],
       "pinDigests": false
     },
     {
@@ -62,68 +87,112 @@
         "kubernetes",
         "kustomize",
         "argocd",
-        "regex"
+        "custom.regex"
       ],
       "pinDigests": false
     },
     {
-      "matchUpdateTypes": ["digest", "pinDigest"],
+      "matchUpdateTypes": [
+        "digest",
+        "pinDigest"
+      ],
       "enabled": false
     },
     {
-      "matchManagers": ["helmv3", "helmfile"],
+      "matchManagers": [
+        "helmv3",
+        "helmfile"
+      ],
       "rangeStrategy": "pin"
     },
     {
-      "matchManagers": ["helmv3", "helmfile", "helm-values"],
+      "matchManagers": [
+        "helmv3",
+        "helmfile",
+        "helm-values"
+      ],
       "groupName": "helm charts"
     },
     {
-      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
+      ],
       "groupName": "base/container images"
     },
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "groupName": "github actions"
     },
     {
-      "matchManagers": ["terraform", "terragrunt"],
+      "matchManagers": [
+        "terraform",
+        "terragrunt"
+      ],
       "groupName": "terraform providers/modules"
     },
     {
-      "matchManagers": ["ansible-galaxy"],
+      "matchManagers": [
+        "ansible-galaxy"
+      ],
       "groupName": "ansible galaxy"
     },
     {
-      "matchManagers": ["kubernetes", "kustomize", "argocd"],
+      "matchManagers": [
+        "kubernetes",
+        "kustomize",
+        "argocd"
+      ],
       "groupName": "platform"
     },
     {
-      "matchDatasources": ["helm"],
+      "matchDatasources": [
+        "helm"
+      ],
       "minimumReleaseAge": "1 day"
     },
     {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true
     },
     {
-      "matchManagers": ["dockerfile", "docker-compose"],
-      "matchUpdateTypes": ["patch"],
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
       "automerge": true
     },
     {
-      "matchManagers": ["terraform", "terragrunt"],
-      "extends": [":semanticCommitType(chore)"],
-      "postUpdateOptions": ["terraformLockFile"]
+      "matchManagers": [
+        "terraform",
+        "terragrunt"
+      ],
+      "extends": [
+        ":semanticCommitType(chore)"
+      ],
+      "postUpdateOptions": [
+        "terraformLockFile"
+      ]
     }
   ],
-
   "customManagers": [
     {
       "customType": "regex",
       "description": "Catch image tags in arbitrary YAML under k8s/gitops",
-      "fileMatch": ["(^|/)k8s/gitops/.+\\.ya?ml$"],
+      "managerFilePatterns": [
+        "/(^|/)k8s/gitops/.+\\.ya?ml$/"
+      ],
       "matchStrings": [
         "image:\\s*(?:\\\"|' )?(?<depName>[^:\\s\\\"']+):(?<currentValue>[^\\s#\\\"']+)"
       ],
