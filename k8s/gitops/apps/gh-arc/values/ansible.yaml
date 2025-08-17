@@ -1,0 +1,6 @@
+runnerScaleSetName: 'arc-ansible'
+template:
+  spec:
+    containers:
+      - name: runner
+        image: docker.io/gr10/gh-ansible-runner:1.0.0

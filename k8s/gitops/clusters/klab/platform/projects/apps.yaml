@@ -12,6 +12,7 @@ spec:
       namespace: '*'
   sourceRepos:
     - https://github.com/greg-court/homelab.git
+    - ghcr.io/actions/actions-runner-controller-charts
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'

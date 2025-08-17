@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-favicons
+  namespace: web
+  labels: { app: nginx-favicons }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: nginx-favicons } }
+  template:
+    metadata: { labels: { app: nginx-favicons } }
+    spec:
+      containers:
+        - name: web
+          image: docker.io/gr10/nginx-favicons:latest
+          ports: [{ name: http, containerPort: 80 }]
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 200m, memory: 256Mi }

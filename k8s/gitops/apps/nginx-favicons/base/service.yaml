@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-favicons
+  namespace: web
+  labels: { app: nginx-favicons }
+spec:
+  type: ClusterIP
+  selector: { app: nginx-favicons }
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

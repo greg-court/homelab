@@ -31,6 +31,11 @@ spec:
         deployment:
           kind: DaemonSet
 
+        persistence:
+          enabled: true
+          path: /data
+          size: 1Gi
+
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"
             operator: "Exists" # deploy on control-plane nodes
@@ -43,6 +48,11 @@ spec:
           - "--providers.kubernetesingress.ingressclass=dmz"
           - "--metrics.prometheus=true"
           - "--accesslog=true"
+
+          # Let's Encrypt configuration
+          - "--certificatesresolvers.le.acme.email=admin@gregc.online"
+          - "--certificatesresolvers.le.acme.storage=/data/acme.json"
+          - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']

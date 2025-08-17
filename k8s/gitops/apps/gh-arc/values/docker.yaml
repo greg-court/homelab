@@ -1,0 +1,18 @@
+runnerScaleSetName: 'arc-docker'
+
+containerMode:
+  type: 'kubernetes'
+  kubernetesModeWorkVolumeClaim:
+    accessModes: ['ReadWriteOnce']
+    storageClassName: 'local-path'
+    resources: { requests: { storage: '1Gi' } }
+
+template:
+  spec:
+    containers:
+      - name: runner
+        env:
+          - name: BUILDKIT_HOST
+            value: 'tcp://buildkitd.gh-runners.svc.cluster.local:1234'
+          - name: DOCKER_BUILDKIT
+            value: '1'
