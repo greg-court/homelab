@@ -50,7 +50,7 @@ grafana:
       jsonData: { implementation: prometheus }
   ingress:
     enabled: true
-    ingressClassName: traefik
+    ingressClassName: trust
     annotations:
       cert-manager.io/cluster-issuer: homelab-ca
     # these are overridden per cluster

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik
+  name: trust
   namespace: argocd
   annotations: { argocd.argoproj.io/sync-wave: '-10' }
 spec:
@@ -18,7 +18,7 @@ spec:
         ingressClass:
           enabled: true
           isDefaultClass: true
-          name: traefik
+          name: trust
 
         service:
           type: LoadBalancer
@@ -30,9 +30,6 @@ spec:
 
         deployment:
           kind: DaemonSet
-
-        nodeSelector:
-          ingress.zone: trust
 
         tolerations:
           - key: 'node-role.kubernetes.io/control-plane'

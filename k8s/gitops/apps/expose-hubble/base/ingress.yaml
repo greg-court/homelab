@@ -6,7 +6,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: homelab-ca
 spec:
-  ingressClassName: traefik
+  ingressClassName: trust
   tls:
     - hosts: ['hubble.apps.klab.internal']
       secretName: hubble-tls
