@@ -30,6 +30,10 @@ spec:
 
         deployment:
           kind: DaemonSet
+
+        nodeSelector:
+          ingress.zone: dmz
+
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"
             operator: "Exists" # deploy on control-plane nodes
