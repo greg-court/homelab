@@ -23,7 +23,7 @@ spec:
           volumeBindingMode: WaitForFirstConsumer
           allowVolumeExpansion: true
           parameters:
-            # Put volumes under /var/local-path-provisioner/<ns>/<pvc>
+            # /var/local-path-provisioner/<ns>/<pvc>
             pathPattern: "{{ .PVC.namespace }}/{{ .PVC.name }}"
         nodePathMap:
           - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
