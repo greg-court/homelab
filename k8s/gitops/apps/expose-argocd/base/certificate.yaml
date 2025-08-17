@@ -5,5 +5,5 @@ metadata:
   namespace: argocd
 spec:
   secretName: argocd-tls
-  dnsNames: ['argocd.klab.internal']
+  dnsNames: ['argocd.apps.klab.internal']
   issuerRef: { kind: ClusterIssuer, name: homelab-ca }
