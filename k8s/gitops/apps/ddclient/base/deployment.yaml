@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddclient
+  namespace: net
+  labels: { app: ddclient }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ddclient } }
+  template:
+    metadata: { labels: { app: ddclient } }
+    spec:
+      containers:
+        - name: ddclient
+          image: lscr.io/linuxserver/ddclient:latest
+          # LSIO image expects /config/ddclient.conf and hot-reloads when it changes
+          env:
+            - name: TZ
+              value: Europe/London
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: DDCLIENT_LOGIN
+              value: 'token'
+          envFrom:
+            - secretRef: { name: ddclient-env } # provides DDCLIENT_PASSWORD
+          volumeMounts:
+            - name: config
+              mountPath: /config # writable working dir
+            - name: conf
+              mountPath: /config/ddclient.conf # only the file is read-only
+              subPath: ddclient.conf
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 64Mi }
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: conf
+          configMap: { name: ddclient-conf }
