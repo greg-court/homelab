@@ -21,4 +21,4 @@ spec:
         - name: nginx-favicons
           port: 80
   tls:
-    certResolver: le
+    secretName: gregc-online-tls
