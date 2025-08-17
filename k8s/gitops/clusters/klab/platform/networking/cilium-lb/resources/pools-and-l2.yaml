@@ -28,7 +28,7 @@ spec:
   loadBalancerIPs: true
   externalIPs: false
   interfaces:
-    - "^enp.*\\.3$"
+    - "^e.*\\.3$"
     - "^bond0\\.3$"
 
 ---
@@ -41,5 +41,5 @@ spec:
   loadBalancerIPs: true
   externalIPs: false
   interfaces:
-    - "^enp.*\\.4$"
+    - "^e.*\\.4$"
     - "^bond0\\.4$"
