@@ -4,6 +4,8 @@
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
+sleep 10
+
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
