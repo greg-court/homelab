@@ -1,5 +1,12 @@
 # Initialisation
 
+```bash
+terraform apply --auto-approve
+
+# flip bootstrap to true
+
+terraform apply --auto-approve
+
 rm -f ~/.talos/config && rm -f ~/.kube/config
 talosctl config merge ./tmp/talosconfig
 
@@ -14,9 +21,11 @@ talosctl health
 kubectl -n argocd get secret argocd-initial-admin-secret \
  -o jsonpath="{.data.password}" | base64 -d; echo
 kubectl -n argocd port-forward svc/argocd-server 6969:443
+```
 
 # Nuking / resetting
 
+```bash
 terraform destroy --auto-approve
 
 talosctl reset \
@@ -24,3 +33,4 @@ talosctl reset \
  --graceful=false \
  --reboot \
  -e n1.klab.internal -n n1.klab.internal
+```
