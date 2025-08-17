@@ -11,7 +11,7 @@ locals {
         dhcpOptions = { routeMetric = 200 }
         # static default on VLAN 3 (lives under the VLAN subinterface)
         routes = [
-          { network = "192.168.0.0/16", gateway = "192.168.3.1", metric = 200 }
+          { network = "0.0.0.0/0", gateway = "192.168.3.1", metric = 200 }
         ]
         addresses = []
       },
@@ -20,7 +20,7 @@ locals {
         dhcp        = true
         dhcpOptions = { routeMetric = 200 }
         routes = [
-          { network = "192.168.0.0/16", gateway = "192.168.4.1", metric = 200 }
+          { network = "0.0.0.0/0", gateway = "192.168.4.1", metric = 200 }
         ]
         addresses = []
       }
