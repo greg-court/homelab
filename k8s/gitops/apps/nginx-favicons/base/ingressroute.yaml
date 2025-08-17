@@ -4,19 +4,12 @@ metadata:
   name: nginx-favicons
   namespace: web
   annotations:
-    kubernetes.io/ingress.class: dmz
+    traefik.io/ingress.class: dmz # use Traefik’s annotation for CRDs
 spec:
   entryPoints: ['websecure']
   routes:
-    # Any subdomain under gregc.online
-    - match: HostRegexp(`{subdomain:[a-z0-9-]+}.gregc.online`)
-      kind: Rule
-      services:
-        - name: nginx-favicons
-          port: 80
-    # Apex domain too (optional)
-    - match: Host(`gregc.online`)
-      kind: Rule
+    - kind: Rule
+      match: Host(`gregc.online`) || Host(`ebay.gregc.online`) || HostRegexp(`{subdomain:.+}.gregc.online`)
       services:
         - name: nginx-favicons
           port: 80
