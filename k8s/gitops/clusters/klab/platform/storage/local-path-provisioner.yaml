@@ -21,6 +21,7 @@ spec:
           name: local-path
           reclaimPolicy: Delete
           volumeBindingMode: WaitForFirstConsumer
+          allowVolumeExpansion: true
           parameters:
             # Put volumes under /var/local-path-provisioner/<ns>/<pvc>
             pathPattern: "{{ .PVC.namespace }}/{{ .PVC.name }}"
