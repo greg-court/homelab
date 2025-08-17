@@ -4,8 +4,8 @@ locals {
     interface = "enp0s31f6"
     dhcp      = true
     vlans = [
-      { vlanId = 3, dhcp = true, addresses = [] },
-      { vlanId = 4, dhcp = true, addresses = [] }
+      { vlanId = 3, dhcp = true, dhcpOptions = { routeMetric = 100 }, addresses = [] }, // preferred
+      { vlanId = 4, dhcp = true, dhcpOptions = { routeMetric = 300 }, addresses = [] }  // deprioritize DMZ
     ]
   }
   base_patch = yamlencode({
