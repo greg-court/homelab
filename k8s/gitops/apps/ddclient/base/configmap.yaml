@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddclient-conf
+  namespace: net
+data:
+  ddclient.conf: |
+    # Poll every 5 minutes; write cache under /config
+    daemon=300
+    syslog=yes
+    ssl=yes
+    cache=/config/ddclient.cache
+
+    # Public IP discovery (v4). Swap to ipify-ipv6 + usev6 if you want AAAA.
+    usev4=webv4, webv4=ipify-ipv4
+
+    # Cloudflare protocol. Use API token via env vars (supported since 3.11).
+    protocol=cloudflare
+    zone=gregc.online
+    ttl=1            # Cloudflare "Auto" TTL is ~300s
+    login_env=DDCLIENT_LOGIN
+    password_env=DDCLIENT_PASSWORD
+
+    # Host(s) to update: apex here. Add more, comma-separated if needed.
+    gregc.online
