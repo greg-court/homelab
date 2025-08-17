@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:best-practices",
-    "default:pinDigestsDisabled",
+    ":pinDigestsDisabled",
     ":rebaseStalePrs"
   ],
   "labels": ["deps", "renovate"],
@@ -25,22 +25,8 @@
     "terraform",
     "terragrunt",
     "ansible-galaxy",
-    "custom.regex"
+    "regex"
   ],
-
-  "kubernetes": {
-    "pinDigests": false,
-    "managerFilePatterns": [
-      "/(^|/)k8s/gitops/apps/.+\\.ya?ml$/",
-      "/(^|/)k8s/gitops/clusters/.+\\.ya?ml$/"
-    ]
-  },
-  "argocd": {
-    "managerFilePatterns": ["/(^|/)k8s/gitops/clusters/.+\\.ya?ml$/"]
-  },
-  "kustomize": {
-    "pinDigests": false
-  },
 
   "ignorePaths": [
     "**/terraform.tfstate*",
@@ -60,7 +46,8 @@
     { "hostType": "helm", "matchHost": "grafana.github.io" },
     { "hostType": "helm", "matchHost": "traefik.github.io" },
     { "hostType": "helm", "matchHost": "metallb.github.io" },
-    { "hostType": "helm", "matchHost": "charts.external-secrets.io" }
+    { "hostType": "helm", "matchHost": "charts.external-secrets.io" },
+    { "hostType": "helm", "matchHost": "helm.cilium.io" }
   ],
 
   "packageRules": [
@@ -79,7 +66,7 @@
         "kubernetes",
         "kustomize",
         "argocd",
-        "custom.regex"
+        "regex"
       ],
       "pinDigests": false
     },
@@ -87,12 +74,10 @@
       "matchUpdateTypes": ["digest", "pinDigest"],
       "enabled": false
     },
-
     {
       "matchManagers": ["helmv3", "helmfile"],
       "rangeStrategy": "pin"
     },
-
     {
       "matchManagers": ["helmv3", "helmfile", "helm-values"],
       "groupName": "helm charts"
@@ -115,18 +100,12 @@
     },
     {
       "matchManagers": ["kubernetes", "kustomize", "argocd"],
-      "groupName": "platform (dmz)"
+      "groupName": "platform"
     },
-    {
-      "matchManagers": ["kubernetes", "kustomize", "argocd"],
-      "groupName": "platform (trust)"
-    },
-
     {
       "matchDatasources": ["helm"],
       "minimumReleaseAge": "1 day"
     },
-
     {
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
@@ -137,22 +116,9 @@
       "matchUpdateTypes": ["patch"],
       "automerge": true
     },
-
-    {
-      "matchManagers": [
-        "dockerfile",
-        "docker-compose",
-        "kubernetes",
-        "kustomize"
-      ],
-      "matchUpdateTypes": ["digest"],
-      "enabled": false
-    },
-
     {
       "matchManagers": ["terraform", "terragrunt"],
       "extends": [":semanticCommitType(chore)"],
-      "schedule": ["on monday"],
       "postUpdateOptions": ["terraformLockFile"]
     }
   ],
@@ -161,9 +127,9 @@
     {
       "customType": "regex",
       "description": "Catch image tags in arbitrary YAML under k8s/gitops",
-      "managerFilePatterns": ["/(^|/)k8s/gitops/.+\\.ya?ml$/"],
+      "fileMatch": ["(^|/)k8s/gitops/.+\\.ya?ml$"],
       "matchStrings": [
-        "image:\\s*(?<depName>[^:\\s]+):(?<currentValue>[^\\s#]+)"
+        "image:\\s*(?:\\\"|' )?(?<depName>[^:\\s\\\"']+):(?<currentValue>[^\\s#\\\"']+)"
       ],
       "datasourceTemplate": "docker"
     }
