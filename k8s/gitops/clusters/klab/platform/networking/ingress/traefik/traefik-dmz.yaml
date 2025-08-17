@@ -29,7 +29,7 @@ spec:
             externalTrafficPolicy: Local
 
         deployment:
-          kind: DaemonSet
+          kind: Deployment
 
         persistence:
           enabled: true
