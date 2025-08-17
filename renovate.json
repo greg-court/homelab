@@ -28,11 +28,7 @@
     "regex"
   ],
 
-  "ignorePaths": [
-    "**/terraform.tfstate*",
-    "**/terraform.tfvars",
-    "**/k8s/terraform.tfstate*"
-  ],
+  "ignorePaths": ["**/terraform.tfstate*", "**/terraform.tfvars"],
 
   "hostRules": [
     {
