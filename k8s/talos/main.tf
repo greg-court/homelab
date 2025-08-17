@@ -7,6 +7,9 @@ locals {
       {
         vlanId      = 3,
         dhcp        = true,
+        routes = [
+          { network = "192.168.0.0/16", gateway = "192.168.3.1" }
+        ]
       },
       {
         vlanId      = 4,
