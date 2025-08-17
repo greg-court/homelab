@@ -29,12 +29,7 @@ spec:
             externalTrafficPolicy: Local
 
         deployment:
-          kind: Deployment
-          replicas: 2
-
-        podDisruptionBudget:
-          enabled: true
-          minAvailable: 1
+          kind: DaemonSet
 
         persistence:
           enabled: false
