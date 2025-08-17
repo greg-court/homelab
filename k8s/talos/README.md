@@ -1,10 +1,10 @@
 # Initialisation
 
 ```bash
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
-# flip bootstrap to true
-
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
 rm -f ~/.talos/config && rm -f ~/.kube/config
