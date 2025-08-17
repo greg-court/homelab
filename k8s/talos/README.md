@@ -4,9 +4,9 @@
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 sleep 30
 
-sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
 rm -f ~/.talos/config && rm -f ~/.kube/config
