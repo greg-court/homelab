@@ -17,6 +17,10 @@ secret_names = {
   arc-gh-app-id = ""
   arc-gh-app-installation-id = ""
   arc-gh-app-private-key = ""
+
+  netbird-greg = ""
+  netbird-dmz = ""
+  netbird-fam = ""
 }
 
 # need to be bootstrapped in GH repo
