@@ -50,7 +50,7 @@ spec:
               iptables -t mangle -F VIP_PBR
 
               # Mark ANY connection that targets a LOCAL address (node IPs or VIPs)
-              # based on the VLAN interface the SYN arrived on. No per‑VIP list.
+              # based on the VLAN interface the SYN arrived on. No per-VIP list.
               iptables -t mangle -A VIP_PBR -i enp0s31f6   -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x102
               iptables -t mangle -A VIP_PBR -i enp0s31f6.3 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x103
               iptables -t mangle -A VIP_PBR -i enp0s31f6.4 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x104
