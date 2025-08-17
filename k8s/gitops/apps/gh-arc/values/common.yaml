@@ -1,0 +1,6 @@
+githubConfigUrl: 'https://github.com/greg-court/homelab'
+
+githubConfigSecret: 'gh-arc-credentials'
+
+minRunners: 0
+maxRunners: 5

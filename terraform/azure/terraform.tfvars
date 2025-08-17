@@ -13,6 +13,10 @@ secret_names = {
   repo-admin-pat      = ""
   repo-tagging-pat    = ""
   discord-webhook-url = ""
+
+  arc-gh-app-id = ""
+  arc-gh-app-installation-id = ""
+  arc-gh-app-private-key = ""
 }
 
 # need to be bootstrapped in GH repo

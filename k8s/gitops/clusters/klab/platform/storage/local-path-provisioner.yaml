@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://charts.rancher.io
     chart: local-path-provisioner
-    targetRevision: 0.0.32
+    targetRevision: 0.0.33
     helm:
       values: |
         storageClass:

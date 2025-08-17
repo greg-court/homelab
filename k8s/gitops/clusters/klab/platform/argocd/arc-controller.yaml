@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: arc-controller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-14' # before apps
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: arc-system
+  source:
+    repoURL: ghcr.io/actions/actions-runner-controller-charts
+    chart: gha-runner-scale-set-controller
+    targetRevision: '0.12.1'
+    helm:
+      values: |
+        controllerManager:
+          metrics:
+            addr: ":8080"
+        # (Optional) Listener/controller metrics if you want Prom scraping later
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']
