@@ -35,6 +35,7 @@ spec:
           enabled: true
           path: /data
           size: 1Gi
+          storageClass: local-path
 
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"

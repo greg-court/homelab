@@ -10,20 +10,21 @@ spec:
     server: https://kubernetes.default.svc
     namespace: local-path-storage
   source:
-    repoURL: https://charts.rancher.io
-    chart: local-path-provisioner
-    targetRevision: 0.0.33
+    repoURL: https://github.com/rancher/local-path-provisioner
+    targetRevision: v0.0.32
+    path: deploy/chart
     helm:
       values: |
         storageClass:
+          create: true
           defaultClass: false
           name: local-path
-          reclaimPolicy: Delete              # delete PV when PVC is deleted
+          reclaimPolicy: Delete
           volumeBindingMode: WaitForFirstConsumer
         nodePathMap:
           - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
-            paths: ["/var/local-path-provisioner"]
-        # DaemonSet scheduling on control-planes too
+            paths:
+              - "/var/local-path-provisioner"
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"
             operator: "Exists"
