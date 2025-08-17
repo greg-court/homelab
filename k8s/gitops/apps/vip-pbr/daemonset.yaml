@@ -19,26 +19,48 @@ spec:
       containers:
         - name: pbr
           image: nicolaka/netshoot:latest
-          securityContext: { privileged: true } # needs CAP_NET_ADMIN
+          securityContext: { privileged: true } # needs NET_ADMIN to touch routes/iptables
           command: ['/bin/sh', '-c']
           args:
             - |
               set -eu
 
-              # Table 102 -> VLAN 2 (VIP 192.168.2.240)
+              ############ Routing tables: 102/103/104 = VLAN 2/3/4 ############
+              # VLAN 2
               ip -4 route replace 192.168.2.0/24 dev enp0s31f6    scope link table 102
               ip -4 route replace default via 192.168.2.1 dev enp0s31f6           table 102
-              ip -4 rule  del     from 192.168.2.240/32 table 102 2>/dev/null || true
-              ip -4 rule  add pref 102 from 192.168.2.240/32 lookup 102
+              ip -4 rule  del pref 102 fwmark 0x102 2>/dev/null || true
+              ip -4 rule  add pref 102 fwmark 0x102 lookup 102
 
-              # Table 103 -> VLAN 3 (VIP 192.168.3.240)
+              # VLAN 3
               ip -4 route replace 192.168.3.0/24 dev enp0s31f6.3  scope link table 103
               ip -4 route replace default via 192.168.3.1 dev enp0s31f6.3         table 103
-              ip -4 rule  del     from 192.168.3.240/32 table 103 2>/dev/null || true
-              ip -4 rule  add pref 103 from 192.168.3.240/32 lookup 103
+              ip -4 rule  del pref 103 fwmark 0x103 2>/dev/null || true
+              ip -4 rule  add pref 103 fwmark 0x103 lookup 103
 
-              # Table 104 -> VLAN 4 (VIP 192.168.4.240)
+              # VLAN 4
               ip -4 route replace 192.168.4.0/24 dev enp0s31f6.4  scope link table 104
               ip -4 route replace default via 192.168.4.1 dev enp0s31f6.4         table 104
-              ip -4 rule  del     from 192.168.4.240/32 table 104 2>/dev/null || true
-              ip -4 rule  add pref 104 from 192.168.4.240/32 lookup 104
+              ip -4 rule  del pref 104 fwmark 0x104 2>/dev/null || true
+              ip -4 rule  add pref 104 fwmark 0x104 lookup 104
+
+              ############ Connmark on ingress → fwmark on replies ############
+              # Make a tiny chain so re-applying is clean/idempotent
+              iptables -t mangle -N VIP_PBR 2>/dev/null || true
+              iptables -t mangle -F VIP_PBR
+
+              # Mark ANY connection that targets a LOCAL address (node IPs or VIPs)
+              # based on the VLAN interface the SYN arrived on. No per‑VIP list.
+              iptables -t mangle -A VIP_PBR -i enp0s31f6   -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x102
+              iptables -t mangle -A VIP_PBR -i enp0s31f6.3 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x103
+              iptables -t mangle -A VIP_PBR -i enp0s31f6.4 -m addrtype --dst-type LOCAL -j CONNMARK --set-mark 0x104
+
+              # Hook the chain once (idempotent)
+              iptables -t mangle -C PREROUTING -j VIP_PBR 2>/dev/null || iptables -t mangle -A PREROUTING -j VIP_PBR
+
+              # On locally-generated replies, restore the connmark to the skb mark
+              iptables -t mangle -C OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark 2>/dev/null || \
+              iptables -t mangle -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j CONNMARK --restore-mark
+
+              # Keep pod alive so rules persist until reboot (K8s will reapply on boot anyway)
+              sleep infinity
