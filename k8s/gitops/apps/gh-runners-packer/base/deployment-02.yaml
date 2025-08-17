@@ -13,7 +13,7 @@ spec:
       containers:
         - name: gh-packer-runner
           resources: {}
-          image: docker.io/gr10/gh-packer-runner:2.0.0
+          image: docker.io/gr10/gh-packer-runner:1.0.0
           ports: [{ containerPort: 8080 }]
           env:
             - { name: EXTERNAL_HTTP_PORT, value: '8082' }
