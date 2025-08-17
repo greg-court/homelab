@@ -4,6 +4,8 @@ metadata:
   name: nginx-favicons
   namespace: web
   labels: { app: nginx-favicons }
+  annotations:
+    kubernetes.io/ingress.class: dmz
 spec:
   replicas: 1
   selector: { matchLabels: { app: nginx-favicons } }
