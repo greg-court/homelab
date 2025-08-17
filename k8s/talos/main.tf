@@ -172,6 +172,7 @@ resource "talos_machine_configuration_apply" "controlplanes" {
 resource "talos_machine_bootstrap" "cluster" {
   node                 = var.bootstrap_node
   client_configuration = talos_machine_secrets.cluster.client_configuration
+  depends_on           = [talos_machine_configuration_apply.controlplanes]
 }
 
 # Get kubeconfig after bootstrap
