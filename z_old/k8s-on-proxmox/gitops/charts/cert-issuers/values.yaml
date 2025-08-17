@@ -1,7 +1,0 @@
-namespace: cert-manager
-
-selfSignedIssuerName: selfsigned-root
-rootCASecretName: homelab-root-ca
-rootCACertName: homelab-root-ca
-
-clusterIssuerName: homelab-ca

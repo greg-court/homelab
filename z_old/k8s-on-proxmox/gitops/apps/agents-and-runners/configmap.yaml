@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: gh-runners-config
-  namespace: agents-and-runners
-data:
-  REPO_URL: 'https://github.com/greg-court/homelab'
