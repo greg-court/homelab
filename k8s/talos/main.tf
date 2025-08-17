@@ -4,9 +4,10 @@ locals {
     interface = "enp0s31f6"
     dhcp      = true
     vlans = [
-      { vlanId = 3, dhcp = true, dhcpOptions = { routeMetric = 100 }, addresses = [] }, // preferred
-      { vlanId = 4, dhcp = true, dhcpOptions = { routeMetric = 300 }, addresses = [] }  // deprioritize DMZ
+      { vlanId = 3, dhcp = true, dhcpOptions = { routeMetric = 100 }, addresses = [] }, # preferred
+      { vlanId = 4, dhcp = true, dhcpOptions = { routeMetric = 300 }, addresses = [] }  # deprioritize DMZ
     ]
+    dhcpOptions = { routeMetric = 50 } # otherwise boostrap does not work asymmetric routing
   }
   base_patch = yamlencode({
     machine = {
