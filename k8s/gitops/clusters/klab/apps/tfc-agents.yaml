@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: apps/tfc-agents/overlays/klab
+    path: k8s/gitops/apps/tfc-agents/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']
