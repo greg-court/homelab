@@ -40,8 +40,10 @@ spec:
             effect: 'NoSchedule'
 
         additionalArguments:
-          - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
-          - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+          - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+          - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+          - "--providers.kubernetescrd.ingressclass=trust"
+          - "--providers.kubernetesingress.ingressclass=trust"
 
   syncPolicy:
     automated: { prune: true, selfHeal: true }

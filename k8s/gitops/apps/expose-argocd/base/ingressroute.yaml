@@ -3,6 +3,8 @@ kind: IngressRoute
 metadata:
   name: argocd
   namespace: argocd
+  annotations:
+    kubernetes.io/ingress.class: trust # binds to trust controller only
 spec:
   entryPoints: ['websecure']
   routes:

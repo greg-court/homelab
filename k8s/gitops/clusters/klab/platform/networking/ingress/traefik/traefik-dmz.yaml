@@ -42,6 +42,8 @@ spec:
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+          - "--providers.kubernetescrd.ingressclass=dmz"
+          - "--providers.kubernetesingress.ingressclass=dmz"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']
