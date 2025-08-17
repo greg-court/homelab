@@ -10,27 +10,31 @@ spec:
   template:
     metadata: { labels: { app: ddclient } }
     spec:
+      initContainers:
+        - name: place-conf
+          image: alpine:3.20
+          command: ['/bin/sh', '-c']
+          args:
+            - |
+              set -eux
+              cp /config-src/ddclient.conf /config/ddclient.conf
+              chmod 600 /config/ddclient.conf
+              chown 1000:1000 /config/ddclient.conf
+          volumeMounts:
+            - { name: config, mountPath: /config } # writable emptyDir
+            - { name: conf, mountPath: /config-src } # read-only ConfigMap dir
       containers:
         - name: ddclient
           image: lscr.io/linuxserver/ddclient:latest
-          # LSIO image expects /config/ddclient.conf and hot-reloads when it changes
           env:
-            - name: TZ
-              value: Europe/London
-            - name: PUID
-              value: '1000'
-            - name: PGID
-              value: '1000'
-            - name: DDCLIENT_LOGIN
-              value: 'token'
+            - { name: TZ, value: Europe/London }
+            - { name: PUID, value: '1000' }
+            - { name: PGID, value: '1000' }
+            - { name: DDCLIENT_LOGIN, value: 'token' } # ddclient login when using CF API token
           envFrom:
             - secretRef: { name: ddclient-env } # provides DDCLIENT_PASSWORD
           volumeMounts:
-            - name: config
-              mountPath: /config # writable working dir
-            - name: conf
-              mountPath: /config/ddclient.conf # only the file is read-only
-              subPath: ddclient.conf
+            - { name: config, mountPath: /config } # ONLY the writable dir
           resources:
             requests: { cpu: 10m, memory: 32Mi }
             limits: { memory: 64Mi }
