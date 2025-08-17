@@ -36,6 +36,9 @@ spec:
           enabled: true
           minAvailable: 1
 
+        persistence:
+          enabled: false
+
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"
             operator: "Exists" # deploy on control-plane nodes
