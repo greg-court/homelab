@@ -22,4 +22,4 @@ data:
     password_env=DDCLIENT_PASSWORD
 
     # Host(s) to update: apex here. Add more, comma-separated if needed.
-    gregc.online
+    gregc.online, onprem.gregc.online
