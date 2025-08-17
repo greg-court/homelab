@@ -19,15 +19,15 @@ locals {
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
       network = {
-        interfaces = {
-          vip = { ip = "192.168.2.240" }
+        interfaces = [{
+          vip       = { ip = "192.168.2.240" }
           interface = "enp0s31f6"
           dhcp      = true
           vlans = [
             { vlanId = 3, dhcp = true },
             { vlanId = 4, dhcp = true }
           ]
-        }
+        }]
       }
       # network = {
       #   interfaces = [{
