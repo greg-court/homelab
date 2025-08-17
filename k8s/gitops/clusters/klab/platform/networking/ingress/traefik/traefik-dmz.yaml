@@ -30,6 +30,11 @@ spec:
 
         deployment:
           kind: Deployment
+          replicas: 2
+
+        podDisruptionBudget:
+          enabled: true
+          minAvailable: 1
 
         tolerations:
           - key: "node-role.kubernetes.io/control-plane"
