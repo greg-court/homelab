@@ -45,18 +45,16 @@ spec:
             effect: "NoSchedule"
 
         podSecurityContext:
-          seccompProfile:
-            type: RuntimeDefault
+          seccompProfile: { type: RuntimeDefault }
 
         securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          runAsUser: 65532
+          runAsGroup: 65532
           runAsNonRoot: true
-          capabilities:
-            drop: ["ALL"]
-            add: ["NET_BIND_SERVICE"]
-          seccompProfile:
-            type: RuntimeDefault
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities: { drop: ["ALL"] }
+          seccompProfile: { type: RuntimeDefault }
 
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
