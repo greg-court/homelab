@@ -1,9 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vip-pbr
+  name: cilium-egress
   namespace: argocd
-  annotations: { argocd.argoproj.io/sync-wave: '-8' } # after CNI/LB, before apps
+  annotations: { argocd.argoproj.io/sync-wave: '-15' } # alongside cilium-lb
 spec:
   project: platform
   destination:
@@ -12,7 +12,9 @@ spec:
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
-    path: k8s/gitops/apps/vip-pbr
+    path: k8s/gitops/apps/cilium-egress/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }
-    syncOptions: ['ServerSideApply=true']
+    syncOptions:
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
