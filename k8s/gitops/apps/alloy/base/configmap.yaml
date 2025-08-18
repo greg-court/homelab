@@ -19,8 +19,17 @@ data:
     // Label / filter pod logs
     loki.process "pods" {
       stage.static_labels { values = { cluster = "homelab" } }
-      // Example drop:
-      // stage.drop { expression = "namespace = \"kube-system\" and container = \"kube-proxy\"" }
+
+      // your existing drop
+      stage.drop { expression = "namespace = \"kube-system\" and (container = \"cilium-health\" or container = \"node-exporter\")" }
+
+      // kubelet probes & common health endpoints
+      stage.drop { expression = "line =~ \".*kube-probe.*\"" }
+      stage.drop { expression = "line =~ \".*/(healthz|readyz|livez).*\"" }
+
+      // noisy scrape/access lines (e.g., Traefik, nginx etc.)
+      stage.drop { expression = "line =~ \".*\\s/metrics\\s.*\"" }
+
       forward_to = [loki.write.default.receiver]
     }
 
@@ -34,6 +43,8 @@ data:
     // Label events the same way
     loki.process "events" {
       stage.static_labels { values = { cluster = "homelab" } }
+      // keep Warnings; drop Normals
+      stage.drop { expression = "type = \"Normal\"" }
       forward_to = [loki.write.default.receiver]
     }
 
