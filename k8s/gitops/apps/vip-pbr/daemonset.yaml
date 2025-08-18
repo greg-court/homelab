@@ -23,7 +23,7 @@ spec:
           command: ['/bin/sh', '-c']
           args:
             - |
-              set -eu
+              set -u
 
               # Table 102 -> VLAN 2 (VIP 192.168.2.240)
               ip -4 route replace 192.168.2.0/24 dev enp0s31f6    scope link table 102
@@ -42,3 +42,5 @@ spec:
               ip -4 route replace default via 192.168.4.1 dev enp0s31f6.4         table 104
               ip -4 rule  del     from 192.168.4.240/32 table 104 2>/dev/null || true
               ip -4 rule  add pref 104 from 192.168.4.240/32 lookup 104
+
+              exec tail -f /dev/null # keep pod alive
