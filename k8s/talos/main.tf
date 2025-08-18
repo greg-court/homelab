@@ -26,8 +26,8 @@ locals {
           vlans = [
             { vlanId = 3, dhcp = true },
             { vlanId = 4, dhcp = true },
-            # { vlanId = 5, dhcp = true },
-            # { vlanId = 6, dhcp = true }
+            { vlanId = 5, dhcp = true },
+            { vlanId = 6, dhcp = true }
           ]
         }]
       }
