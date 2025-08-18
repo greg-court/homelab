@@ -25,6 +25,12 @@ prometheus:
           storageClassName: local-path
           resources:
             requests: { storage: 32Gi }
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65534 # 'nobody' in the prom image
+      runAsGroup: 65534
+      fsGroup: 65534
+      fsGroupChangePolicy: 'OnRootMismatch'
 
 alertmanager:
   enabled: true
