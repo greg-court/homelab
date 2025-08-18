@@ -1,22 +1,9 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+# k8s/gitops/apps/debug/base/namespace.yaml
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: debug-namespace
-  namespace: argocd
-  annotations:
-    # make sure this lands before the pod at wave 80
-    argocd.argoproj.io/sync-wave: '-30'
-spec:
-  project: platform
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: debug
-  source:
-    repoURL: https://github.com/greg-court/homelab.git
-    targetRevision: main
-    path: k8s/gitops/charts/namespace-privileged
-    helm:
-      values: |
-        name: debug
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }
+  name: debug
+  labels:
+    pod-security.kubernetes.io/enforce: 'privileged'
+    pod-security.kubernetes.io/warn: 'baseline'
+    pod-security.kubernetes.io/audit: 'baseline'
