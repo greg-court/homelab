@@ -9,7 +9,5 @@ spec:
           egress.zone: 'dmz'
   destinationCIDRs: ['0.0.0.0/0', '::/0']
   egressGateway:
-    nodeSelector:
-      matchLabels:
-        egress-node: 'true'
+    nodeSelector: {}
     interface: 'enp0s31f6.4'
