@@ -18,7 +18,7 @@ locals {
     }
     configs = { clusters = { inCluster = { enabled = true } } }
     global = {
-      podLabels = { egress.zone = "trust" }
+      podLabels = { "egress.zone" = "trust" }
     }
   })
 }
