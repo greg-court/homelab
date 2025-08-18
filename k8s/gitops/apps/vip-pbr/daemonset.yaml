@@ -43,15 +43,4 @@ spec:
               ip -4 rule  del     from 192.168.4.240/32 table 104 2>/dev/null || true
               ip -4 rule  add pref 104 from 192.168.4.240/32 lookup 104
 
-              # Make sure table 105 has the subnet + default (safe to repeat)
-              ip -4 route replace 192.168.5.0/24 dev enp0s31f6.5 scope link table 105
-              ip -4 route replace default via 192.168.5.1 dev enp0s31f6.5 table 105
-              # Remove any old rules we added
-              ip -4 rule del from 192.168.5.104/32 table 105 2>/dev/null || true
-              ip -4 rule del from 192.168.5.200/32 table 105 2>/dev/null || true
-              # ADD the correct rule for the PRIMARY address (.200) with a unique pref
-              ip -4 rule add pref 205 from 192.168.5.200/32 lookup 105    # <— this is the one that matters
-              # (Optional) also cover .104 in case Cilium ever flips, use a different pref
-              ip -4 rule add pref 206 from 192.168.5.104/32 lookup 105
-
               exec tail -f /dev/null # keep pod alive
