@@ -1,7 +1,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumEgressGatewayPolicy
 metadata:
-  name: egress-trusted-vlan3
+  name: egress-trust-vlan3
 spec:
   selectors:
     - podSelector:
