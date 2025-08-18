@@ -12,7 +12,7 @@ spec:
     spec:
       initContainers:
         - name: place-conf
-          image: alpine:3.20
+          image: alpine:3.22
           command: ['/bin/sh', '-c']
           args:
             - |
