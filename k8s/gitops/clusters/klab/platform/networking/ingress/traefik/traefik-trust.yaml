@@ -44,7 +44,7 @@ spec:
         ports:
           metrics:
             port: 9100
-            expose: false
+            expose: true
         serviceMonitor:
           enabled: true
           namespace: monitoring
