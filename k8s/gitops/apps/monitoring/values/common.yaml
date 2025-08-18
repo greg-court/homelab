@@ -28,12 +28,6 @@ prometheus:
           resources:
             requests:
               storage: 32Gi
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 65534 # 'nobody' in the prom image
-      runAsGroup: 65534
-      fsGroup: 65534
-      fsGroupChangePolicy: Always
 
     initContainers:
       - name: fix-permissions
@@ -45,6 +39,7 @@ prometheus:
             chown -R 65534:65534 /prometheus
             chmod -R g+rwX /prometheus
         securityContext:
+          runAsNonRoot: false
           runAsUser: 0
           runAsGroup: 0
           allowPrivilegeEscalation: false
