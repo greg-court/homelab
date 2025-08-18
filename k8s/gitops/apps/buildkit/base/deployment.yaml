@@ -11,7 +11,7 @@ metadata:
   namespace: gh-runners
   labels: { app: buildkitd }
 spec:
-  replicas: 1
+  replicas: 0
   selector: { matchLabels: { app: buildkitd } }
   template:
     metadata: { labels: { app: buildkitd } }
@@ -34,8 +34,8 @@ spec:
           volumeMounts:
             [{ name: cfg, mountPath: /etc/buildkit, readOnly: true }]
           resources:
-            requests: { cpu: '1500m', memory: '4Gi', ephemeral-storage: '8Gi' }
-            limits: { cpu: '3', memory: '8Gi', ephemeral-storage: '32Gi' }
+            requests: { cpu: '1000m', memory: '3Gi', ephemeral-storage: '8Gi' }
+            limits: { cpu: '3', memory: '6Gi', ephemeral-storage: '32Gi' }
           livenessProbe:
             {
               tcpSocket: { port: grpc },
