@@ -16,8 +16,8 @@ prometheusOperator:
 
 prometheus:
   prometheusSpec:
-    disableMountSubPath: true
     storageSpec:
+      disableMountSubPath: true
       volumeClaimTemplate:
         metadata: { name: prometheus-data }
         spec:
