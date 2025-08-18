@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netbird
+  namespace: net
+  labels:
+    app: netbird
+    # egress.zone is overridden per overlay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netbird
+  template:
+    metadata:
+      labels:
+        app: netbird
+        egress.zone: PLACEHOLDER # overridden per overlay
+    spec:
+      # Cilium egress-gateway works on normal pods; do NOT use hostNetwork here
+      containers:
+        - name: netbird
+          image: netbirdio/netbird:latest
+          env:
+            - name: NB_SETUP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: PLACEHOLDER-SECRET # overridden per overlay
+                  key: setup-key
+            - name: NB_HOSTNAME
+              value: PLACEHOLDER-HOSTNAME # overridden per overlay
+            - name: NB_LOG_LEVEL
+              value: info
+          # NetBird creates a WireGuard interface inside the container
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add: ['NET_ADMIN', 'SYS_RESOURCE', 'SYS_ADMIN']
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+              cpu: 500m
