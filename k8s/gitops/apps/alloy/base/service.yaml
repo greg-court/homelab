@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: alloy
+  namespace: monitoring
+  labels: { app: alloy }
+spec:
+  selector: { app: alloy }
+  ports:
+    - name: http
+      port: 12345
+      targetPort: http
+      protocol: TCP

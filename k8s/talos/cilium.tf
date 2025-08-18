@@ -33,8 +33,43 @@ locals {
       }
     }
 
-    hubble          = { enabled = true, relay = { enabled = true }, ui = { enabled = true } }
+    hubble          = {
+      enabled = true
+      relay   = { enabled = true }
+      ui      = { enabled = true }
+
+      # ➜ Enable Hubble metrics + ServiceMonitor
+      metrics = {
+        enabled = [
+          "dns:query;ignoreAAAA",
+          "drop",
+          "tcp",
+          "flow",
+          "icmp",
+          "http"
+        ]
+      }
+      metricsServer = {
+        enabled = true
+        serviceMonitor = { enabled = true }
+      }
+    }
+
     l2announcements = { enabled = true }
+
+    # ➜ Cilium agent metrics + ServiceMonitor
+    prometheus = {
+      enabled = true
+      serviceMonitor = { enabled = true }
+    }
+
+    # ➜ Cilium operator metrics + ServiceMonitor
+    operator = {
+      prometheus = {
+        enabled = true
+        serviceMonitor = { enabled = true }
+      }
+    }
 
     # Steer pod egress out specific NIC/VLANs
     egressGateway = { enabled = true }

@@ -30,6 +30,10 @@ prometheus:
       runAsGroup: 65534
       fsGroup: 65534
 
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+
     initContainers:
       - name: fix-permissions
         image: busybox:1.36
