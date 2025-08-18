@@ -4,7 +4,7 @@ metadata:
   name: nginx-favicons
   namespace: web
   annotations:
-    kubernetes.io/ingress.class: dmz
+    traefik.io/ingress.class: dmz
 spec:
   entryPoints: ['websecure']
   routes:
