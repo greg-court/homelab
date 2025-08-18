@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: netshoot-on-every-node
+  name: netshoot
   namespace: debug
 spec:
   selector:
-    matchLabels: { app: netshoot-on-every-node }
+    matchLabels: { app: netshoot }
   template:
     metadata:
-      labels: { app: netshoot-on-every-node }
+      labels: { app: netshoot }
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
