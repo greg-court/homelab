@@ -15,4 +15,4 @@ spec:
     path: k8s/gitops/apps/gh-runners-common/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }
-    syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']
+    syncOptions: ['ServerSideApply=true']
