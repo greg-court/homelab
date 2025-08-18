@@ -2,3 +2,5 @@ resources:
   - rbac.yaml
   - configmap.yaml
   - daemonset.yaml
+  - service.yaml
+  - servicemonitor.yaml

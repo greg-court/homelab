@@ -15,11 +15,53 @@ locals {
     controller = {
       serverSideApply = { enabled = true }
       rbac            = { namespaced = false }
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled   = true
+          namespace = "monitoring"
+        }
+      }
+    }
+    server = {
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled   = true
+          namespace = "monitoring"
+        }
+      }
+    }
+    repoServer = {
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled   = true
+          namespace = "monitoring"
+        }
+      }
+    }
+    applicationSet = {
+      enabled = true
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled   = true
+          namespace = "monitoring"
+        }
+      }
+    }
+    redis = {
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled   = true
+          namespace = "monitoring"
+        }
+      }
     }
     configs = { clusters = { inCluster = { enabled = true } } }
-    global = {
-      podLabels = { "egress.zone" = "trust" }
-    }
+    global  = { podLabels = { "egress.zone" = "trust" } }
   })
 }
 

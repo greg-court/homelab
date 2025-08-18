@@ -36,13 +36,32 @@ spec:
             operator: 'Exists'
             effect: 'NoSchedule'
 
+        # ➜ Prometheus metrics & ServiceMonitor
+        metrics:
+          prometheus:
+            enabled: true
+            entryPoint: metrics
+        ports:
+          metrics:
+            port: 9100
+            expose: false
+        serviceMonitor:
+          enabled: true
+          namespace: monitoring
+
+        # ➜ JSON logs to Loki
+        logs:
+          general:
+            format: json
+          access:
+            enabled: true
+            format: json
+
         additionalArguments:
           - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
           - "--providers.kubernetescrd.ingressclass=trust"
           - "--providers.kubernetesingress.ingressclass=trust"
-          - "--metrics.prometheus=true"
-          - "--accesslog=true"
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: ['CreateNamespace=true']

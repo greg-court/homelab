@@ -18,6 +18,11 @@ spec:
       parameters:
         - name: installCRDs
           value: 'true'
+      values: |
+        prometheus:
+          enabled: true
+          servicemonitor:
+            enabled: true
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
