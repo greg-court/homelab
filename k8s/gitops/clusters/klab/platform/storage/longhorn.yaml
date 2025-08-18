@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-28' }
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  source:
+    repoURL: https://charts.longhorn.io
+    chart: longhorn
+    targetRevision: 1.9.1
+    helm:
+      values: |
+        # Make Longhorn the default StorageClass *now*
+        persistence:
+          defaultClass: true
+          # single node today; raise to 2 or 3 when you have 3 nodes
+          defaultClassReplicaCount: 1
+
+        # Longhorn cluster defaults
+        defaultSettings:
+          # single node today; raise when you have 3 nodes
+          defaultReplicaCount: 1
+          # Optional: keep data under /var/mnt/longhorn (Talos writable area)
+          defaultDataPath: /var/mnt/longhorn
+
+        # Expose UI only on VLAN 3 via Traefik "trust" ingress class
+        ingress:
+          enabled: true
+          ingressClassName: trust
+          host: longhorn.apps.klab.internal
+          tls: true
+          tlsSecret: longhorn-tls
+          annotations:
+            cert-manager.io/cluster-issuer: homelab-ca
+
+        # Let Prometheus Operator (KPS) scrape Longhorn
+        metrics:
+          serviceMonitor:
+            enabled: true
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true

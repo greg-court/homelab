@@ -21,6 +21,7 @@ spec:
     - https://grafana.github.io/helm-charts
     - https://kubernetes-sigs.github.io/metrics-server # HPA needs metrics-server
     - ghcr.io/actions/actions-runner-controller-charts
+    - https://charts.longhorn.io
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
