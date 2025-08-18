@@ -9,10 +9,10 @@ spec:
   replicas: 1
   selector: { matchLabels: { app: nginx-favicons } }
   template:
-    metadata: { labels: { app: nginx-favicons } }
-    labels:
-      app: nginx-favicons
-      egress.zone: dmz
+    metadata:
+      labels:
+        app: nginx-favicons
+        egress.zone: dmz
     spec:
       containers:
         - name: web
