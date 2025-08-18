@@ -40,6 +40,7 @@ prometheus:
             'chown -R 65534:65534 /prometheus && chmod -R u+rwX,g+rwX /prometheus',
           ]
         securityContext:
+          runAsNonRoot: false
           runAsUser: 0
           runAsGroup: 0
           allowPrivilegeEscalation: false
