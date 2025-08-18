@@ -15,6 +15,9 @@ spec:
     targetRevision: 37.0.0
     helm:
       values: |
+        podLabels:
+          egress.zone: dmz
+
         ingressClass:
           enabled: true
           isDefaultClass: false
