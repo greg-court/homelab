@@ -1,4 +1,12 @@
 locals {
+  base_interface = yamldecode(local.base_patch).machine.network.interfaces[0].interface
+  vlans = [
+    for v in yamldecode(local.base_patch).machine.network.interfaces[0].vlans : v.vlanId
+  ]
+  cilium_devices = concat(
+    [local.base_interface],
+    [for v in local.vlans : "${local.base_interface}.${v}"]
+  )
   cilium_config = [yamlencode({
     ipam = { mode = "kubernetes" }
 
@@ -30,9 +38,7 @@ locals {
 
     # Steer pod egress out specific NIC/VLANs
     egressGateway = { enabled = true }
-
-    # Strongly recommended with multiple NIC/VLAN sub-interfaces
-    devices = ["enp0s31f6", "enp0s31f6.3", "enp0s31f6.4", "enp0s31f6.5", "enp0s31f6.6"] # automate this list later based on interfaces & vlans
+    devices       = local.cilium_devices
   })]
 }
 
