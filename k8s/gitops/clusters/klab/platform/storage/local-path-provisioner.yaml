@@ -16,6 +16,8 @@ spec:
     helm:
       values: |
         storageClass:
+          annotations:
+            defaultVolumeType: local
           create: true
           defaultClass: false
           name: local-path
