@@ -11,7 +11,7 @@ metadata:
   namespace: gh-runners
   labels: { app: buildkitd }
 spec:
-  replicas: 0
+  replicas: 1
   selector: { matchLabels: { app: buildkitd } }
   template:
     metadata: { labels: { app: buildkitd } }
