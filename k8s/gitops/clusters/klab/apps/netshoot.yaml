@@ -1,3 +1,4 @@
+# k8s/gitops/clusters/klab/apps/debug.yaml  (rename from netshoot.yaml)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -6,11 +7,13 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '30' }
 spec:
   project: apps
-  destination: { server: https://kubernetes.default.svc, namespace: web }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: debug
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
     path: k8s/gitops/apps/debug/overlays/klab
   syncPolicy:
     automated: { prune: true, selfHeal: true }
-    syncOptions: ['CreateNamespace=true', 'ServerSideApply=true']
+    syncOptions: ['ServerSideApply=true']
