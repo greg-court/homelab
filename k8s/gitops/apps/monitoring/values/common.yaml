@@ -16,13 +16,13 @@ prometheusOperator:
 
 prometheus:
   prometheusSpec:
+    disableMountSubPath: true
     storageSpec:
       volumeClaimTemplate:
         metadata: { name: prometheus-data }
         spec:
           storageClassName: local-path
           resources: { requests: { storage: 32Gi } }
-          disableMountSubPath: true
 
     securityContext:
       runAsNonRoot: true
