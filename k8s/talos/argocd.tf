@@ -2,6 +2,7 @@ variable "namespace" { default = "argocd" }
 variable "bootstrap_repo_url" {}
 variable "bootstrap_repo_path" {}
 variable "bootstrap_repo_revision" { default = "main" }
+variable "enable_monitoring" {} # set to false before ArgoCD deploys apps
 
 resource "kubernetes_namespace" "argocd" {
   metadata {
@@ -18,7 +19,7 @@ locals {
       metrics = {
         enabled = true
         serviceMonitor = {
-          enabled   = true
+          enabled   = var.enable_monitoring
           namespace = "monitoring"
         }
       }
@@ -27,7 +28,7 @@ locals {
       metrics = {
         enabled = true
         serviceMonitor = {
-          enabled   = true
+          enabled   = var.enable_monitoring
           namespace = "monitoring"
         }
       }
@@ -36,7 +37,7 @@ locals {
       metrics = {
         enabled = true
         serviceMonitor = {
-          enabled   = true
+          enabled   = var.enable_monitoring
           namespace = "monitoring"
         }
       }
@@ -46,7 +47,7 @@ locals {
       metrics = {
         enabled = true
         serviceMonitor = {
-          enabled   = true
+          enabled   = var.enable_monitoring
           namespace = "monitoring"
         }
       }
@@ -55,7 +56,7 @@ locals {
       metrics = {
         enabled = true
         serviceMonitor = {
-          enabled   = true
+          enabled   = var.enable_monitoring
           namespace = "monitoring"
         }
       }

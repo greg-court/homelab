@@ -49,7 +49,7 @@ locals {
       }
       metricsServer = {
         enabled = true
-        serviceMonitor = { enabled = true }
+        serviceMonitor = { enabled = var.enable_monitoring }
       }
     }
 
@@ -58,14 +58,14 @@ locals {
     # ➜ Cilium agent metrics + ServiceMonitor
     prometheus = {
       enabled = true
-      serviceMonitor = { enabled = true }
+      serviceMonitor = { enabled = var.enable_monitoring }
     }
 
     # ➜ Cilium operator metrics + ServiceMonitor
     operator = {
       prometheus = {
         enabled = true
-        serviceMonitor = { enabled = true }
+        serviceMonitor = { enabled = var.enable_monitoring }
       }
     }
 
