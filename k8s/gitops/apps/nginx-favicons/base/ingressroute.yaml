@@ -9,9 +9,8 @@ spec:
   entryPoints: ['websecure']
   routes:
     - kind: Rule
-      match: >
-        Host(`gregc.online`) ||
-        HostRegexp(`{subdomain:[a-z0-9-]+}.gregc.online`)
+      match: |
+        Host(`gregc.online`) || HostRegexp(`^[a-z0-9-]+\.gregc\.online$`)
       services:
         - name: nginx-favicons
           port: 80
