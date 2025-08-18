@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: netbird
-  namespace: net
   labels:
     app: netbird
     # egress.zone is overridden per overlay
@@ -33,9 +32,9 @@ spec:
               value: info
           # NetBird creates a WireGuard interface inside the container
           securityContext:
-            allowPrivilegeEscalation: true
+            allowPrivilegeEscalation: false
             capabilities:
-              add: ['NET_ADMIN', 'SYS_RESOURCE', 'SYS_ADMIN']
+              add: ['NET_ADMIN']
           resources:
             requests:
               cpu: 50m
