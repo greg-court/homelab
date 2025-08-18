@@ -44,9 +44,7 @@ locals {
           "dns:query;ignoreAAAA",
           "drop",
           "tcp",
-          "flow",
-          "icmp",
-          "http"
+          "icmp"
         ]
       }
       metricsServer = {
