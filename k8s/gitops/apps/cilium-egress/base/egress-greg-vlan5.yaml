@@ -9,5 +9,7 @@ spec:
           egress.zone: 'greg'
   destinationCIDRs: ['0.0.0.0/0', '::/0']
   egressGateway:
-    nodeSelector: {}
+    nodeSelector:
+      matchLabels:
+        egress-node: 'true'
     interface: 'enp0s31f6.5'
