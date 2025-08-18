@@ -32,7 +32,7 @@ locals {
     egressGateway = { enabled = true }
 
     # Strongly recommended with multiple NIC/VLAN sub-interfaces
-    devices = ["enp0s31f6","enp0s31f6.3","enp0s31f6.4","enp0s31f6.5","enp0s31f6.6"] # automate this list later based on interfaces & vlans
+    devices = ["enp0s31f6", "enp0s31f6.3", "enp0s31f6.4", "enp0s31f6.5", "enp0s31f6.6"] # automate this list later based on interfaces & vlans
   })]
 }
 

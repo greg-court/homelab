@@ -5,6 +5,8 @@ metadata:
   namespace: kube-system
   annotations:
     cert-manager.io/cluster-issuer: homelab-ca
+  labels:
+    egress.zone: trust
 spec:
   ingressClassName: trust
   tls:
