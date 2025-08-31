@@ -49,8 +49,10 @@ locals {
             interfaces     = ["enP4p65s0", "enP3p49s0"] # putting NIC with DHCP reservation FIRST
           }
           vlans = [
-            { vlanId = 3, dhcp = false, addresses = [] },
-            { vlanId = 4, dhcp = false, addresses = [] }
+            { vlanId = 3, dhcp = true },
+            { vlanId = 4, dhcp = true },
+            { vlanId = 5, dhcp = true },
+            { vlanId = 6, dhcp = true }
           ]
         }]
       }
