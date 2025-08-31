@@ -10,3 +10,11 @@ variable "azure_tenant_id" { sensitive = true }
 variable "azure_client_id" { sensitive = true }
 variable "azure_client_secret" { sensitive = true }
 
+variable "hosts" {
+  type = list(string)
+  default = [
+    "n1.klab.internal",
+    "n2.klab.internal",
+    "n3.klab.internal"
+  ]
+}

@@ -33,7 +33,7 @@ locals {
       }
     }
 
-    hubble          = {
+    hubble = {
       enabled = true
       relay   = { enabled = true }
       ui      = { enabled = true }
@@ -48,7 +48,7 @@ locals {
         ]
       }
       metricsServer = {
-        enabled = true
+        enabled        = true
         serviceMonitor = { enabled = var.enable_monitoring }
       }
     }
@@ -57,14 +57,14 @@ locals {
 
     # ➜ Cilium agent metrics + ServiceMonitor
     prometheus = {
-      enabled = true
+      enabled        = true
       serviceMonitor = { enabled = var.enable_monitoring }
     }
 
     # ➜ Cilium operator metrics + ServiceMonitor
     operator = {
       prometheus = {
-        enabled = true
+        enabled        = true
         serviceMonitor = { enabled = var.enable_monitoring }
       }
     }
