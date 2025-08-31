@@ -23,43 +23,43 @@ locals {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
-      network = {
-        interfaces = [{
-          vip       = { ip = "192.168.2.240" }
-          interface = "enp0s31f6"
-          dhcp      = true
-          vlans = [
-            { vlanId = 3, dhcp = true },
-            { vlanId = 4, dhcp = true },
-            { vlanId = 5, dhcp = true },
-            { vlanId = 6, dhcp = true }
-          ]
-        }]
-      }
-      # network = {
+      # network = { # config for single dell
       #   interfaces = [{
-      #     interface = "bond0"
+      #     vip       = { ip = "192.168.2.240" }
+      #     interface = "enp0s31f6"
       #     dhcp      = true
-      #     vip = {
-      #       ip = "192.168.2.240"
-      #     }
-      #     bond = {
-      #       mode           = "802.3ad"
-      #       lacpRate       = "fast"
-      #       xmitHashPolicy = "layer3+4"
-      #       interfaces     = ["enp1s0", "enp2s0"] # putting NIC with DHCP reservation FIRST
-      #     }
       #     vlans = [
-      #       { vlanId = 3, dhcp = false, addresses = [] },
-      #       { vlanId = 4, dhcp = false, addresses = [] }
+      #       { vlanId = 3, dhcp = true },
+      #       { vlanId = 4, dhcp = true },
+      #       { vlanId = 5, dhcp = true },
+      #       { vlanId = 6, dhcp = true }
       #     ]
       #   }]
-      #   kubernetes = {
-      #     virtualIP = {
-      #       ip = "192.168.2.240"
-      #     }
-      #   }
       # }
+      network = {
+        interfaces = [{
+          interface = "bond0"
+          dhcp      = true
+          vip = {
+            ip = "192.168.2.240"
+          }
+          bond = {
+            mode           = "802.3ad"
+            lacpRate       = "fast"
+            xmitHashPolicy = "layer3+4"
+            interfaces     = ["enP4p65s0", "enP3p49s0"] # putting NIC with DHCP reservation FIRST
+          }
+          vlans = [
+            { vlanId = 3, dhcp = false, addresses = [] },
+            { vlanId = 4, dhcp = false, addresses = [] }
+          ]
+        }]
+        kubernetes = {
+          virtualIP = {
+            ip = "192.168.2.240"
+          }
+        }
+      }
     }
     cluster = {
       allowSchedulingOnControlPlanes = true
