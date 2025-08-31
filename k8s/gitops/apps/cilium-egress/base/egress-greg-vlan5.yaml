@@ -12,4 +12,4 @@ spec:
     nodeSelector:
       matchLabels:
         egress-node: 'true'
-    interface: 'enp0s31f6.5'
+    interface: 'bond0.5'
