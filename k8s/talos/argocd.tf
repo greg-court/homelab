@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.namespace
   }
-  depends_on = [local_file.kubeconfig_local]
+  depends_on = [local_file.kubeconfig_local, null_resource.wait_for_api]
 }
 
 locals {

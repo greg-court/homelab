@@ -1,6 +1,6 @@
 resource "kubernetes_namespace" "external_secrets" {
   metadata { name = "external-secrets" }
-  depends_on = [talos_cluster_kubeconfig.kc]
+  depends_on = [talos_cluster_kubeconfig.kc, null_resource.wait_for_api]
 }
 
 resource "kubernetes_secret" "azure_kv_creds" {
