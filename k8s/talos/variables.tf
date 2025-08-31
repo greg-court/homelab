@@ -9,3 +9,4 @@ variable "container_name" { type = string }
 variable "azure_tenant_id" { sensitive = true }
 variable "azure_client_id" { sensitive = true }
 variable "azure_client_secret" { sensitive = true }
+
