@@ -155,8 +155,8 @@ resource "local_file" "controlplane_local" {
 resource "talos_machine_configuration_apply" "controlplanes" {
   for_each = toset([
     "n1.klab.internal",
-    # "n2.klab.internal",
-    # "n3.klab.internal"
+    "n2.klab.internal",
+    "n3.klab.internal"
   ])
 
   # Hit EACH node’s Talos API directly (pre-bootstrap there’s no proxying)
@@ -190,4 +190,17 @@ resource "local_file" "kubeconfig_local" {
   depends_on = [null_resource.mkdir_tmp, talos_cluster_kubeconfig.kc]
   filename   = "${local.tmp_dir}/kubeconfig"
   content    = talos_cluster_kubeconfig.kc.kubeconfig_raw
+}
+
+resource "null_resource" "wait_for_api" {
+  depends_on = [local_file.kubeconfig_local]
+  provisioner "local-exec" {
+    command = <<EOT
+    for i in $(seq 1 60); do
+      nc -zvw2 api.klab.internal 6443 && exit 0
+      sleep 2
+    done
+    echo "API not ready" >&2; exit 1
+    EOT
+  }
 }

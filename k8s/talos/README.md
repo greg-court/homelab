@@ -41,5 +41,5 @@ talosctl reset \
  --system-labels-to-wipe EPHEMERAL,STATE \
  --graceful=false \
  --reboot \
- -e n1.klab.internal -n n1.klab.internal
+ -e n1.klab.internal,n2.klab.internal,n3.klab.internal -n n1.klab.internal,n2.klab.internal,n3.klab.internal
 ```

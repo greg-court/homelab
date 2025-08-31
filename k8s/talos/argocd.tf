@@ -107,5 +107,5 @@ resource "helm_release" "argocd_root_apps" {
     }
   })]
 
-  depends_on = [helm_release.argocd]
+  depends_on = [helm_release.argocd, null_resource.wait_for_api]
 }

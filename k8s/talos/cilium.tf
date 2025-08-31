@@ -85,5 +85,5 @@ resource "helm_release" "cilium" {
   timeout         = 600
   atomic          = true
   cleanup_on_fail = true
-  depends_on      = [talos_cluster_kubeconfig.kc, talos_machine_bootstrap.cluster]
+  depends_on      = [talos_cluster_kubeconfig.kc, talos_machine_bootstrap.cluster, null_resource.wait_for_api]
 }
