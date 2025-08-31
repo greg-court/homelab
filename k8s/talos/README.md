@@ -38,7 +38,7 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 terraform destroy --auto-approve
 
 talosctl reset \
- --wipe-mode all \
+ --system-labels-to-wipe EPHEMERAL,STATE \
  --graceful=false \
  --reboot \
  -e n1.klab.internal,n2.klab.internal,n3.klab.internal -n n1.klab.internal,n2.klab.internal,n3.klab.internal
