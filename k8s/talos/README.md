@@ -3,6 +3,11 @@
 ```bash
 # comment
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+
+nc -vz n1.klab.internal 50000
+nc -vz n2.klab.internal 50000
+nc -vz n3.klab.internal 50000
+
 terraform apply --auto-approve
 
 rm -f ~/.talos/config && rm -f ~/.kube/config
