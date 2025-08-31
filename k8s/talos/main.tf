@@ -53,11 +53,6 @@ locals {
             { vlanId = 4, dhcp = false, addresses = [] }
           ]
         }]
-        kubernetes = {
-          virtualIP = {
-            ip = "192.168.2.240"
-          }
-        }
       }
     }
     cluster = {
