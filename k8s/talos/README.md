@@ -1,6 +1,7 @@
 # Initialisation
 
 ```bash
+# comment
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 terraform apply --auto-approve
 
