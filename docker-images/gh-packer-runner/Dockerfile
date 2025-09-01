@@ -20,24 +20,36 @@ RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
 
 # Runner user
 RUN useradd -m runner
-
 WORKDIR /home/runner
 
-# GitHub Actions runner
-RUN RUNNER_VER=$(curl -s https://api.github.com/repos/actions/runner/releases/latest \
-                    | jq -r '.tag_name' | sed 's/^v//') \
- && curl -fsSL \
-      "https://github.com/actions/runner/releases/download/v${RUNNER_VER}/actions-runner-linux-x64-${RUNNER_VER}.tar.gz" \
-      -o actions-runner.tar.gz \
- && tar xzf actions-runner.tar.gz && rm actions-runner.tar.gz
+# Select architecture-specific assets based on TARGETARCH
+ARG TARGETARCH
 
-# Packer
-RUN PACKER_VER=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/packer \
-                    | jq -r '.current_version') \
- && curl -fsSL \
-      "https://releases.hashicorp.com/packer/${PACKER_VER}/packer_${PACKER_VER}_linux_amd64.zip" \
-      -o packer.zip \
- && unzip packer.zip && mv packer /usr/local/bin/ && rm packer.zip
+# GitHub Actions runner (x64/arm64)
+RUN set -eux; \
+    case "$TARGETARCH" in \
+      amd64) RUNNER_ARCH="x64" ;; \
+      arm64) RUNNER_ARCH="arm64" ;; \
+      *) echo "Unsupported arch: $TARGETARCH"; exit 1 ;; \
+    esac; \
+    RUNNER_VER="$(curl -s https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name' | sed 's/^v//')"; \
+    curl -fsSL \
+      "https://github.com/actions/runner/releases/download/v${RUNNER_VER}/actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VER}.tar.gz" \
+      -o actions-runner.tar.gz; \
+    tar xzf actions-runner.tar.gz; rm actions-runner.tar.gz
+
+# Packer (amd64/arm64)
+RUN set -eux; \
+    case "$TARGETARCH" in \
+      amd64) HASHI_ARCH="amd64" ;; \
+      arm64) HASHI_ARCH="arm64" ;; \
+      *) echo "Unsupported arch: $TARGETARCH"; exit 1 ;; \
+    esac; \
+    PACKER_VER="$(curl -s https://checkpoint-api.hashicorp.com/v1/check/packer | jq -r '.current_version')"; \
+    curl -fsSL \
+      "https://releases.hashicorp.com/packer/${PACKER_VER}/packer_${PACKER_VER}_linux_${HASHI_ARCH}.zip" \
+      -o packer.zip; \
+    unzip packer.zip; mv packer /usr/local/bin/; rm packer.zip
 
 RUN chown -R runner:runner /home/runner
 USER runner

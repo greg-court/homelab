@@ -11,6 +11,7 @@ template:
   spec:
     containers:
       - name: runner
+        image: docker.io/gr10/gh-docker-runner:2.0.0
         env:
           - name: BUILDKIT_HOST
             value: 'tcp://buildkitd.gh-runners.svc.cluster.local:1234'

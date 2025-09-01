@@ -12,7 +12,7 @@ RUN apt-get update \
       gnupg lsb-release apt-transport-https \
  && rm -rf /var/lib/apt/lists/*
 
-# Azure CLI (official repo)
+# Azure CLI (official repo, arch-portable)
 RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
       | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" \
@@ -32,14 +32,19 @@ RUN useradd --create-home --shell /bin/bash runner \
 
 WORKDIR /home/runner
 
-# Latest GitHub Actions runner
-RUN LATEST_VERSION_TAG=$(curl -sL -H "Accept: application/vnd.github+json" \
-      https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name') \
- && LATEST_VERSION=${LATEST_VERSION_TAG#v} \
- && curl -fsSL -o runner.tar.gz \
-      "https://github.com/actions/runner/releases/download/${LATEST_VERSION_TAG}/actions-runner-linux-x64-${LATEST_VERSION}.tar.gz" \
- && tar xzf runner.tar.gz && rm runner.tar.gz \
- && chown -R runner:runner /home/runner
+# Select architecture-specific actions runner
+ARG TARGETARCH
+RUN set -eux; \
+    case "$TARGETARCH" in \
+      amd64) RUNNER_ARCH="x64" ;; \
+      arm64) RUNNER_ARCH="arm64" ;; \
+      *) echo "Unsupported arch: $TARGETARCH"; exit 1 ;; \
+    esac; \
+    LATEST_VERSION_TAG="$(curl -sL -H "Accept: application/vnd.github+json" https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name')"; \
+    LATEST_VERSION="${LATEST_VERSION_TAG#v}"; \
+    curl -fsSL -o runner.tar.gz \
+      "https://github.com/actions/runner/releases/download/${LATEST_VERSION_TAG}/actions-runner-linux-${RUNNER_ARCH}-${LATEST_VERSION}.tar.gz"; \
+    tar xzf runner.tar.gz && rm runner.tar.gz && chown -R runner:runner /home/runner
 
 USER runner
 
