@@ -38,6 +38,8 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 terraform state rm 'helm_release.cilium'
 terraform state rm 'helm_release.argocd'
 terraform state rm 'helm_release.argocd_root_apps'
+terraform state rm 'kubernetes_namespace.argocd'
+terraform state rm 'kubernetes_namespace.external_secrets'
 
 terraform destroy --auto-approve
 
