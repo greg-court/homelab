@@ -11,7 +11,6 @@ locals {
         } # ensures no 'node.kubernetes.io/exclude-from-external-load-balancers: ""' on control planes
         "egress-node" = "true"
       }
-      certSANs = distinct(concat(var.hosts, [var.api_server]))
       install = {
         disk = var.install_disk
         wipe = true
@@ -133,6 +132,7 @@ resource "local_file" "talosconfig_local" {
   content  = data.talos_client_configuration.client.talos_config
 }
 
+
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
@@ -141,10 +141,17 @@ data "talos_machine_configuration" "controlplane" {
   config_patches   = [local.base_patch, local.ephemeral_patch]
 }
 
-resource "local_file" "controlplane_local" {
+# not applied directly, just for reference
+resource "local_file" "controlplane_baseline" {
   depends_on = [null_resource.mkdir_tmp]
-  filename   = "${local.tmp_dir}/controlplane.yaml"
+  filename   = "${local.tmp_dir}/controlplane-baseline.yaml"
   content    = data.talos_machine_configuration.controlplane.machine_configuration
+}
+
+resource "local_file" "controlplane_per_node" {
+  for_each = toset(var.hosts)
+  filename = "${local.tmp_dir}/controlplane-${local.shortnames[each.value]}.yaml"
+  content  = data.talos_machine_configuration.cp_per_node[each.value].machine_configuration
 }
 
 locals {
@@ -163,11 +170,14 @@ data "talos_machine_configuration" "cp_per_node" {
     local.ephemeral_patch,
     yamlencode({
       machine = {
-        network = { hostname = local.shortnames[each.key] }
+        # Limit SANs to this node’s FQDN + the VIP FQDN
+        certSANs = [each.key, var.api_server]
+        network  = { hostname = local.shortnames[each.key] }
       }
     }),
   ]
 }
+
 
 # Apply machine config to all CP nodes BEFORE bootstrap
 resource "talos_machine_configuration_apply" "controlplanes" {
