@@ -147,23 +147,40 @@ resource "local_file" "controlplane_local" {
   content    = data.talos_machine_configuration.controlplane.machine_configuration
 }
 
+locals {
+  shortnames = { for h in var.hosts : h => split(".", h)[0] }
+}
+
+data "talos_machine_configuration" "cp_per_node" {
+  for_each         = toset(var.hosts)
+  cluster_name     = var.cluster_name
+  machine_type     = "controlplane"
+  cluster_endpoint = var.cluster_endpoint
+  machine_secrets  = talos_machine_secrets.cluster.machine_secrets
+
+  config_patches = [
+    local.base_patch,
+    local.ephemeral_patch,
+    yamlencode({
+      machine = {
+        network = { hostname = local.shortnames[each.key] }
+      }
+    }),
+  ]
+}
+
 # Apply machine config to all CP nodes BEFORE bootstrap
 resource "talos_machine_configuration_apply" "controlplanes" {
   for_each = toset(var.hosts)
-
-  # Hit EACH node’s Talos API directly (pre-bootstrap there’s no proxying)
   endpoint = each.value
   node     = each.value
 
   client_configuration        = talos_machine_secrets.cluster.client_configuration
-  machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
+  machine_configuration_input = data.talos_machine_configuration.cp_per_node[each.value].machine_configuration
   apply_mode                  = "auto"
-
-  # make sure the rendered file/data exists first (not strictly required, but sane)
-  depends_on = [local_file.controlplane_local]
 }
 
-# Bootstrap the cluster (Talos provider) — runs only when bootstrap=true
+# Bootstrap the cluster (Talos provider)
 resource "talos_machine_bootstrap" "cluster" {
   node                 = var.bootstrap_node
   client_configuration = talos_machine_secrets.cluster.client_configuration
