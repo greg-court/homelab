@@ -138,10 +138,13 @@ jobs:
           DOCKER_NAMESPACE: gr10
           IMAGE_VERSION: ${{ steps.setver.outputs.version }}
           CACHE_REF: gr10/${{ matrix.image }}:buildcache
+          # Build only ARM64 now (Orange Pi 5 Plus). For multi-arch later,
+          # change this to: linux/amd64,linux/arm64
+          PLATFORMS: linux/arm64
         shell: bash
         run: |
           set -euo pipefail
-          docker buildx build --platform linux/amd64 \
+          docker buildx build --platform "${PLATFORMS}" \
             -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:${IMAGE_VERSION}" \
             -t "${DOCKER_NAMESPACE}/${{ matrix.image }}:latest" \
             --cache-from "type=registry,ref=${CACHE_REF}" \

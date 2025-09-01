@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       apt-transport-https \
  && rm -rf /var/lib/apt/lists/*
 
-# Docker CLI + Buildx
+# Docker CLI + Buildx (arch-portable via repo)
 RUN mkdir -p /etc/apt/keyrings \
  && curl -fsSL https://download.docker.com/linux/debian/gpg \
     | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
@@ -27,7 +27,7 @@ RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
  && apt-get update && apt-get install -y --no-install-recommends azure-cli \
  && rm -rf /var/lib/apt/lists/*
 
-# GitHub CLI (you had this before; keeping)
+# GitHub CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
  && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -42,12 +42,18 @@ RUN useradd --create-home --shell /bin/bash runner \
 
 WORKDIR /home/runner
 
-# Actions runner
-RUN RUNNER_VER=$(curl -s https://api.github.com/repos/actions/runner/releases/latest \
-             | jq -r '.tag_name' | sed 's/^v//') \
- && curl -fsSL -o actions-runner.tar.gz \
-      "https://github.com/actions/runner/releases/download/v${RUNNER_VER}/actions-runner-linux-x64-${RUNNER_VER}.tar.gz" \
- && tar xzf actions-runner.tar.gz && rm actions-runner.tar.gz \
+# Select architecture-specific actions runner
+ARG TARGETARCH
+RUN set -eux; \
+    case "$TARGETARCH" in \
+      amd64) RUNNER_ARCH="x64" ;; \
+      arm64) RUNNER_ARCH="arm64" ;; \
+      *) echo "Unsupported arch: $TARGETARCH"; exit 1 ;; \
+    esac; \
+    RUNNER_VER="$(curl -s https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name' | sed 's/^v//')"; \
+    curl -fsSL -o actions-runner.tar.gz \
+      "https://github.com/actions/runner/releases/download/v${RUNNER_VER}/actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VER}.tar.gz"; \
+    tar xzf actions-runner.tar.gz && rm actions-runner.tar.gz \
  && chown -R runner:runner /home/runner
 
 USER runner
