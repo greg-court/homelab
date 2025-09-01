@@ -11,9 +11,7 @@ locals {
         } # ensures no 'node.kubernetes.io/exclude-from-external-load-balancers: ""' on control planes
         "egress-node" = "true"
       }
-      certSANs = merge(var.hosts, [
-        var.api_server,
-      ])
+      certSANs = distinct(concat(var.hosts, [var.api_server]))
       install = {
         disk = var.install_disk
         wipe = true
