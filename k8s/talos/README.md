@@ -40,6 +40,7 @@ terraform state rm 'helm_release.argocd'
 terraform state rm 'helm_release.argocd_root_apps'
 terraform state rm 'kubernetes_namespace.argocd'
 terraform state rm 'kubernetes_namespace.external_secrets'
+terraform state rm 'kubernetes_secret.azure_kv_creds'
 
 terraform destroy --auto-approve
 
