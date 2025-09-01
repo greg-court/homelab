@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: binfmt
+  namespace: gh-runners
+  labels: { app: binfmt }
+spec:
+  selector:
+    matchLabels: { app: binfmt }
+  template:
+    metadata:
+      labels: { app: binfmt }
+    spec:
+      tolerations:
+        - key: 'node-role.kubernetes.io/control-plane'
+          operator: 'Exists'
+          effect: 'NoSchedule'
+      # Install QEMU binfmt on each node once, then keep a tiny container running
+      initContainers:
+        - name: setup-binfmt
+          image: tonistiigi/binfmt:latest
+          args: ['--install', 'amd64,arm64']
+          securityContext:
+            privileged: true
+      containers:
+        - name: idle
+          image: alpine:3.20
+          command: ['sh', '-c', 'sleep infinity']
+          securityContext:
+            allowPrivilegeEscalation: false
