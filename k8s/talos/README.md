@@ -35,6 +35,7 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 # Nuking / resetting
 
 ```bash
+cd /Users/gregc/devSandbox/gh-gc/homelab/k8s/talos
 terraform state rm 'helm_release.cilium'
 terraform state rm 'helm_release.argocd'
 terraform state rm 'helm_release.argocd_root_apps'
