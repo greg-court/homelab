@@ -1,11 +1,9 @@
 runnerScaleSetName: 'arc-docker'
 
 containerMode:
-  type: 'kubernetes'
-  kubernetesModeWorkVolumeClaim:
-    accessModes: ['ReadWriteOnce']
-    storageClassName: 'local-path'
-    resources: { requests: { storage: '1Gi' } }
+  type: kubernetes
+  # ARC-recommended: ephemeral job workspace, no PVC
+  kubernetesModeWorkVolumeEmptyDir: {}
 
 template:
   spec:
