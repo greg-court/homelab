@@ -1,4 +1,6 @@
 runnerScaleSetName: 'arc-terraform'
+labels: ['terraform']
+
 template:
   spec:
     containers:
