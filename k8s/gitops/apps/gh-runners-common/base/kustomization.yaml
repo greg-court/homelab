@@ -4,4 +4,5 @@ resources:
   - namespace.yaml
   - secretstore.yaml
   - externalsecrets-gh.yaml
+  - externalsecrets-arc.yaml
   - configmap.yaml
