@@ -13,10 +13,6 @@ template:
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
             value: 'false'
-          - name: ACTIONS_RUNNER_DEBUG
-            value: 'true'
-          - name: ACTIONS_STEP_DEBUG
-            value: 'true'
           - name: REPO_URL
             valueFrom:
               configMapKeyRef:
