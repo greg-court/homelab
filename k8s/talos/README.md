@@ -1,7 +1,7 @@
 # Initialisation
 
 ```bash
-# comment
+cd /Users/gregc/devSandbox/gh-gc/homelab/k8s/talos
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
 nc -vz n1.klab.internal 50000
