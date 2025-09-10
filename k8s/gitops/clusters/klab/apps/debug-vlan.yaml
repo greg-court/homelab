@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: netshoot
+  name: netshoot-greg
   namespace: debug
   labels:
-    app: netshoot
+    app: netshoot-greg
     egress.zone: 'greg'
 spec:
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
   containers:
-    - name: netshoot
+    - name: netshoot-greg
       image: nicolaka/netshoot:latest
       command: ['bash', '-lc', 'sleep infinity']
       securityContext:
