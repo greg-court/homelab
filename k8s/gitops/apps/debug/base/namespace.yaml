@@ -1,4 +1,3 @@
-# k8s/gitops/apps/debug/base/namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
