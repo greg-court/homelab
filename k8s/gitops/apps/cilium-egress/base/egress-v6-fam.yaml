@@ -7,7 +7,7 @@ spec:
     - podSelector:
         matchLabels:
           egress.zone: 'fam'
-  destinationCIDRs: ['0.0.0.0/0', '::/0']
+  destinationCIDRs: ['0.0.0.0/0']
   egressGateway:
     nodeSelector:
       matchLabels:
