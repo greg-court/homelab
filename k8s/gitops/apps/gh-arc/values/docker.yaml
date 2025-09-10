@@ -13,6 +13,11 @@ template:
       - name: runner
         image: docker.io/gr10/gh-docker-runner:1.1.0
         env:
+          - name: REPO_URL
+            valueFrom:
+              configMapKeyRef:
+                name: gh-runners-config
+                key: REPO_URL
           - name: BUILDKIT_HOST
             value: 'tcp://buildkitd.gh-runners.svc.cluster.local:1234'
           - name: DOCKER_BUILDKIT
