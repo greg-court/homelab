@@ -11,3 +11,8 @@ template:
               configMapKeyRef:
                 name: gh-runners-config
                 key: REPO_URL
+          - name: GH_PAT
+            valueFrom:
+              secretKeyRef:
+                name: gh-runners-env
+                key: GH_PAT
