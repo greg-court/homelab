@@ -19,6 +19,12 @@ kubectl get ciliumegressgatewaypolicies.cilium.io
 kubectl get ciliumegressgatewaypolicy egress-greg-vlan5 -o yaml | sed -n '1,120p'
 kubectl get nodes -L egress-node
 
-# KEY COMMAND
+# On n1’s cilium pod (gateway will be lexicographically first labeled node):
+kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg bpf egress list
+
+# Should show Source IP 10.244.0.38 (your netshoot) -> Gateway IP 192.168.2.231
+# and on the gateway node it should list a non-zero Egress IP (your DHCP on bond0.5, e.g. 192.168.5.106).
+
+# Watch for drops (they should disappear):
 kubectl -n kube-system exec -ti cilium-nb255 -- sh -lc \
-'hubble observe --since 1m --from-pod debug/netshoot-greg --to-ip 8.8.8.8 | head -n 30'
+'hubble observe --since 45s --from-pod debug/netshoot-greg --to-ip 8.8.8.8 | head -n 30'
