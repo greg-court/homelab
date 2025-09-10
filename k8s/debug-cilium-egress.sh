@@ -38,3 +38,8 @@ kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg config | egrep 'devic
 
 echo "check what cilium is reading from its configmap:"
 kubectl -n kube-system get cm cilium-config -o yaml | sed -n '1,180p'
+
+echo "check egress BPF maps and bond0.5 IP:"
+kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg bpf egress list
+kubectl -n kube-system exec -ti cilium-nb255 -- ip -4 addr show dev bond0.5
+kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg config | grep -i '^devices\|masquerade'
