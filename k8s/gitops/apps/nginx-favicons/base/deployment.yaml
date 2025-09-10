@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: docker.io/gr10/nginx-favicons:latest
+          image: docker.io/gr10/nginx-favicons:1.0.0
           ports: [{ name: http, containerPort: 80 }]
           resources:
             requests: { cpu: 50m, memory: 64Mi }
