@@ -30,3 +30,8 @@ kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg bpf egress list
 # Watch for drops (they should disappear):
 kubectl -n kube-system exec -ti cilium-nb255 -- sh -lc \
 'hubble observe --since 45s --from-pod debug/netshoot-greg --to-ip 8.8.8.8 | head -n 30'
+
+# check if cilium is aware of the bond NICs
+kubectl -n kube-system get ds cilium -o jsonpath='{.spec.template.spec.containers[0].args}' | xargs -n1
+
+➜  ~ kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg config | egrep 'device'
