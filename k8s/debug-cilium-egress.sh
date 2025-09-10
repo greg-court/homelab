@@ -35,3 +35,6 @@ kubectl -n kube-system exec -ti cilium-nb255 -- sh -lc \
 echo "check if cilium is aware of the bond NICs (not 100% sure about this command):"
 kubectl -n kube-system get ds cilium -o jsonpath='{.spec.template.spec.containers[0].args}' | xargs -n1
 kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg config | egrep 'device'
+
+echo "check what cilium is reading from its configmap:"
+kubectl -n kube-system get cm cilium-config -o yaml | sed -n '1,180p'
