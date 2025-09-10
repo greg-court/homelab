@@ -1,4 +1,6 @@
 runnerScaleSetName: 'arc-ansible'
+labels: ['ansible']
+
 template:
   spec:
     containers:
