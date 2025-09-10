@@ -18,6 +18,11 @@ template:
               configMapKeyRef:
                 name: gh-runners-config
                 key: REPO_URL
+          - name: GH_PAT
+            valueFrom:
+              secretKeyRef:
+                name: gh-runners-env
+                key: GH_PAT
           - name: BUILDKIT_HOST
             value: 'tcp://buildkitd.gh-runners.svc.cluster.local:1234'
           - name: DOCKER_BUILDKIT
