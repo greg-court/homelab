@@ -11,7 +11,7 @@ template:
   spec:
     containers:
       - name: runner
-        image: docker.io/gr10/gh-docker-runner:1.1.0
+        image: docker.io/gr10/gh-docker-runner:2.0.0
         env:
           - name: REPO_URL
             valueFrom:

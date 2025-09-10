@@ -4,7 +4,7 @@ template:
   spec:
     containers:
       - name: runner
-        image: docker.io/gr10/gh-terraform-runner:1.0.0
+        image: docker.io/gr10/gh-terraform-runner:2.0.0
         env:
           - name: REPO_URL
             valueFrom:
