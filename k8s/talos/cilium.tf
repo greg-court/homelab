@@ -87,3 +87,8 @@ resource "helm_release" "cilium" {
   cleanup_on_fail = true
   depends_on      = [talos_cluster_kubeconfig.kc, talos_machine_bootstrap.cluster, null_resource.wait_for_api]
 }
+
+# output cilium_devices
+output "cilium_devices" {
+  value = local.cilium_devices
+}
