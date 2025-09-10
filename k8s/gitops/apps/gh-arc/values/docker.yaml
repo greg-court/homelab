@@ -12,7 +12,7 @@ template:
         image: docker.io/gr10/gh-docker-runner:2.0.0
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
-            value: 'false'
+            value: 'false' # temporary to find root cause of issue
           - name: REPO_URL
             valueFrom:
               configMapKeyRef:
