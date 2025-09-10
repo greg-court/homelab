@@ -43,4 +43,13 @@ spec:
               ip -4 rule  del     from 192.168.4.240/32 table 104 2>/dev/null || true
               ip -4 rule  add pref 104 from 192.168.4.240/32 lookup 104
 
+              # Table 105 -> VLAN 5 (node's bond0.5 IP for Cilium egress)
+              # Discover this node's bond0.5 IPv4 (so each node programs its own /32 correctly)
+
+              # SRC5="$(ip -4 -o addr show dev bond0.5 | awk 'NR==1{print $4}' | cut -d/ -f1)"
+              # ip -4 route replace 192.168.5.0/24 dev bond0.5  scope link table 105
+              # ip -4 route replace default via 192.168.5.1 dev bond0.5         table 105
+              # ip -4 rule  del     from "${SRC5}"/32 table 105 2>/dev/null || true
+              # ip -4 rule  add pref 105 from "${SRC5}"/32 lookup 105
+
               exec tail -f /dev/null # keep pod alive
