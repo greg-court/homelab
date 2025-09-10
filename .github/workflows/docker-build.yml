@@ -69,7 +69,7 @@ jobs:
   build:
     needs: prep
     if: needs.prep.outputs.matrix != '[]'
-    runs-on: [arc-docker]
+    runs-on: arc-docker
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.image || matrix.image }}
