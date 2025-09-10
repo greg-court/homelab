@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot-fam
+  namespace: debug
+  labels:
+    app: netshoot-fam
+    egress.zone: 'fam'
+spec:
+  dnsPolicy: ClusterFirst
+  containers:
+    - name: netshoot-fam
+      image: nicolaka/netshoot:latest
+      command: ['bash', '-lc', 'sleep infinity']
+      securityContext:
+        privileged: true
+      resources:
+  restartPolicy: Always

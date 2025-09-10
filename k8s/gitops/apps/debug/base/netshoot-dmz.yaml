@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot-dmz
+  namespace: debug
+  labels:
+    app: netshoot-dmz
+    egress.zone: 'dmz'
+spec:
+  dnsPolicy: ClusterFirst
+  containers:
+    - name: netshoot-dmz
+      image: nicolaka/netshoot:latest
+      command: ['bash', '-lc', 'sleep infinity']
+      securityContext:
+        privileged: true
+      resources:
+  restartPolicy: Always

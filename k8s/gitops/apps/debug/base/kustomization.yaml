@@ -4,3 +4,5 @@ resources:
   - namespace.yaml
   - netshoot-daemonset.yaml
   - netshoot-greg.yaml
+  - netshoot-fam.yaml
+  
