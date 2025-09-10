@@ -31,6 +31,6 @@ kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg bpf egress list
 kubectl -n kube-system exec -ti cilium-nb255 -- sh -lc \
 'hubble observe --since 45s --from-pod debug/netshoot-greg --to-ip 8.8.8.8 | head -n 30'
 
-# check if cilium is aware of the bond NICs
+# check if cilium is aware of the bond NICs (not 100% sure about this command)
 kubectl -n kube-system get ds cilium -o jsonpath='{.spec.template.spec.containers[0].args}' | xargs -n1
 kubectl -n kube-system exec -ti cilium-nb255 -- cilium-dbg config | egrep 'device'
