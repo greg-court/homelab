@@ -5,3 +5,9 @@ template:
     containers:
       - name: runner
         image: docker.io/gr10/gh-terraform-runner:1.0.0
+        env:
+          - name: REPO_URL
+            valueFrom:
+              configMapKeyRef:
+                name: gh-runners-config
+                key: REPO_URL
