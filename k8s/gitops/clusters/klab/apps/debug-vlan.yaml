@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot
+  namespace: debug
+  labels:
+    app: netshoot
+    egress.zone: 'greg'
+spec:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  containers:
+    - name: netshoot
+      image: nicolaka/netshoot:latest
+      command: ['bash', '-lc', 'sleep infinity']
+      securityContext:
+        privileged: true
+      resources:
+  restartPolicy: Always
