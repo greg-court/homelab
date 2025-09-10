@@ -19,7 +19,7 @@ done
 
 echo "general cilium info:"
 kubectl get ciliumegressgatewaypolicies.cilium.io
-kubectl get ciliumegressgatewaypolicy egress-greg-vlan5 -o yaml | sed -n '1,120p'
+kubectl get ciliumegressgatewaypolicy egress-v5-greg -o yaml | sed -n '1,120p'
 kubectl get nodes -L egress-node
 
 echo "on n1's cilium pod (gateway will be lexicographically first labeled node):"
