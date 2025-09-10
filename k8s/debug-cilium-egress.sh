@@ -43,3 +43,13 @@ echo "check egress BPF maps and bond0.5 IP:"
 kubectl -n kube-system exec -ti cilium-5swfb -- cilium-dbg bpf egress list
 kubectl -n kube-system exec -ti cilium-5swfb -- ip -4 addr show dev bond0.5
 kubectl -n kube-system exec -ti cilium-5swfb -- cilium-dbg config | grep -i '^devices\|masquerade'
+
+# Agent logs on the gateway node; look for egress selection lines / errors
+kubectl -n kube-system logs cilium-5swfb -c cilium-agent --since=10m | \
+  egrep -i 'egress|gateway|egress ip|policy'
+
+# Full agent status
+kubectl -n kube-system exec -ti cilium-5swfb -- cilium-dbg status --verbose
+
+# NAT / SNAT stats (can reveal oddities)
+kubectl -n kube-system exec -ti ds/cilium -- cilium-dbg shell -- db/show nat-stats
