@@ -1,7 +1,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumEgressGatewayPolicy
 metadata:
-  name: egress-greg-vlan5
+  name: egress-v5-greg
 spec:
   selectors:
     - podSelector:

@@ -1,7 +1,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumEgressGatewayPolicy
 metadata:
-  name: egress-dmz-vlan4
+  name: egress-v4-dmz
 spec:
   selectors:
     - podSelector:
