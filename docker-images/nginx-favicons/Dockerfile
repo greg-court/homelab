@@ -4,7 +4,7 @@ FROM nginx:alpine
 # Remove the default site if you want a clean config
 RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Your config + static assets
+# Config + static assets
 COPY conf/default.conf /etc/nginx/conf.d/default.conf
 COPY html/ /usr/share/nginx/html/
 
