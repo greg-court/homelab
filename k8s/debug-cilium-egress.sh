@@ -1,3 +1,5 @@
+k get pods -A -o wide
+
 # paste your node IPs here
 NODES=("192.168.2.231" "192.168.2.232" "192.168.2.233")
 
