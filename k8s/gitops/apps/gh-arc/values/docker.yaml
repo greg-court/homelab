@@ -1,5 +1,4 @@
 runnerScaleSetName: 'arc-docker'
-labels: ['docker']
 
 containerMode:
   type: 'kubernetes'
