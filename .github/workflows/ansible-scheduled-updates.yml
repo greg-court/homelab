@@ -12,7 +12,7 @@ permissions:
 jobs:
   apply-updates:
     name: Apply Daily Updates
-    runs-on: [self-hosted, ansible]
+    runs-on: [arc-ansible]
     defaults:
       run:
         working-directory: ./ansible
