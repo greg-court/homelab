@@ -11,6 +11,8 @@ template:
       - name: runner
         image: docker.io/gr10/gh-docker-runner:2.0.0
         env:
+          - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+            value: 'false'
           - name: ACTIONS_RUNNER_DEBUG
             value: 'true'
           - name: ACTIONS_STEP_DEBUG
