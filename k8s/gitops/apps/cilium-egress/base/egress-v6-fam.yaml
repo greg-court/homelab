@@ -1,7 +1,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumEgressGatewayPolicy
 metadata:
-  name: egress-fam-vlan6
+  name: egress-v6-fam
 spec:
   selectors:
     - podSelector:
