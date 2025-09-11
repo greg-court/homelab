@@ -1,10 +1,5 @@
 runnerScaleSetName: 'arc-docker'
 
-containerMode:
-  type: kubernetes
-  # ARC-recommended: ephemeral job workspace, no PVC
-  kubernetesModeWorkVolumeEmptyDir: {}
-
 template:
   spec:
     containers:
