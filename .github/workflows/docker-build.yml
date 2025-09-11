@@ -140,7 +140,7 @@ jobs:
           CACHE_REF: gr10/${{ matrix.image }}:buildcache
           # Build only ARM64 now (Orange Pi 5 Plus). For multi-arch later,
           # change this to: linux/amd64,linux/arm64
-          PLATFORMS: linux/arm64, linux/amd64
+          PLATFORMS: linux/arm64,linux/amd64
         shell: bash
         run: |
           set -euo pipefail
