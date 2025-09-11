@@ -5,6 +5,7 @@ template:
     containers:
       - name: runner
         image: docker.io/gr10/gh-docker-runner:2.0.0
+        command: ['/home/runner/run.sh'] # explicit, per docs
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
             value: 'false' # temporary to find root cause of issue
