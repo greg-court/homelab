@@ -43,3 +43,4 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 # IMPORTANT: leave the base image's entrypoint intact (ARC will configure the runner)
 USER runner
+#
