@@ -11,40 +11,56 @@ ssh-copy-id -o StrictHostKeyChecking=no root@pve
 apt install tree
 ```
 
-## Configure apt
+## Configure apt & update
 
 ```bash
 #!/bin/bash
-set -e
+set -euo pipefail
 
-echo ">>> Disabling Proxmox enterprise repo"
-sed -i.bak 's/^deb https:/#deb https:/' /etc/apt/sources.list.d/pve-enterprise.list 2>/dev/null || true
+echo ">>> Detecting suite"
+SUITE="$(. /etc/os-release; echo "${VERSION_CODENAME:-trixie}")"
 
-echo ">>> Disabling Ceph enterprise repo (if exists)"
-sed -i.bak 's|^deb https://enterprise.proxmox.com/debian/ceph.*|# &|' /etc/apt/sources.list.d/*ceph*.list 2>/dev/null || true
+echo ">>> Disabling Proxmox enterprise repo (deb822)"
+if [ -f /etc/apt/sources.list.d/pve-enterprise.sources ]; then
+  mv -v /etc/apt/sources.list.d/pve-enterprise.sources \
+        /etc/apt/sources.list.d/pve-enterprise.sources.disabled || true
+fi
 
-echo ">>> Adding Proxmox no-subscription repo"
-echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
-  > /etc/apt/sources.list.d/pve-install-repo.list
+echo ">>> Disabling Ceph enterprise repo if present (simple way)"
+if [ -f /etc/apt/sources.list.d/ceph.sources ]; then
+  mv -v /etc/apt/sources.list.d/ceph.sources \
+        /etc/apt/sources.list.d/ceph.sources.disabled || true
+fi
 
-echo ">>> Adding Debian main repos"
-cat <<EOF > /etc/apt/sources.list.d/debian.list
-deb http://deb.debian.org/debian bookworm main contrib
-deb http://deb.debian.org/debian bookworm-updates main contrib
-deb http://security.debian.org/debian-security bookworm-security main contrib
+echo ">>> Removing old legacy .list files to avoid duplicates"
+rm -f /etc/apt/sources.list.d/pve-enterprise.list \
+      /etc/apt/sources.list.d/pve-no-subscription.list \
+      /etc/apt/sources.list.d/pve-install-repo.list || true
+
+echo ">>> Writing Proxmox no-subscription repo (deb822)"
+cat >/etc/apt/sources.list.d/proxmox.sources <<EOF
+Types: deb
+URIs: http://download.proxmox.com/debian/pve
+Suites: ${SUITE}
+Components: pve-no-subscription
+Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
 EOF
 
-echo ">>> Downloading Proxmox GPG key"
-wget -q https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \
-  -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+echo ">>> Ensuring Proxmox keyring exists"
+if [ ! -s /usr/share/keyrings/proxmox-archive-keyring.gpg ]; then
+  wget -q https://enterprise.proxmox.com/debian/proxmox-archive-keyring-${SUITE}.gpg \
+    -O /usr/share/keyrings/proxmox-archive-keyring.gpg || \
+  wget -q https://enterprise.proxmox.com/debian/proxmox-archive-keyring-trixie.gpg \
+    -O /usr/share/keyrings/proxmox-archive-keyring.gpg
+fi
 
-echo ">>> Updating and upgrading"
+echo ">>> Update & upgrade"
 apt update
 apt -y full-upgrade
-apt autoremove -y
+apt -y autoremove
 apt clean
 
-echo ">>> DONE"
+echo ">>> All set. Rebooting..."
 reboot
 ```
 
