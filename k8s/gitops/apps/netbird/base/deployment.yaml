@@ -28,8 +28,8 @@ spec:
                   key: setup-key
             - name: NB_HOSTNAME
               value: PLACEHOLDER-HOSTNAME # overridden per overlay
-            - name: NB_LOG_LEVEL
-              value: info
+            - name: NB_WIREGUARD_PORT
+              value: PLACEHOLDER-PORT # overridden per overlay
           # NetBird creates a WireGuard interface inside the container
           securityContext:
             allowPrivilegeEscalation: false
