@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: netbird-dmz
+  name: netbird # MUST match base name to patch
 spec:
   selector:
     matchLabels:
@@ -19,7 +19,7 @@ spec:
             - name: NB_SETUP_KEY
               valueFrom:
                 secretKeyRef:
-                  name: netbird-setup-dmz
+                  name: netbird-setup-dmz # ExternalSecret.spec.target.name; unaffected by nameSuffix
                   key: setup-key
             - name: NB_HOSTNAME
               value: netbird-dmz
