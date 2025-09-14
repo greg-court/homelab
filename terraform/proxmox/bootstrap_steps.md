@@ -1,3 +1,8 @@
+## On initial setup
+
+- Set proxmox installation to ZFS
+- Set installation volume to 29.8GB
+
 ## On local client
 
 ```bash
