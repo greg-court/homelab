@@ -19,19 +19,6 @@ locals {
         kubePrism = { enabled = true, port = 7445 }
         hostDNS   = { enabled = true, forwardKubeDNSToHost = false }
       }
-      # network = {
-      #   interfaces = [{
-      #     vip       = { ip = "192.168.2.240" }
-      #     interface = "enP4p65s0"
-      #     dhcp      = true
-      #     vlans = [
-      #       { vlanId = 3, dhcp = true },
-      #       { vlanId = 4, dhcp = true },
-      #       { vlanId = 5, dhcp = true },
-      #       { vlanId = 6, dhcp = true }
-      #     ]
-      #   }]
-      # }
       network = {
         interfaces = [{
           interface = "bond0"
