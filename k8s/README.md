@@ -24,17 +24,12 @@ talosctl reboot --mode powercycle --wait=false --nodes n1.klab.internal,n2.klab.
 
 ```
 export TARGET=v1.11.2
+export IMAGE="ghcr.io/siderolabs/installer:${TARGET}"
 
-for n in n1.klab.internal n2.klab.internal n3.klab.internal; do
-echo ">>> Cordon + drain $n"
+for n in n1 n2 n3; do
+  echo ">>> upgrading $n"
   kubectl drain "$n" --ignore-daemonsets --delete-emptydir-data --force --grace-period=15 --timeout=30s
-
-echo ">>> Upgrade Talos on $n"
-  talosctl upgrade -n "$n" \
- --image ghcr.io/siderolabs/installer:${TARGET} \
- --wait --timeout=30m
-
-echo ">>> Uncordon $n"
+  talosctl upgrade -n "$n.klab.internal" --image "$IMAGE" --preserve --wait --force --timeout=30m
   kubectl uncordon "$n"
 done
 

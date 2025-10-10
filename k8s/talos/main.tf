@@ -15,9 +15,9 @@ locals {
         disk = var.install_disk
         wipe = true
         extensions = [
-          { image = "ghcr.io/siderolabs/iscsi-tools:v1.11.2" },      # for longhorn
-          { image = "ghcr.io/siderolabs/util-linux-tools:v1.11.2" }, # for longhorn
-          # { image = "ghcr.io/siderolabs/nfs-utils:v1.11.2" }       # optional, if using RWX via Longhorn NFS
+          { image = "ghcr.io/siderolabs/iscsi-tools" },      # for longhorn
+          { image = "ghcr.io/siderolabs/util-linux-tools" }, # for longhorn
+          # { image = "ghcr.io/siderolabs/nfs-utils" }       # optional, if using RWX via Longhorn NFS
         ]
       }
       kernel = {
