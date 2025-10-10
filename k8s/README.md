@@ -5,3 +5,11 @@ talosctl reboot \
  --mode=powercycle \
  --wait=false \
  --timeout=1m
+
+# General K8s commands
+
+k get pods -A -o wide
+
+# Troubleshooting commands
+
+kubectl -n argocd logs argocd-application-controller-0 --since=1h --timestamps | grep -Ei 'level(=|":")(warn|error|fatal)|\b(error|warn|failed|timeout|panic)\b'

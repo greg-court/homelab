@@ -14,6 +14,19 @@ locals {
       install = {
         disk = var.install_disk
         wipe = true
+        extensions = [
+          { image = "ghcr.io/siderolabs/iscsi-tools" },      # for longhorn
+          { image = "ghcr.io/siderolabs/util-linux-tools" }, # for longhorn
+          { image = "ghcr.io/siderolabs/nfs-utils" }         # optional, if using RWX via Longhorn NFS
+        ]
+      }
+      kernel = {
+        modules = [
+          { name = "iscsi_tcp" },     # for longhorn
+          { name = "iscsi_generic" }, # for longhorn
+          { name = "configfs" },      # for longhorn
+          { name = "nbd" }            # for longhorn
+        ]
       }
       features = {
         kubePrism = { enabled = true, port = 7445 }
