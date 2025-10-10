@@ -41,3 +41,7 @@ done
 talosctl version --nodes n1.klab.internal,n2.klab.internal,n3.klab.internal
 talosctl health
 ```
+
+# ArgoCD commands
+
+argocd login argocd.apps.klab.internal --username admin --password <password>
