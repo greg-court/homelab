@@ -11,6 +11,7 @@ nc -vz n2.klab.internal 50000
 nc -vz n3.klab.internal 50000
 
 terraform apply --auto-approve
+# at some point here, enable LACP on the switches
 
 rm -f ~/.talos/config && rm -f ~/.kube/config
 talosctl config merge ./tmp/talosconfig
