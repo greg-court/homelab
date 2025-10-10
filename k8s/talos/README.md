@@ -1,6 +1,8 @@
 # Initialisation
 
 ```bash
+# note, this process must be initiated from the INFRA vlan due to asymmetric routing
+
 cd /Users/gregc/devSandbox/gh-gc/homelab/k8s/talos
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
