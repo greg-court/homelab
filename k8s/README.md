@@ -27,7 +27,7 @@ export TARGET=v1.11.2
 
 for n in n1.klab.internal n2.klab.internal n3.klab.internal; do
 echo ">>> Cordon + drain $n"
-  kubectl drain "$n" --ignore-daemonsets --delete-emptydir-data --force --grace-period=30 --timeout=10m
+  kubectl drain "$n" --ignore-daemonsets --delete-emptydir-data --force --grace-period=15 --timeout=30s
 
 echo ">>> Upgrade Talos on $n"
   talosctl upgrade -n "$n" \
