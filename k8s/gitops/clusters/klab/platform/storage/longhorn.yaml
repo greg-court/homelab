@@ -40,6 +40,10 @@ spec:
         metrics:
           serviceMonitor:
             enabled: true
+
+        preUpgradeChecker:
+          jobEnabled: false
+
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
