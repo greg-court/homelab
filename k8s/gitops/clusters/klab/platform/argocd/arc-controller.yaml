@@ -19,12 +19,6 @@ spec:
         controllerManager:
           metrics:
             addr: ":8080"
-        # (Optional) Listener/controller metrics if you want Prom scraping later
-  ignoreDifferences:
-    - group: apiextensions.k8s.io
-      kind: CustomResourceDefinition
-      jqPathExpressions:
-        - .spec.preserveUnknownFields
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
