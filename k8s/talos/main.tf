@@ -14,6 +14,7 @@ locals {
       install = {
         disk = var.install_disk
         wipe = true
+        image = "ghcr.io/siderolabs/installer:${var.talos_version}"
         extensions = [
           { image = "ghcr.io/siderolabs/iscsi-tools" },      # for longhorn
           { image = "ghcr.io/siderolabs/util-linux-tools" }, # for longhorn
@@ -136,6 +137,7 @@ resource "local_file" "talosconfig_local" {
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
+  talos_version    = var.talos_version
   cluster_endpoint = var.cluster_endpoint
   machine_secrets  = talos_machine_secrets.cluster.machine_secrets
   config_patches   = [local.base_patch, local.ephemeral_patch]
@@ -164,6 +166,7 @@ data "talos_machine_configuration" "cp_per_node" {
   machine_type     = "controlplane"
   cluster_endpoint = var.cluster_endpoint
   machine_secrets  = talos_machine_secrets.cluster.machine_secrets
+  talos_version    = var.talos_version
 
   config_patches = [
     local.base_patch,

@@ -18,3 +18,8 @@ variable "hosts" {
     "n3.klab.internal"
   ]
 }
+
+variable "talos_version" {
+  type    = string
+  default = "v1.11.2"
+}
