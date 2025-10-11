@@ -16,14 +16,6 @@ locals {
         wipe = true
         image = "ghcr.io/siderolabs/installer:${var.talos_version}"
       }
-      # System extensions (Talos v1.11+) must be defined at machine.systemExtensions (NOT under install)
-      systemExtensions = {
-        officialExtensions = [
-          "iscsi-tools",       # required by Longhorn (iscsiadm userspace)
-          "util-linux-tools",  # lsblk, mount helpers used by Longhorn + general ops
-          # "nfs-utils"        # uncomment if enabling Longhorn RWX via NFS provisioner
-        ]
-      }
       kernel = {
         modules = [
           { name = "iscsi_tcp" },     # for longhorn
