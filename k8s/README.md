@@ -20,21 +20,12 @@ kubectl -n argocd logs argocd-application-controller-0 --since=1h --timestamps |
 
 talosctl reboot --mode powercycle --wait=false --nodes n1.klab.internal,n2.klab.internal,n3.klab.internal
 
-## Update all nodes
+## Update nodes to new installer image
 
 ```
-export TARGET=v1.11.2
-export IMAGE="ghcr.io/siderolabs/installer:${TARGET}"
-
-for n in n1 n2 n3; do
-  echo ">>> upgrading $n"
-  kubectl drain "$n" --ignore-daemonsets --delete-emptydir-data --force --grace-period=15 --timeout=30s
-  talosctl upgrade -n "$n.klab.internal" --image "$IMAGE" --preserve --wait --force --timeout=30m
-  kubectl uncordon "$n"
-done
-
-talosctl version --nodes n1.klab.internal,n2.klab.internal,n3.klab.internal
-talosctl health
+talosctl -n n1.klab.internal upgrade \
+  --image factory.talos.dev/metal-installer/80617d0e416b08d3ee0f06f52fb21db36a823f9135fb3e1b735fa65dd1a87632:v1.11.2 \
+  --preserve=true --wait
 ```
 
 # ArgoCD commands
