@@ -13,17 +13,26 @@ spec:
   source:
     repoURL: https://github.com/rancher/local-path-provisioner
     targetRevision: v0.0.32
-    path: deploy/helm/local-path-provisioner
-    helm:
-      values: |
-        storageClass:
-          name: local-path
-          defaultClass: false
-          reclaimPolicy: Delete
-          volumeBindingMode: WaitForFirstConsumer
-
-        # Talos-friendly writable path
-        nodePath: /var/local-path-provisioner
+    path: deploy
+    kustomize:
+      patchesJson6902:
+        - target:
+            version: v1
+            kind: ConfigMap
+            name: local-path-config
+            namespace: local-path-storage
+          patch: |-
+            - op: replace
+              path: /data/config.json
+              value: |
+                {
+                  "nodePathMap": [
+                    {
+                      "node": "DEFAULT_PATH_FOR_NON_LISTED_NODES",
+                      "paths": ["/var/local-path-provisioner"]
+                    }
+                  ]
+                }
   syncPolicy:
     automated:
       prune: true
