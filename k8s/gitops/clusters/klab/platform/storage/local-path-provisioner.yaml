@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-provisioner
+  namespace: argocd
+  annotations:
+    # Ensure the storage class exists before apps that depend on it (KPS: -5, Loki: -4)
+    argocd.argoproj.io/sync-wave: '-10'
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  source:
+    repoURL: https://github.com/rancher/local-path-provisioner
+    # Use the Helm chart from the repo; if the default branch differs, adjust targetRevision.
+    targetRevision: main
+    path: deploy/helm/local-path-provisioner
+    helm:
+      values: |
+        # Install a local, non-default StorageClass named "local-path"
+        storageClass:
+          name: local-path
+          defaultClass: false
+          reclaimPolicy: Delete
+          volumeBindingMode: WaitForFirstConsumer
+
+        # On Talos, use a writable persistent path under /var
+        nodePath: /var/local-path-provisioner
+
+        # Keep provisioner name default; PVCs reference only the StorageClass name above
+        # provisionerName: rancher.io/local-path
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
