@@ -7,7 +7,6 @@ metadata:
 spec:
   project: platform
   destination:
-    server: https://kubernetes.default.svc
     namespace: kube-system
   source:
     repoURL: https://kubernetes-sigs.github.io/metrics-server
@@ -18,5 +17,3 @@ spec:
         args:
           - --kubelet-insecure-tls
           - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }

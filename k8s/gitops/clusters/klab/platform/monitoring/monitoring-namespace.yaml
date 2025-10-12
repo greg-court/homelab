@@ -14,5 +14,3 @@ spec:
     helm:
       values: |
         name: monitoring
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }

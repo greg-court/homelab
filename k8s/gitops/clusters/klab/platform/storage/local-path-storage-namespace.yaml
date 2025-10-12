@@ -8,7 +8,6 @@ metadata:
 spec:
   project: platform
   destination:
-    server: https://kubernetes.default.svc
     namespace: local-path-storage
   source:
     repoURL: https://github.com/greg-court/homelab.git
@@ -21,10 +20,3 @@ spec:
           pod-security.kubernetes.io/enforce: privileged
           pod-security.kubernetes.io/audit: baseline
           pod-security.kubernetes.io/warn: baseline
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true

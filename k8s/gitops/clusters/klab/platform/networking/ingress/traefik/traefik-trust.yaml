@@ -7,7 +7,6 @@ metadata:
 spec:
   project: platform
   destination:
-    server: https://kubernetes.default.svc
     namespace: traefik-trust
   source:
     repoURL: https://traefik.github.io/charts
@@ -63,6 +62,5 @@ spec:
           - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
           - "--providers.kubernetescrd.ingressclass=trust"
           - "--providers.kubernetesingress.ingressclass=trust"
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }
+
     syncOptions: ['CreateNamespace=true']

@@ -12,5 +12,3 @@ spec:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
     path: k8s/gitops/apps/expose-hubble/overlays/klab
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }

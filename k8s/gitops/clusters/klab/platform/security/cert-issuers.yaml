@@ -8,11 +8,8 @@ metadata:
 spec:
   project: platform
   destination:
-    server: https://kubernetes.default.svc
     namespace: cert-manager
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
     path: k8s/gitops/charts/cert-issuers
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }

@@ -8,7 +8,6 @@ metadata:
 spec:
   project: platform
   destination:
-    server: https://kubernetes.default.svc
     namespace: local-path-storage
   source:
     repoURL: https://github.com/rancher/local-path-provisioner
@@ -33,10 +32,3 @@ spec:
                     }
                   ]
                 }
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true

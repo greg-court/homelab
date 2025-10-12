@@ -8,7 +8,6 @@ metadata:
 spec:
   project: apps
   destination:
-    server: https://kubernetes.default.svc
     namespace: gh-runners
   sources:
     # 1) Make sure arc-system namespace is labeled first
@@ -60,7 +59,3 @@ spec:
     - repoURL: https://github.com/greg-court/homelab.git
       targetRevision: main
       ref: values
-
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }
-    syncOptions: ['ServerSideApply=true']
