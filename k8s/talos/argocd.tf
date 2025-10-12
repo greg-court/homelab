@@ -93,7 +93,6 @@ resource "helm_release" "argocd_root_apps" {
           repoURL        = var.bootstrap_repo_url
           targetRevision = var.bootstrap_repo_revision
           path           = var.bootstrap_repo_path
-          directory      = { recurse = true }
         }
         destination = {
           server    = "https://kubernetes.default.svc"
