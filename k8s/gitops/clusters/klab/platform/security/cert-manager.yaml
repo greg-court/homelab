@@ -8,6 +8,7 @@ metadata:
 spec:
   project: platform
   destination:
+    server: https://kubernetes.default.svc
     namespace: cert-manager
   source:
     repoURL: https://charts.jetstack.io
@@ -22,3 +23,11 @@ spec:
           enabled: true
           servicemonitor:
             enabled: true
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true

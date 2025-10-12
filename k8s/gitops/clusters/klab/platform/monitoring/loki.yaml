@@ -16,3 +16,11 @@ spec:
     - repoURL: https://github.com/greg-court/homelab.git
       targetRevision: main
       ref: values
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true

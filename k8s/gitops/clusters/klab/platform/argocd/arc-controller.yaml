@@ -8,6 +8,7 @@ metadata:
 spec:
   project: platform
   destination:
+    server: https://kubernetes.default.svc
     namespace: arc-system
   source:
     repoURL: ghcr.io/actions/actions-runner-controller-charts
@@ -18,3 +19,11 @@ spec:
         controllerManager:
           metrics:
             addr: ":8080"
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
