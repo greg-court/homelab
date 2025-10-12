@@ -13,8 +13,6 @@ spec:
     namespace: kube-system
   source:
     repoURL: https://github.com/rancher/local-path-provisioner
-    # Use the Helm chart from the repo; if the default branch differs, adjust targetRevision.
-    targetRevision: main
     path: deploy/helm/local-path-provisioner
     helm:
       values: |
