@@ -6,8 +6,7 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '-15' }
 spec:
   project: platform
-  destination:
-    { server: https://kubernetes.default.svc, namespace: kube-system }
+  destination: { namespace: kube-system }
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main

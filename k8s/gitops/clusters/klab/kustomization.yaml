@@ -26,3 +26,5 @@ patches:
           - CreateNamespace=true
           - ServerSideApply=true
           - SkipDryRunOnMissingResource=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true

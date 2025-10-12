@@ -6,8 +6,7 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '-19' } # after cert-manager (-30), before dmz (-9)
 spec:
   project: platform
-  destination:
-    { server: https://kubernetes.default.svc, namespace: cert-manager }
+  destination: { namespace: cert-manager }
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main

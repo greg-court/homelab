@@ -6,7 +6,7 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '-11' }
 spec:
   project: platform
-  destination: { server: https://kubernetes.default.svc, namespace: traefik }
+  destination: { namespace: traefik }
   source:
     repoURL: https://traefik.github.io/charts
     chart: traefik-crds
