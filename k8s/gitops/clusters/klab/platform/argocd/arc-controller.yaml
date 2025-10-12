@@ -18,6 +18,3 @@ spec:
         controllerManager:
           metrics:
             addr: ":8080"
-
-      - PruneLast=true
-      - ApplyOutOfSyncOnly=true
