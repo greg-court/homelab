@@ -98,11 +98,11 @@ locals {
       grow         = false
     }
   })
-  tmp_dir = "${path.module}/tmp"
+  configs_dir = "${path.module}/cluster-configs"
 }
 
-resource "null_resource" "mkdir_tmp" {
-  provisioner "local-exec" { command = "mkdir -p ${local.tmp_dir}" }
+resource "null_resource" "mkdir_configs" {
+  provisioner "local-exec" { command = "mkdir -p ${local.configs_dir}" }
 }
 
 resource "talos_machine_secrets" "cluster" {}
@@ -124,7 +124,7 @@ resource "azurerm_storage_blob" "talosconfig" {
 }
 
 resource "local_file" "talosconfig_local" {
-  filename = "${local.tmp_dir}/talosconfig"
+  filename = "${local.configs_dir}/talosconfig"
   content  = data.talos_client_configuration.client.talos_config
 }
 
@@ -140,14 +140,14 @@ data "talos_machine_configuration" "controlplane" {
 
 # not applied directly, just for reference
 resource "local_file" "controlplane_baseline" {
-  depends_on = [null_resource.mkdir_tmp]
-  filename   = "${local.tmp_dir}/controlplane-baseline.yaml"
+  depends_on = [null_resource.mkdir_configs]
+  filename   = "${local.configs_dir}/controlplane-baseline.yaml"
   content    = data.talos_machine_configuration.controlplane.machine_configuration
 }
 
 resource "local_file" "controlplane_per_node" {
   for_each = toset(var.hosts)
-  filename = "${local.tmp_dir}/controlplane-${local.shortnames[each.value]}.yaml"
+  filename = "${local.configs_dir}/controlplane-${local.shortnames[each.value]}.yaml"
   content  = data.talos_machine_configuration.cp_per_node[each.value].machine_configuration
 }
 
@@ -204,8 +204,8 @@ resource "talos_cluster_kubeconfig" "kc" {
 
 # Write kubeconfig locally (only when bootstrap=true)
 resource "local_file" "kubeconfig_local" {
-  depends_on = [null_resource.mkdir_tmp, talos_cluster_kubeconfig.kc]
-  filename   = "${local.tmp_dir}/kubeconfig"
+  depends_on = [null_resource.mkdir_configs, talos_cluster_kubeconfig.kc]
+  filename   = "${local.configs_dir}/kubeconfig"
   content    = talos_cluster_kubeconfig.kc.kubeconfig_raw
 }
 

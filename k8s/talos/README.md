@@ -14,13 +14,13 @@ terraform apply --auto-approve
 # at some point here, enable LACP on the switches
 
 rm -f ~/.talos/config && rm -f ~/.kube/config
-talosctl config merge ./tmp/talosconfig
+talosctl config merge ./cluster-configs/talosconfig
 
 talosctl config use-context klab
 talosctl config node api.klab.internal
 talosctl config endpoints api.klab.internal
 
-KUBECONFIG=~/.kube/config:tmp/kubeconfig kubectl config view --flatten --merge > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
+KUBECONFIG=~/.kube/config:cluster-configs/kubeconfig kubectl config view --flatten --merge > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
 
 talosctl health
 
