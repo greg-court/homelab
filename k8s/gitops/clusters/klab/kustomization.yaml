@@ -17,9 +17,8 @@ patches:
         path: /spec/destination/server
         value: https://kubernetes.default.svc
       - op: add
-        path: /spec/syncPolicy
-        value:
-          automated: { prune: true, selfHeal: true }
+        path: /spec/syncPolicy/automated
+        value: { prune: true, selfHeal: true }
       - op: add
         path: /spec/syncPolicy/syncOptions
         value:
