@@ -14,16 +14,20 @@ spec:
     targetRevision: v0.0.32
     path: deploy
     kustomize:
-      patchesJson6902:
+      patches:
         - target:
             version: v1
             kind: ConfigMap
             name: local-path-config
             namespace: local-path-storage
-          patch: |-
-            - op: replace
-              path: /data/config.json
-              value: |
+          patch: |
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: local-path-config
+              namespace: local-path-storage
+            data:
+              config.json: |
                 {
                   "nodePathMap": [
                     {
