@@ -6,7 +6,7 @@ metadata:
   annotations: { argocd.argoproj.io/sync-wave: '-3' }
 spec:
   project: platform
-  destination: { namespace: monitoring }
+  destination: { server: https://kubernetes.default.svc, namespace: monitoring }
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
