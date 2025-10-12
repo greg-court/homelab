@@ -23,7 +23,7 @@ provider "azurerm" {
   subscription_id = "f01a5d70-cf46-4291-80de-336ee2a894d4"
 }
 
-variable "kubeconfig_path" { default = "./cluser-configs/kubeconfig" }
+variable "kubeconfig_path" { default = "./cluster-configs/kubeconfig" }
 
 provider "kubernetes" { config_path = var.kubeconfig_path }
 provider "helm" { kubernetes = { config_path = var.kubeconfig_path } }
