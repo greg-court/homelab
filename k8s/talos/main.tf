@@ -12,8 +12,8 @@ locals {
         "egress-node" = "true"
       }
       install = {
-        disk = var.install_disk
-        wipe = true
+        disk  = var.install_disk
+        wipe  = true
         image = "ghcr.io/siderolabs/installer:${var.talos_version}"
       }
       kernel = {

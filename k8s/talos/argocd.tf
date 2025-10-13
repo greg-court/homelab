@@ -61,7 +61,14 @@ locals {
         }
       }
     }
-    configs = { clusters = { inCluster = { enabled = true } } }
+    configs = {
+      cm = {
+        "accounts.admin" = "apiKey, login" # for mcp server
+      }
+      clusters = {
+        inCluster = { enabled = true }
+      }
+    }
   })
 }
 
