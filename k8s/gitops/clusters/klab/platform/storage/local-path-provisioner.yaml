@@ -18,6 +18,15 @@ spec:
       patches:
         # 2a) point to /var (Talos-friendly) instead of /opt
         - target:
+            kind: Namespace
+            name: local-path-storage
+          patch: |
+            $patch: delete
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: local-path-storage
+        - target:
             version: v1
             kind: ConfigMap
             name: local-path-config
@@ -54,7 +63,6 @@ spec:
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions:
-      - CreateNamespace=true
       - ServerSideApply=true
       - SkipDryRunOnMissingResource=true
       - PruneLast=true
