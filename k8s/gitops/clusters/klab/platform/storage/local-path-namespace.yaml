@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-namespace
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-29' } # before the provisioner
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: local-path-storage
+  source:
+    repoURL: https://github.com/greg-court/homelab.git
+    targetRevision: main
+    path: k8s/gitops/charts/namespace-privileged
+    helm:
+      values: |
+        name: local-path-storage
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - PruneLast=true

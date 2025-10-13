@@ -4,7 +4,7 @@ metadata:
   name: local-path-provisioner
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '-10'
+    argocd.argoproj.io/sync-wave: '-10' # after the namespace app
 spec:
   project: platform
   destination:
@@ -16,6 +16,7 @@ spec:
     path: deploy
     kustomize:
       patches:
+        # 2a) point to /var (Talos-friendly) instead of /opt
         - target:
             version: v1
             kind: ConfigMap
@@ -33,16 +34,24 @@ spec:
                   "nodePathMap": [
                     {
                       "node": "DEFAULT_PATH_FOR_NON_LISTED_NODES",
-                      "paths": ["/opt/local-path-provisioner"]
+                      "paths": ["/var/local-path-provisioner"]
                     }
                   ]
                 }
+        # 2b) make sure local-path is NOT the default StorageClass
+        - target:
+            group: storage.k8s.io
+            version: v1
+            kind: StorageClass
+            name: local-path
+          patch: |
+            apiVersion: storage.k8s.io/v1
+            kind: StorageClass
+            metadata:
+              name: local-path
+              annotations:
+                storageclass.kubernetes.io/is-default-class: "false"
   syncPolicy:
-    managedNamespaceMetadata:
-      labels:
-        pod-security.kubernetes.io/enforce: 'privileged'
-        pod-security.kubernetes.io/audit: 'baseline'
-        pod-security.kubernetes.io/warn: 'baseline'
     automated: { prune: true, selfHeal: true }
     syncOptions:
       - CreateNamespace=true
