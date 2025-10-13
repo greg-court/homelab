@@ -18,6 +18,19 @@ spec:
       patches:
         - target:
             version: v1
+            kind: Namespace
+            name: local-path-storage
+          patch: |
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: local-path-storage
+              labels:
+                pod-security.kubernetes.io/enforce: 'privileged'
+                pod-security.kubernetes.io/audit: 'baseline'
+                pod-security.kubernetes.io/warn: 'baseline'
+        - target:
+            version: v1
             kind: ConfigMap
             name: local-path-config
             namespace: local-path-storage
@@ -33,7 +46,7 @@ spec:
                   "nodePathMap": [
                     {
                       "node": "DEFAULT_PATH_FOR_NON_LISTED_NODES",
-                      "paths": ["/opt/local-path-provisioner"]
+                      "paths": ["/var/mnt/local-path-provisioner"]
                     }
                   ]
                 }
