@@ -7,6 +7,6 @@ resource "azurerm_key_vault_secret" "kv_secrets" {
   key_vault_id = azurerm_key_vault.homelab.id
 
   lifecycle {
-    ignore_changes = [value]
+    ignore_changes = [value, tags]
   }
 }

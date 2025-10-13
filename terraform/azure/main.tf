@@ -40,3 +40,8 @@ resource "azurerm_storage_container" "k8s" {
   name               = "k8s"
   storage_account_id = azurerm_storage_account.homelab.id
 }
+
+resource "azurerm_storage_container" "config-backups" {
+  name               = "config-backups"
+  storage_account_id = azurerm_storage_account.homelab.id
+}
