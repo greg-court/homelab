@@ -3,7 +3,7 @@
 ```bash
 # note, this process must be initiated from the INFRA vlan due to asymmetric routing
 
-cd /Users/gregc/devSandbox/gh-gc/homelab/k8s/talos
+cd /Users/gregc/devSandbox/github/homelab/k8s/talos
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
 nc -vz n1.klab.internal 50000
@@ -38,7 +38,7 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 # Nuking / resetting
 
 ```bash
-cd /Users/gregc/devSandbox/gh-gc/homelab/k8s/talos
+cd /Users/gregc/devSandbox/github/homelab/k8s/talos
 terraform state rm 'helm_release.cilium'
 terraform state rm 'helm_release.argocd'
 terraform state rm 'helm_release.argocd_root_apps'
