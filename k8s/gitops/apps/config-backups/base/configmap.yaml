@@ -31,13 +31,39 @@ data:
     # --- Discord helpers -------------------------------------------------------
     MSG=""  # we accumulate lines and send once on exit
     add() { MSG="${MSG}$*\n"; printf '%s\n' "$*"; }
+
     send_discord() {
       [ -n "${DISCORD_WEBHOOK_URL}" ] || return 0
-      # Use form post so we don't need to JSON-escape newlines/quotes
-      # Trim to 1900 chars to avoid Discord 2000-char limit
+
+      # Trim to ~1900 chars (Discord 2000 max)
       SHORT_MSG="$(printf '%s' "$MSG" | awk 'BEGIN{max=1900} {s=s $0 "\n"} END{if (length(s)>max) print substr(s,1,max) "..."; else print s}')"
-      ${CURL} -X POST -F "content=${SHORT_MSG}" "${DISCORD_WEBHOOK_URL}" >/dev/null 2>&1 || true
+
+      # Escape for JSON + turn real newlines into \n
+      JSON_BODY="$(printf '%s' "$SHORT_MSG" \
+        | sed 's/\\/\\\\/g; s/"/\\"/g; s/\r//g' \
+        | awk '{ printf "%s\\n", $0 }' )"
+      JSON_BODY="${JSON_BODY%\\n}" # drop trailing \n
+
+      # Color by status (set in on_exit)
+      [ "${STATUS:-SUCCESS}" = "SUCCESS" ] && COLOR=3066993 || COLOR=15158332
+      TS_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      # Send as an embed with a code block description
+      PAYLOAD=$(cat <<EOF
+    {"username":"Config Backups",
+    "allowed_mentions":{"parse":[]},
+    "embeds":[
+      {"title":"Config Backups — ${STATUS:-UNKNOWN}",
+        "color":$COLOR,
+        "timestamp":"$TS_ISO",
+        "description":"\`\`\`\n$JSON_BODY\n\`\`\`"}
+    ]
     }
+    EOF
+    )
+      ${CURL} -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL" >/dev/null 2>&1 || true
+    }
+
     on_exit() {
       rc=$?
       STATUS="FAILURE"
@@ -46,6 +72,7 @@ data:
       send_discord
       exit $rc
     }
+
     trap on_exit EXIT
 
     add "Starting config-backups @ ${DATE}"
