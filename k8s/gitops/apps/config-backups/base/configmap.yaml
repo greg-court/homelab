@@ -12,8 +12,7 @@ data:
     : "${PFSENSE_USER?Missing PFSENSE_USER}"
     : "${PFSENSE_PASS?Missing PFSENSE_PASS}"
     : "${TRUENAS_API_KEY?Missing TRUENAS_API_KEY}"
-    # Optional: Discord webhook for notifications
-    : "${DISCORD_WEBHOOK_URL:=}"
+    : "${DISCORD_WEBHOOK_URL:=}"   # optional
 
     PFSENSE_HOST="${PFSENSE_HOST:-192.168.2.1}" # swap to pfsense.internal when DNS is ready
     TRUENAS_HOST="${TRUENAS_HOST:-truenas.internal}"
@@ -28,12 +27,16 @@ data:
     CURL="curl -sS -L"
     [ "${CURL_INSECURE:-false}" = "true" ] && CURL="$CURL -k"
 
-    # --- Discord helpers -------------------------------------------------------
-    MSG=""  # we accumulate lines and send once on exit
+    # ---------- tiny log helpers ----------
+    MSG=""  # accumulate lines -> Discord once on exit
     add() { MSG="${MSG}$*\n"; printf '%s\n' "$*"; }
+    fail() { add "ERROR!!! $*"; exit 1; }
 
-    # Escape a string for JSON (quotes, backslashes)
-    json_escape() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\r//g'; }
+    # Escape for JSON and make *real* newlines into \n (not \\n)
+    json_escape_ml() {
+      # 1) escape backslashes + quotes, 2) turn newlines into \n
+      sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\r//g' | awk '{printf "%s\\n",$0}' | sed '$ s/\\n$//'
+    }
 
     send_discord() {
       [ -n "${DISCORD_WEBHOOK_URL}" ] || return 0
@@ -42,19 +45,21 @@ data:
       TS_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       [ "${STATUS:-SUCCESS}" = "SUCCESS" ] && COLOR=3066993 || COLOR=15158332
 
-      BACKUPS="pfSense: ${PFS_BN}\nTrueNAS: ${TRU_BN}\nUniFi: ${UNI_BN:-none}"
-      UPLOADS="pfsense/${PFS_BN}\ntruenas/${TRU_BN}\n${UNI_BN:+unifi/${UNI_BN}}"
-      RETENTION="pfsense: ${RET_pfsense:-n/a}\ntruenas: ${RET_truenas:-n/a}\nunifi: ${RET_unifi:-n/a}"
+      # Build multiline field values with *real newlines*
+      BACKUPS="$(printf 'pfSense: %s\nTrueNAS: %s\nUniFi: %s' "${PFS_BN:-none}" "${TRU_BN:-none}" "${UNI_BN:-none}")"
+      UPLOADS="$(printf 'pfsense/%s\ntruenas/%s\n%s' "${PFS_BN:-none}" "${TRU_BN:-none}" "${UNI_BN:+unifi/${UNI_BN}}")"
+      [ -z "${UNI_BN:-}" ] && UPLOADS="$(printf 'pfsense/%s\ntruenas/%s' "${PFS_BN:-none}" "${TRU_BN:-none}")"
+      RETENTION="$(printf 'pfsense: %s\ntruenas: %s\nunifi: %s' "${RET_pfsense:-n/a}" "${RET_truenas:-n/a}" "${RET_unifi:-n/a}")"
 
       PAYLOAD="$(cat <<EOF
     {"username":"Config Backups","allowed_mentions":{"parse":[]},"embeds":[
-      {"title":"$(json_escape "$TITLE")",
+      {"title":"$(printf '%s' "$TITLE" | json_escape_ml)",
        "color":$COLOR,
        "timestamp":"$TS_ISO",
        "fields":[
-         {"name":"Backups","value":"$(json_escape "$BACKUPS")","inline":false},
-         {"name":"Uploads","value":"$(json_escape "$UPLOADS")","inline":false},
-         {"name":"Retention","value":"$(json_escape "$RETENTION")","inline":false}
+         {"name":"Backups","value":"$(printf '%s' "$BACKUPS" | json_escape_ml)","inline":false},
+         {"name":"Uploads","value":"$(printf '%s' "$UPLOADS" | json_escape_ml)","inline":false},
+         {"name":"Retention","value":"$(printf '%s' "$RETENTION" | json_escape_ml)","inline":false}
        ]}
     ]}
     EOF
@@ -80,50 +85,55 @@ data:
     rm -f "$COOK" "$CSRF"
     ${CURL} --cookie-jar "$COOK" "https://${PFSENSE_HOST}/diag_backup.php" \
       | grep -E "name=['\"]__csrf_magic['\"]" \
-      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
+      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF" \
+      || fail "pfSense: could not fetch CSRF token"
 
     ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       --data-urlencode "login=Login" \
       --data-urlencode "usernamefld=${PFSENSE_USER}" \
       --data-urlencode "passwordfld=${PFSENSE_PASS}" \
       --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
-      "https://${PFSENSE_HOST}/" > /dev/null
+      "https://${PFSENSE_HOST}/" > /dev/null \
+      || fail "pfSense: login failed"
 
     ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       "https://${PFSENSE_HOST}/diag_backup.php" \
       | grep -E "name=['\"]__csrf_magic['\"]" \
-      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
+      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF" \
+      || fail "pfSense: CSRF refresh failed"
 
     PFS_OUT="${WORK}/pfsense-${DATE}.xml"
     ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       --data-urlencode "download=download" \
       --data-urlencode "donotbackuprrd=yes" \
       --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
-      "https://${PFSENSE_HOST}/diag_backup.php" > "$PFS_OUT"
-    add "pfSense: $(basename "$PFS_OUT")"
+      "https://${PFSENSE_HOST}/diag_backup.php" > "$PFS_OUT" \
+      || fail "pfSense: config download failed"
     PFS_BN="$(basename "$PFS_OUT")"
+    add "pfSense: ${PFS_BN}"
 
     # --- TrueNAS config.db -----------------------------------------------------
     TRU_OUT="${WORK}/truenas-${DATE}.db"
     ${CURL} -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
       -H "Accept: application/octet-stream" \
       -X POST "https://${TRUENAS_HOST}/api/v2.0/config/save" \
-      --output "$TRU_OUT"
-    add "TrueNAS: $(basename "$TRU_OUT")"
+      --output "$TRU_OUT" \
+      || fail "TrueNAS: config save/download failed"
     TRU_BN="$(basename "$TRU_OUT")"
+    add "TrueNAS: ${TRU_BN}"
 
     # --- UniFi latest .unf from PVC -------------------------------------------
     UDIR="/unifi-data"
     UNF="$(find "$UDIR" -type f -name '*.unf' 2>/dev/null | xargs -r ls -t | head -n1 || true)"
     if [ -n "${UNF}" ]; then
       UNI_OUT="${WORK}/unifi-${DATE}.unf"
-      cp "$UNF" "$UNI_OUT"
-      add "UniFi: $(basename "$UNI_OUT")"
+      cp "$UNF" "$UNI_OUT" || fail "UniFi: copy .unf failed"
       UNI_BN="$(basename "$UNI_OUT")"
+      add "UniFi: ${UNI_BN}"
     else
-      add "UniFi: (no .unf found)"
       UNI_OUT=""
       UNI_BN=""
+      add "UniFi: (no .unf found)"
     fi
 
     # --- Uploads to Azure Blob (SAS) ------------------------------------------
@@ -135,7 +145,8 @@ data:
       [ -n "$FILE" ] && [ -f "$FILE" ] || return 0
       NAME="$(basename "$FILE")"
       URL="${BASE}/${FOLDER}/${NAME}?${QS}"
-      ${CURL} --fail-with-body -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL" >/dev/null
+      ${CURL} --fail-with-body -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL" >/dev/null \
+        || fail "Azure: upload failed for ${FOLDER}/${NAME}"
       add "Uploaded ${FOLDER}/${NAME}"
     }
 
@@ -153,15 +164,13 @@ data:
       OUT=""
       while :; do
         URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000${MARKER:+&marker=$MARKER}"
-        RESP="$(${CURL} --fail-with-body "$URL")" || { echo "$RESP" >&2; return 1; }
-
+        RESP="$(${CURL} --fail-with-body "$URL")" || fail "Azure: list failed for ${FOLDER}/"
         NAMES="$(printf '%s' "$RESP" \
           | tr -d '\n' \
           | sed 's#<Name>#\n<Name>#g' \
           | sed -n 's:.*<Name>\([^<]*\)</Name>.*:\1:p' \
           | grep "^${FOLDER}/" || true)"
         [ -n "$NAMES" ] && OUT="${OUT}${OUT:+\n}${NAMES}"
-
         MARKER="$(printf '%s' "$RESP" \
           | tr -d '\n' \
           | sed -n 's:.*<NextMarker>\([^<]*\)</NextMarker>.*:\1:p')"
@@ -177,8 +186,8 @@ data:
       COUNT="$(printf '%s\n' "$KEYS" | sed '/^$/d' | wc -l | awk '{print $1}')"
 
       if [ "$COUNT" -le "$KEEP" ]; then
-        add "Retention: ${FOLDER}/ nothing to delete (<= ${KEEP})"
         eval "RET_${FOLDER}=\"kept ${COUNT} of ${COUNT}\""
+        add "Retention: ${FOLDER}/ nothing to delete (<= ${KEEP})"
         return 0
       fi
 
@@ -192,7 +201,8 @@ data:
       while IFS= read -r KEY; do
         [ -n "$KEY" ] || continue
         DEL_URL="${BASE}/${KEY}?${QS}"
-        ${CURL} --fail-with-body -X DELETE "$DEL_URL" >/dev/null
+        ${CURL} --fail-with-body -X DELETE "$DEL_URL" >/dev/null \
+          || fail "Azure: delete failed for ${KEY}"
         echo "Deleted ${KEY}"
         DEL_COUNT=$((DEL_COUNT+1))
       done < "$OLD_KEYS"
