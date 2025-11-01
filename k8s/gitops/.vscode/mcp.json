@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "kubernetes": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server@latest"],
+      "env": {
+        "KUBECONFIG": "${workspaceFolder}/k8s/talos/cluster-configs/kubeconfig"
+      }
+    },
+    "argocd": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "argocd-mcp@latest", "stdio"],
+      "envFile": "${workspaceFolder}/.vscode/argocd.env"
+    }
+  }
+}
