@@ -1,3 +1,0 @@
-# Exclude nested Kustomize package managed by a child Application
-# This prevents the root "directory" source from applying raw Kustomization manifests
-platform/storage/extras/**
