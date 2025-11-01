@@ -94,31 +94,32 @@ data:
     # NOTE: Requires SAS with 'l' (list) and 'd' (delete) permissions.
     list_keys() {
       FOLDER="$1"
-      # Single-page list (KISS). If you ever exceed ~5k blobs per folder, we can add marker pagination.
-      URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/"
-      # Extract <Name>...</Name> lines -> FOLDER/filename.ext
+      URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000"
+      # Extract all blob names, trim CR, and normalize to include FOLDER/ prefix
       $CURL --fail-with-body "$URL" \
         | sed -n 's:.*<Name>\([^<][^<]*\)</Name>.*:\1:p' \
-        | grep "^${FOLDER}/" || true
+        | sed 's/\r$//' \
+        | awk -v folder="${FOLDER}/" '{
+            if (index($0, folder)==1) print $0; else print folder $0
+          }'
     }
 
     prune_folder() {
       FOLDER="$1"
       KEEP="${2:-$RETAIN}"
       KEYS="$(list_keys "$FOLDER")"
-      [ -n "$KEYS" ] || { echo "No blobs under ${FOLDER}/ to prune."; return 0; }
+      COUNT="$(printf '%s\n' "$KEYS" | sed '/^$/d' | wc -l | awk "{print \$1}")"
 
-      # Newest first by filename (timestamped names sort lexicographically)
-      SORTED="$(printf '%s\n' "$KEYS" | sort -r)"
-      # Anything after the first $KEEP is old and will be deleted
-      OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) || true)"
-
-      if [ -z "$OLD" ]; then
+      if [ "$COUNT" -le "$KEEP" ]; then
         echo "Nothing to delete under ${FOLDER}/ (<= ${KEEP})."
         return 0
       fi
 
-      echo "$OLD" | while IFS= read -r KEY; do
+      # Newest first by filename (timestamp timestamps sort lexicographically)
+      SORTED="$(printf '%s\n' "$KEYS" | sed '/^$/d' | LC_ALL=C sort -r)"
+      OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) )"
+
+      printf '%s\n' "$OLD" | while IFS= read -r KEY; do
         [ -n "$KEY" ] || continue
         DEL_URL="${BASE}/${KEY}?${QS}"
         $CURL --fail-with-body -X DELETE "$DEL_URL"
