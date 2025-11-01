@@ -32,7 +32,7 @@ locals {
         interfaces = [{
           interface = "bond0"
           dhcp      = true
-          vip       = { ip = "192.168.2.240" }
+          vip       = { ip = "192.168.2.230" }
           bond = {
             mode           = "802.3ad"
             lacpRate       = "fast"

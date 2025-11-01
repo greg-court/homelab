@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: unifi
+  namespace: net
+  annotations:
+    kubernetes.io/ingress.class: infra
+spec:
+  entryPoints: ['websecure']
+  routes:
+    - match: Host(`unifi.infra.klab.internal`)
+      kind: Rule
+      services:
+        - name: unifi
+          port: 8443
+          scheme: https
+          serversTransport: https-insecure
+  tls:
+    secretName: unifi-tls

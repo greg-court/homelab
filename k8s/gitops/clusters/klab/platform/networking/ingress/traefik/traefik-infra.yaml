@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik-infra
+  namespace: argocd
+  annotations: { argocd.argoproj.io/sync-wave: '-10' }
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik-infra
+  source:
+    repoURL: https://traefik.github.io/charts
+    chart: traefik
+    targetRevision: 37.0.0
+    helm:
+      values: |
+        ingressClass:
+          enabled: true
+          isDefaultClass: false
+          name: infra
+
+        service:
+          type: LoadBalancer
+          annotations:
+              lbipam.cilium.io/ips: '192.168.2.240'
+          spec:
+            loadBalancerClass: io.cilium/l2-announcer
+            externalTrafficPolicy: Local
+
+        deployment:
+          kind: DaemonSet
+
+        tolerations:
+          - key: 'node-role.kubernetes.io/control-plane'
+            operator: 'Exists'
+            effect: 'NoSchedule'
+
+        # ➜ Prometheus metrics & ServiceMonitor
+        metrics:
+          prometheus:
+            enabled: true
+            entryPoint: metrics
+        ports:
+          metrics:
+            port: 9100
+            expose:
+              default: true
+        serviceMonitor:
+          enabled: true
+          namespace: monitoring
+
+        # ➜ JSON logs to Loki
+        logs:
+          general:
+            format: json
+          access:
+            enabled: true
+            format: json
+
+        additionalArguments:
+          - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+          - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+          - "--providers.kubernetescrd.ingressclass=infra"
+          - "--providers.kubernetesingress.ingressclass=infra"
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - PruneLast=true

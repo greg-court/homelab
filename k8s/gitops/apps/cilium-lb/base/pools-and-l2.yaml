@@ -9,6 +9,16 @@ spec:
     - cidr: 192.168.3.241/32
 
 ---
+# VLAN 2 pool (infra)
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: vlan2
+spec:
+  blocks:
+    - cidr: 192.168.2.240/32
+
+---
 # VLAN 4 pool (dmz)
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
@@ -43,3 +53,16 @@ spec:
   interfaces:
     - "^e.*\\.4$"
     - "^bond0\\.4$"
+
+---
+# L2 announce on VLAN 2
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: l2-vlan2
+spec:
+  loadBalancerIPs: true
+  externalIPs: false
+  interfaces:
+    - "^e.*\\.2$"
+    - "^bond0\\.2$"

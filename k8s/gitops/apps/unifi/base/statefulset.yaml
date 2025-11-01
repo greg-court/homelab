@@ -24,7 +24,7 @@ spec:
         runAsGroup: 999
       containers:
         - name: controller
-          image: jacobalberty/unifi:latest
+          image: jacobalberty/unifi:v9.5.21
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -48,18 +48,14 @@ spec:
             - { name: logs, mountPath: /unifi/log }
             - { name: cert, mountPath: /unifi/cert }
           readinessProbe:
-            httpGet:
-              scheme: HTTPS
-              path: /
+            tcpSocket:
               port: 8443
             initialDelaySeconds: 60
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 8
           livenessProbe:
-            httpGet:
-              scheme: HTTPS
-              path: /
+            tcpSocket:
               port: 8443
             initialDelaySeconds: 120
             periodSeconds: 30
