@@ -92,7 +92,6 @@ data:
 
     # ---------- Retention: keep newest $RETAIN per folder ----------
     # NOTE: Requires SAS with 'l' (list) and 'd' (delete) permissions.
-    # List all blob keys under a folder (robust to 1-line XML + pagination)
     # List all blob keys under a folder (handles one-line XML + pagination)
     list_keys() {
       FOLDER="$1"
