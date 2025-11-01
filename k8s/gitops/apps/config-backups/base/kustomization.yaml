@@ -5,9 +5,3 @@ resources:
   - externalsecret.yaml
   - configmap.yaml
   - cronjob.yaml
-configMapGenerator:
-  - name: homelab-ca
-    files:
-      - homelab-ca.crt=../../../certs/homelab-ca.crt
-generatorOptions:
-  disableNameSuffixHash: true

@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: config-backups
-  namespace: unifi # same ns to mount the UniFi PVC
+  namespace: unifi
   labels:
     app: config-backups
     egress.zone: infra
@@ -22,18 +22,9 @@ spec:
               command: ['/bin/sh', '-c', '/scripts/backup.sh']
               envFrom:
                 - secretRef: { name: config-backups-env }
-              env:
-                - name: SSL_CERT_FILE
-                  value: /etc/ssl/certs/homelab-ca.crt
               volumeMounts:
                 - { name: scripts, mountPath: /scripts, readOnly: true }
                 - { name: unifi-data, mountPath: /unifi-data, readOnly: true }
-                - {
-                    name: homelab-ca,
-                    mountPath: /etc/ssl/certs/homelab-ca.crt,
-                    subPath: homelab-ca.crt,
-                    readOnly: true,
-                  }
           volumes:
             - name: scripts
               configMap:
@@ -41,11 +32,4 @@ spec:
                 defaultMode: 0755
             - name: unifi-data
               persistentVolumeClaim:
-                # From StatefulSet 'unifi', volumeClaimTemplates name 'data' -> data-unifi-0
                 claimName: data-unifi-0
-            - name: homelab-ca
-              configMap:
-                name: homelab-ca
-                items:
-                  - key: homelab-ca.crt
-                    path: homelab-ca.crt
