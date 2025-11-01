@@ -3,6 +3,9 @@ kind: RecurringJob
 metadata:
   name: daily-backup
   namespace: longhorn-system
+  annotations:
+    # can be after Longhorn itself
+    argocd.argoproj.io/sync-wave: '-27'
 spec:
   cron: '0 2 * * *' # 02:00 daily
   task: 'backup'
