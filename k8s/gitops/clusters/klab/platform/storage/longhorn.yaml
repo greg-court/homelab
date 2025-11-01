@@ -19,6 +19,7 @@ spec:
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 2
+          backupTargetName: default
 
         # Longhorn cluster defaults
         defaultSettings:

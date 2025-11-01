@@ -1,13 +1,12 @@
 apiVersion: longhorn.io/v1beta2
-kind: Setting
+kind: BackupTarget
 metadata:
-  name: backup-target
+  name: default
   namespace: longhorn-system
-value: s3://longhorn@minio/
----
-apiVersion: longhorn.io/v1beta2
-kind: Setting
-metadata:
-  name: backup-target-credential-secret
-  namespace: longhorn-system
-value: longhorn-backup-truenas-s3
+  annotations:
+    # apply after the Longhorn chart (-28) so the CRD exists
+    argocd.argoproj.io/sync-wave: '-27'
+spec:
+  backupTargetURL: s3://longhorn@minio/
+  credentialSecret: longhorn-backup-truenas-s3
+  pollInterval: 300s
