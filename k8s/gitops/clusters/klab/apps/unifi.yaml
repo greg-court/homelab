@@ -8,7 +8,7 @@ spec:
   project: apps
   destination:
     server: https://kubernetes.default.svc
-    namespace: net
+    namespace: unifi
   source:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
