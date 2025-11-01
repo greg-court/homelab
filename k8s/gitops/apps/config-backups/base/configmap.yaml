@@ -184,16 +184,18 @@ data:
       OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) )"
 
       DEL_COUNT=0
-      # Run in current shell (no subshell) so counters stick
+      OLD_KEYS="$WORK/${FOLDER}-old.txt"
+      printf '%s\n' "$OLD" > "$OLD_KEYS"
+
       while IFS= read -r KEY; do
         [ -n "$KEY" ] || continue
         DEL_URL="${BASE}/${KEY}?${QS}"
         ${CURL} --fail-with-body -X DELETE "$DEL_URL" >/dev/null
         echo "Deleted ${KEY}"
         DEL_COUNT=$((DEL_COUNT+1))
-      done <<EOF
-    $OLD
-    EOF
+      done < "$OLD_KEYS"
+
+      rm -f "$OLD_KEYS"
 
       case "$FOLDER" in
         pfsense) DELETED_PFS=$((DELETED_PFS+DEL_COUNT));;
