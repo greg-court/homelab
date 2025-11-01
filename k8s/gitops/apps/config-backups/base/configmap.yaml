@@ -12,8 +12,10 @@ data:
     : "${PFSENSE_USER?Missing PFSENSE_USER}"
     : "${PFSENSE_PASS?Missing PFSENSE_PASS}"
     : "${TRUENAS_API_KEY?Missing TRUENAS_API_KEY}"
+    # Optional: Discord webhook for notifications
+    : "${DISCORD_WEBHOOK_URL:=}"
 
-    PFSENSE_HOST="${PFSENSE_HOST:-192.168.2.1}" # replace with pfsense.internal when configured vlan-scoped dns
+    PFSENSE_HOST="${PFSENSE_HOST:-192.168.2.1}" # swap to pfsense.internal when DNS is ready
     TRUENAS_HOST="${TRUENAS_HOST:-truenas.internal}"
     DATE="$(date -u +%Y%m%dT%H%M%SZ)"
     WORK="/work"
@@ -26,53 +28,77 @@ data:
     CURL="curl -sS -L"
     [ "${CURL_INSECURE:-false}" = "true" ] && CURL="$CURL -k"
 
-    # ---------- pfSense config.xml ----------
-    # 1) Fetch CSRF from backup page (unauth), 2) login, 3) re-fetch CSRF, 4) post download
+    # --- Discord helpers -------------------------------------------------------
+    MSG=""  # we accumulate lines and send once on exit
+    add() { MSG="${MSG}$*\n"; printf '%s\n' "$*"; }
+    send_discord() {
+      [ -n "${DISCORD_WEBHOOK_URL}" ] || return 0
+      # Use form post so we don't need to JSON-escape newlines/quotes
+      # Trim to 1900 chars to avoid Discord 2000-char limit
+      SHORT_MSG="$(printf '%s' "$MSG" | awk 'BEGIN{max=1900} {s=s $0 "\n"} END{if (length(s)>max) print substr(s,1,max) "..."; else print s}')"
+      ${CURL} -X POST -F "content=${SHORT_MSG}" "${DISCORD_WEBHOOK_URL}" >/dev/null 2>&1 || true
+    }
+    on_exit() {
+      rc=$?
+      STATUS="FAILURE"
+      [ $rc -eq 0 ] && STATUS="SUCCESS"
+      add "Status: ${STATUS}"
+      send_discord
+      exit $rc
+    }
+    trap on_exit EXIT
+
+    add "Starting config-backups @ ${DATE}"
+    add "Retain newest ${RETAIN} per folder"
+
+    # --- pfSense config.xml ----------------------------------------------------
     COOK="$WORK/cookies.txt"; CSRF="$WORK/csrf.txt"
     rm -f "$COOK" "$CSRF"
-    $CURL --cookie-jar "$COOK" "https://${PFSENSE_HOST}/diag_backup.php" \
+    ${CURL} --cookie-jar "$COOK" "https://${PFSENSE_HOST}/diag_backup.php" \
       | grep -E "name=['\"]__csrf_magic['\"]" \
       | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
 
-    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+    ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       --data-urlencode "login=Login" \
       --data-urlencode "usernamefld=${PFSENSE_USER}" \
       --data-urlencode "passwordfld=${PFSENSE_PASS}" \
       --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
       "https://${PFSENSE_HOST}/" > /dev/null
 
-    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+    ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       "https://${PFSENSE_HOST}/diag_backup.php" \
       | grep -E "name=['\"]__csrf_magic['\"]" \
       | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
 
     PFS_OUT="${WORK}/pfsense-${DATE}.xml"
-    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+    ${CURL} --cookie "$COOK" --cookie-jar "$COOK" \
       --data-urlencode "download=download" \
       --data-urlencode "donotbackuprrd=yes" \
       --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
       "https://${PFSENSE_HOST}/diag_backup.php" > "$PFS_OUT"
+    add "pfSense: $(basename "$PFS_OUT")"
 
-    # ---------- TrueNAS config.db ----------
+    # --- TrueNAS config.db -----------------------------------------------------
     TRU_OUT="${WORK}/truenas-${DATE}.db"
-    $CURL -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+    ${CURL} -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
       -H "Accept: application/octet-stream" \
       -X POST "https://${TRUENAS_HOST}/api/v2.0/config/save" \
       --output "$TRU_OUT"
+    add "TrueNAS: $(basename "$TRU_OUT")"
 
-    # ---------- UniFi latest .unf from PVC ----------
+    # --- UniFi latest .unf from PVC -------------------------------------------
     UDIR="/unifi-data"
     UNF="$(find "$UDIR" -type f -name '*.unf' 2>/dev/null | xargs -r ls -t | head -n1 || true)"
     if [ -n "${UNF}" ]; then
       UNI_OUT="${WORK}/unifi-${DATE}.unf"
       cp "$UNF" "$UNI_OUT"
+      add "UniFi: $(basename "$UNI_OUT")"
     else
-      echo "WARN: no UniFi .unf found under $UDIR" >&2
+      add "UniFi: (no .unf found)"
       UNI_OUT=""
     fi
 
-    # ---------- Uploads to Azure Blob (SAS) ----------
-    # AZURE_SAS_URL is like: https://acct.blob.core.windows.net/<container>?<sas>
+    # --- Uploads to Azure Blob (SAS) ------------------------------------------
     BASE="${AZURE_SAS_URL%%\?*}"
     QS="${AZURE_SAS_URL#*\?}"
 
@@ -81,43 +107,35 @@ data:
       [ -n "$FILE" ] && [ -f "$FILE" ] || return 0
       NAME="$(basename "$FILE")"
       URL="${BASE}/${FOLDER}/${NAME}?${QS}"
-      # --fail-with-body is nice to surface 4xx/5xx; keep KISS if you want
-      $CURL --fail-with-body -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL"
-      echo "Uploaded ${FOLDER}/${NAME}"
+      ${CURL} --fail-with-body -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL" >/dev/null
+      add "Uploaded ${FOLDER}/${NAME}"
     }
 
     upload "$PFS_OUT"  "pfsense"
     upload "$TRU_OUT"  "truenas"
     [ -n "${UNI_OUT:-}" ] && upload "$UNI_OUT" "unifi"
 
-    # ---------- Retention: keep newest $RETAIN per folder ----------
-    # NOTE: Requires SAS with 'l' (list) and 'd' (delete) permissions.
-    # List all blob keys under a folder (handles one-line XML + pagination)
+    # --- Retention: keep newest $RETAIN per folder -----------------------------
+    DELETED_PFS=0; DELETED_TRU=0; DELETED_UNI=0
+
     list_keys() {
       FOLDER="$1"
       MARKER=""
       OUT=""
-
       while :; do
         URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000${MARKER:+&marker=$MARKER}"
-        RESP="$($CURL --fail-with-body "$URL")" || { echo "$RESP" >&2; return 1; }
-
-        # Extract *every* <Name>…</Name> even if XML is a single line
+        RESP="$(${CURL} --fail-with-body "$URL")" || { echo "$RESP" >&2; return 1; }
         NAMES="$(printf '%s' "$RESP" \
           | tr -d '\n' \
           | sed 's#<Name>#\n<Name>#g' \
           | sed -n 's:.*<Name>\([^<]*\)</Name>.*:\1:p' \
           | grep "^${FOLDER}/" || true)"
-
         [ -n "$NAMES" ] && OUT="${OUT}${OUT:+\n}${NAMES}"
-
-        # Get NextMarker (empty when done)
         MARKER="$(printf '%s' "$RESP" \
           | tr -d '\n' \
           | sed -n 's:.*<NextMarker>\([^<]*\)</NextMarker>.*:\1:p')"
         [ -z "$MARKER" ] && break
       done
-
       printf '%s\n' "$OUT"
     }
 
@@ -125,25 +143,34 @@ data:
       FOLDER="$1"
       KEEP="${2:-$RETAIN}"
       KEYS="$(list_keys "$FOLDER")"
-      COUNT="$(printf '%s\n' "$KEYS" | sed '/^$/d' | wc -l | awk "{print \$1}")"
+      COUNT="$(printf '%s\n' "$KEYS" | sed '/^$/d' | wc -l | awk '{print $1}')"
 
       if [ "$COUNT" -le "$KEEP" ]; then
-        echo "Nothing to delete under ${FOLDER}/ (<= ${KEEP})."
+        add "Retention: ${FOLDER}/ nothing to delete (<= ${KEEP})"
         return 0
       fi
 
-      # Newest first by filename (timestamp timestamps sort lexicographically)
       SORTED="$(printf '%s\n' "$KEYS" | sed '/^$/d' | LC_ALL=C sort -r)"
       OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) )"
 
+      DEL_COUNT=0
       printf '%s\n' "$OLD" | while IFS= read -r KEY; do
         [ -n "$KEY" ] || continue
         DEL_URL="${BASE}/${KEY}?${QS}"
-        $CURL --fail-with-body -X DELETE "$DEL_URL"
+        ${CURL} --fail-with-body -X DELETE "$DEL_URL" >/dev/null
         echo "Deleted ${KEY}"
+        DEL_COUNT=$((DEL_COUNT+1))
+        case "$FOLDER" in
+          pfsense) DELETED_PFS=$((DELETED_PFS+1));;
+          truenas) DELETED_TRU=$((DELETED_TRU+1));;
+          unifi)   DELETED_UNI=$((DELETED_UNI+1));;
+        esac
       done
+      add "Retention: ${FOLDER}/ deleted ${DEL_COUNT}, kept ${KEEP} of ${COUNT}"
     }
 
     prune_folder "pfsense"  "$RETAIN"
     prune_folder "truenas"  "$RETAIN"
     prune_folder "unifi"    "$RETAIN"
+
+    add "Pruned totals -> pfsense:${DELETED_PFS} truenas:${DELETED_TRU} unifi:${DELETED_UNI}"
