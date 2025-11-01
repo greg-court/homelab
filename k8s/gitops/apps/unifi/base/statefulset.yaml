@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: unifi
-  namespace: net
+  namespace: unifi
   labels: { app: unifi }
 spec:
   selector:
