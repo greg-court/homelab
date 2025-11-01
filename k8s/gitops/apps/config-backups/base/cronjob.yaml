@@ -16,6 +16,9 @@ spec:
       ttlSecondsAfterFinished: 1800
       template:
         spec:
+          securityContext:
+            fsGroup: 1001
+            fsGroupChangePolicy: OnRootMismatch
           restartPolicy: OnFailure
           affinity:
             podAffinity:
@@ -35,6 +38,7 @@ spec:
               volumeMounts:
                 - { name: scripts, mountPath: /scripts, readOnly: true }
                 - { name: unifi-data, mountPath: /unifi-data, readOnly: true }
+                - { name: work, mountPath: /work }
           volumes:
             - name: scripts
               configMap:
@@ -43,3 +47,5 @@ spec:
             - name: unifi-data
               persistentVolumeClaim:
                 claimName: data-unifi-0
+                - name: work
+                  emptyDir: {}
