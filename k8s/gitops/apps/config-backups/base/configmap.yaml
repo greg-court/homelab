@@ -118,27 +118,6 @@ data:
     # --- Retention: keep newest $RETAIN per folder -----------------------------
     DELETED_PFS=0; DELETED_TRU=0; DELETED_UNI=0
 
-    list_keys() {
-      FOLDER="$1"
-      MARKER=""
-      OUT=""
-      while :; do
-        URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000${MARKER:+&marker=$MARKER}"
-        RESP="$(${CURL} --fail-with-body "$URL")" || { echo "$RESP" >&2; return 1; }
-        NAMES="$(printf '%s' "$RESP" \
-          | tr -d '\n' \
-          | sed 's#<Name>#\n<Name>#g' \
-          | sed -n 's:.*<Name>\([^<]*\)</Name>.*:\1:p' \
-          | grep "^${FOLDER}/" || true)"
-        [ -n "$NAMES" ] && OUT="${OUT}${OUT:+\n}${NAMES}"
-        MARKER="$(printf '%s' "$RESP" \
-          | tr -d '\n' \
-          | sed -n 's:.*<NextMarker>\([^<]*\)</NextMarker>.*:\1:p')"
-        [ -z "$MARKER" ] && break
-      done
-      printf '%s\n' "$OUT"
-    }
-
     prune_folder() {
       FOLDER="$1"
       KEEP="${2:-$RETAIN}"
@@ -154,23 +133,22 @@ data:
       OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) )"
 
       DEL_COUNT=0
-      printf '%s\n' "$OLD" | while IFS= read -r KEY; do
+      # run loop in *current* shell (no subshell), so counters stick
+      while IFS= read -r KEY; do
         [ -n "$KEY" ] || continue
         DEL_URL="${BASE}/${KEY}?${QS}"
         ${CURL} --fail-with-body -X DELETE "$DEL_URL" >/dev/null
         echo "Deleted ${KEY}"
         DEL_COUNT=$((DEL_COUNT+1))
-        case "$FOLDER" in
-          pfsense) DELETED_PFS=$((DELETED_PFS+1));;
-          truenas) DELETED_TRU=$((DELETED_TRU+1));;
-          unifi)   DELETED_UNI=$((DELETED_UNI+1));;
-        esac
-      done
+      done <<EOF
+    $OLD
+    EOF
+
+      case "$FOLDER" in
+        pfsense) DELETED_PFS=$((DELETED_PFS+DEL_COUNT));;
+        truenas) DELETED_TRU=$((DELETED_TRU+DEL_COUNT));;
+        unifi)   DELETED_UNI=$((DELETED_UNI+DEL_COUNT));;
+      esac
+
       add "Retention: ${FOLDER}/ deleted ${DEL_COUNT}, kept ${KEEP} of ${COUNT}"
     }
-
-    prune_folder "pfsense"  "$RETAIN"
-    prune_folder "truenas"  "$RETAIN"
-    prune_folder "unifi"    "$RETAIN"
-
-    add "Pruned totals -> pfsense:${DELETED_PFS} truenas:${DELETED_TRU} unifi:${DELETED_UNI}"
