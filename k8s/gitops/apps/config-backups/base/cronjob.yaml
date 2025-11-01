@@ -13,9 +13,19 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 1800
       template:
         spec:
           restartPolicy: OnFailure
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app
+                        operator: In
+                        values: [unifi]
+                  topologyKey: kubernetes.io/hostname
           containers:
             - name: runner
               image: curlimages/curl:8.10.1
