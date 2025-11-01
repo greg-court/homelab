@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi
+  namespace: net
+  labels: { app: unifi }
+spec:
+  selector:
+    matchLabels: { app: unifi }
+  serviceName: unifi
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels: { app: unifi }
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
+      containers:
+        - name: controller
+          image: jacobalberty/unifi:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Europe/London
+            - name: SYSTEM_IP
+              valueFrom:
+                fieldRef: { fieldPath: status.podIP }
+            - name: JVM_MAX_HEAP_SIZE
+              value: 1024M
+            - name: JVM_INIT_HEAP_SIZE
+              value: 512M
+          ports:
+            - { name: webapi, containerPort: 8443, protocol: TCP }
+            - { name: inform, containerPort: 8080, protocol: TCP }
+            - { name: stun, containerPort: 3478, protocol: UDP }
+            - { name: discovery, containerPort: 10001, protocol: UDP }
+            - { name: portal-https, containerPort: 8843, protocol: TCP }
+            - { name: portal-http, containerPort: 8880, protocol: TCP }
+          volumeMounts:
+            - { name: data, mountPath: /unifi/data }
+            - { name: logs, mountPath: /unifi/log }
+            - { name: cert, mountPath: /unifi/cert }
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 8
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests: { cpu: 100m, memory: 512Mi }
+            limits: { memory: 1Gi }
+      volumes:
+        - name: cert
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: logs
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 1Gi

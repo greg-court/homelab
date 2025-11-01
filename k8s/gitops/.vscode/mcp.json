@@ -5,7 +5,7 @@
       "command": "npx",
       "args": ["-y", "kubernetes-mcp-server@latest"],
       "env": {
-        "KUBECONFIG": "${workspaceFolder}/k8s/talos/cluster-configs/kubeconfig"
+        "KUBECONFIG": "${workspaceFolder}/../talos/cluster-configs/kubeconfig"
       }
     },
     "argocd": {
