@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-backups-scripts
+  namespace: unifi
+data:
+  backup.sh: |
+    #!/bin/sh
+    set -eu
+
+    : "${AZURE_SAS_URL?Missing AZURE_SAS_URL}"
+    : "${PFSENSE_USER?Missing PFSENSE_USER}"
+    : "${PFSENSE_PASS?Missing PFSENSE_PASS}"
+    : "${TRUENAS_API_KEY?Missing TRUENAS_API_KEY}"
+
+    PFSENSE_HOST="${PFSENSE_HOST:-pfsense.internal}"
+    TRUENAS_HOST="${TRUENAS_HOST:-truenas.internal}"
+    DATE="$(date -u +%Y%m%dT%H%M%SZ)"
+    WORK="/work"
+    mkdir -p "$WORK"
+
+    # Curl flags (optionally -k)
+    CURL="curl -sS -L"
+    [ "${CURL_INSECURE:-false}" = "true" ] && CURL="$CURL -k"
+
+    # ---------- pfSense config.xml ----------
+    # 1) Fetch CSRF from backup page (unauth), 2) login, 3) re-fetch CSRF, 4) post download
+    COOK="$WORK/cookies.txt"; CSRF="$WORK/csrf.txt"
+    rm -f "$COOK" "$CSRF"
+    $CURL --cookie-jar "$COOK" "https://${PFSENSE_HOST}/diag_backup.php" \
+      | grep -E "name=['\"]__csrf_magic['\"]" \
+      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
+
+    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+      --data-urlencode "login=Login" \
+      --data-urlencode "usernamefld=${PFSENSE_USER}" \
+      --data-urlencode "passwordfld=${PFSENSE_PASS}" \
+      --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
+      "https://${PFSENSE_HOST}/" > /dev/null
+
+    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+      "https://${PFSENSE_HOST}/diag_backup.php" \
+      | grep -E "name=['\"]__csrf_magic['\"]" \
+      | sed 's/.*value=["'\'']\([^"'\'' ]*\).*/\1/' > "$CSRF"
+
+    PFS_OUT="${WORK}/pfsense-${DATE}.xml"
+    $CURL --cookie "$COOK" --cookie-jar "$COOK" \
+      --data-urlencode "download=download" \
+      --data-urlencode "donotbackuprrd=yes" \
+      --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
+      "https://${PFSENSE_HOST}/diag_backup.php" > "$PFS_OUT"
+
+    # ---------- TrueNAS config.db ----------
+    TRU_OUT="${WORK}/truenas-${DATE}.db"
+    $CURL -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+      -H "Accept: application/octet-stream" \
+      -X POST "https://${TRUENAS_HOST}/api/v2.0/config/save" \
+      --output "$TRU_OUT"
+
+    # ---------- UniFi latest .unf from PVC ----------
+    UDIR="/unifi-data"
+    UNF="$(find "$UDIR" -type f -name '*.unf' 2>/dev/null | xargs -r ls -t | head -n1 || true)"
+    if [ -n "${UNF}" ]; then
+      UNI_OUT="${WORK}/unifi-${DATE}.unf"
+      cp "$UNF" "$UNI_OUT"
+    else
+      echo "WARN: no UniFi .unf found under $UDIR" >&2
+      UNI_OUT=""
+    fi
+
+    # ---------- Uploads to Azure Blob (SAS) ----------
+    # AZURE_SAS_URL is like: https://acct.blob.core.windows.net/<container>?<sas>
+    BASE="${AZURE_SAS_URL%%\?*}"
+    QS="${AZURE_SAS_URL#*\?}"
+
+    upload() {
+      FILE="$1"; FOLDER="$2"
+      [ -n "$FILE" ] && [ -f "$FILE" ] || return 0
+      NAME="$(basename "$FILE")"
+      URL="${BASE}/${FOLDER}/${NAME}?${QS}"
+      $CURL -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL"
+      echo "Uploaded ${FOLDER}/${NAME}"
+    }
+
+    upload "$PFS_OUT" "pfsense"
+    upload "$TRU_OUT" "truenas"
+    [ -n "${UNI_OUT:-}" ] && upload "$UNI_OUT" "unifi"

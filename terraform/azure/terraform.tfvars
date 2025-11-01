@@ -23,6 +23,7 @@ secret_names = {
   netbird-fam  = ""
 
   longhorn-backup-truenas-s3 = ""
+  config-backups = ""
 }
 
 # need to be bootstrapped in GH repo
