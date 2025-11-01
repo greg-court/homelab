@@ -47,5 +47,5 @@ spec:
             - name: unifi-data
               persistentVolumeClaim:
                 claimName: data-unifi-0
-                - name: work
-                  emptyDir: {}
+            - name: work
+              emptyDir: {}
