@@ -20,19 +20,22 @@ spec:
       - ServerSideApply=true
       - SkipDryRunOnMissingResource=true
       - PruneLast=true
-  # ignoreDifferences:
-  #   - group: apps
-  #     kind: StatefulSet
-  #     name: unifi
-  #     namespace: unifi
-  #     jqPathExpressions:
-  #       - .spec.persistentVolumeClaimRetentionPolicy
-  #       - .spec.template.spec.terminationGracePeriodSeconds
-  #       - .spec.template.spec.restartPolicy
-  #       - .spec.template.spec.schedulerName
-  #       - .spec.template.spec.containers[].livenessProbe.successThreshold
-  #       - .spec.template.spec.containers[].readinessProbe.successThreshold
-  #       - .spec.template.spec.containers[].terminationMessagePath
-  #       - .spec.template.spec.containers[].terminationMessagePolicy
-  #       - .spec.template.spec.containers[].env[] | select(.name=="SYSTEM_IP").valueFrom.fieldRef.apiVersion
-  #       - .spec.volumeClaimTemplates[].spec.volumeMode
+  ignoreDifferences: # prevent drift causing OutOfSync
+    - group: apps
+      kind: StatefulSet
+      name: unifi
+      namespace: unifi
+      jqPathExpressions:
+        - .spec.persistentVolumeClaimRetentionPolicy
+        - .spec.template.spec.terminationGracePeriodSeconds
+        - .spec.template.spec.restartPolicy
+        - .spec.template.spec.schedulerName
+        - .spec.template.spec.containers[] | select(.name=="controller").livenessProbe.successThreshold
+        - .spec.template.spec.containers[] | select(.name=="controller").readinessProbe.successThreshold
+        - .spec.template.spec.containers[] | select(.name=="controller").terminationMessagePath
+        - .spec.template.spec.containers[] | select(.name=="controller").terminationMessagePolicy
+        - .spec.template.spec.containers[] | select(.name=="controller").env[] | select(.name=="SYSTEM_IP").valueFrom.fieldRef.apiVersion
+        - .spec.volumeClaimTemplates[].spec.volumeMode
+        - .spec.volumeClaimTemplates[].apiVersion
+        - .spec.volumeClaimTemplates[].kind
+        - .spec.volumeClaimTemplates[].status
