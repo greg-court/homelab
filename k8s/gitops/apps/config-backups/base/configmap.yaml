@@ -92,16 +92,30 @@ data:
 
     # ---------- Retention: keep newest $RETAIN per folder ----------
     # NOTE: Requires SAS with 'l' (list) and 'd' (delete) permissions.
+    # List all blob keys under a folder (robust to 1-line XML + pagination)
     list_keys() {
       FOLDER="$1"
-      URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000"
-      # Extract all blob names, trim CR, and normalize to include FOLDER/ prefix
-      $CURL --fail-with-body "$URL" \
-        | sed -n 's:.*<Name>\([^<][^<]*\)</Name>.*:\1:p' \
-        | sed 's/\r$//' \
-        | awk -v folder="${FOLDER}/" '{
-            if (index($0, folder)==1) print $0; else print folder $0
-          }'
+      MARKER=""
+      OUT=""
+
+      while :; do
+        URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/&maxresults=5000${MARKER:+&marker=$MARKER}"
+        RESP="$($CURL --fail-with-body "$URL")" || { echo "$RESP" >&2; return 1; }
+
+        # Extract every <Name>…</Name> occurrence from a single long line
+        NAMES="$(printf '%s' "$RESP" | awk '{
+          s=$0;
+          while (match(s, /<Name>([^<]+)<\/Name>/, a)) { print a[1]; s=substr(s, RSTART+RLENGTH); }
+        }' | grep "^${FOLDER}/" || true)"
+
+        [ -n "$NAMES" ] && OUT="${OUT}${OUT:+\n}${NAMES}"
+
+        # Grab NextMarker (empty when done)
+        MARKER="$(printf '%s' "$RESP" | awk 'match($0, /<NextMarker>([^<]*)<\/NextMarker>/, m){print m[1]}')"
+        [ -z "$MARKER" ] && break
+      done
+
+      printf '%s\n' "$OUT"
     }
 
     prune_folder() {
