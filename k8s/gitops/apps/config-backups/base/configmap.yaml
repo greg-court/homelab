@@ -19,6 +19,9 @@ data:
     WORK="/work"
     mkdir -p "$WORK"
 
+    # Keep N most recent per folder; defaults to 7
+    RETAIN="${RETAIN:-7}"
+
     # Curl flags (optionally -k)
     CURL="curl -sS -L"
     [ "${CURL_INSECURE:-false}" = "true" ] && CURL="$CURL -k"
@@ -78,10 +81,51 @@ data:
       [ -n "$FILE" ] && [ -f "$FILE" ] || return 0
       NAME="$(basename "$FILE")"
       URL="${BASE}/${FOLDER}/${NAME}?${QS}"
-      $CURL -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL"
+      # --fail-with-body is nice to surface 4xx/5xx; keep KISS if you want
+      $CURL --fail-with-body -X PUT -T "$FILE" -H "x-ms-blob-type: BlockBlob" "$URL"
       echo "Uploaded ${FOLDER}/${NAME}"
     }
 
-    upload "$PFS_OUT" "pfsense"
-    upload "$TRU_OUT" "truenas"
+    upload "$PFS_OUT"  "pfsense"
+    upload "$TRU_OUT"  "truenas"
     [ -n "${UNI_OUT:-}" ] && upload "$UNI_OUT" "unifi"
+
+    # ---------- Retention: keep newest $RETAIN per folder ----------
+    # NOTE: Requires SAS with 'l' (list) and 'd' (delete) permissions.
+    list_keys() {
+      FOLDER="$1"
+      # Single-page list (KISS). If you ever exceed ~5k blobs per folder, we can add marker pagination.
+      URL="${BASE}?${QS}&restype=container&comp=list&prefix=${FOLDER}/"
+      # Extract <Name>...</Name> lines -> FOLDER/filename.ext
+      $CURL --fail-with-body "$URL" \
+        | sed -n 's:.*<Name>\([^<][^<]*\)</Name>.*:\1:p' \
+        | grep "^${FOLDER}/" || true
+    }
+
+    prune_folder() {
+      FOLDER="$1"
+      KEEP="${2:-$RETAIN}"
+      KEYS="$(list_keys "$FOLDER")"
+      [ -n "$KEYS" ] || { echo "No blobs under ${FOLDER}/ to prune."; return 0; }
+
+      # Newest first by filename (timestamped names sort lexicographically)
+      SORTED="$(printf '%s\n' "$KEYS" | sort -r)"
+      # Anything after the first $KEEP is old and will be deleted
+      OLD="$(printf '%s\n' "$SORTED" | tail -n +$((KEEP+1)) || true)"
+
+      if [ -z "$OLD" ]; then
+        echo "Nothing to delete under ${FOLDER}/ (<= ${KEEP})."
+        return 0
+      fi
+
+      echo "$OLD" | while IFS= read -r KEY; do
+        [ -n "$KEY" ] || continue
+        DEL_URL="${BASE}/${KEY}?${QS}"
+        $CURL --fail-with-body -X DELETE "$DEL_URL"
+        echo "Deleted ${KEY}"
+      done
+    }
+
+    prune_folder "pfsense"  "$RETAIN"
+    prune_folder "truenas"  "$RETAIN"
+    prune_folder "unifi"    "$RETAIN"
