@@ -32,35 +32,33 @@ data:
     MSG=""  # we accumulate lines and send once on exit
     add() { MSG="${MSG}$*\n"; printf '%s\n' "$*"; }
 
+    # Escape a string for JSON (quotes, backslashes)
+    json_escape() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\r//g'; }
+
     send_discord() {
       [ -n "${DISCORD_WEBHOOK_URL}" ] || return 0
 
-      # Trim to ~1900 chars (Discord 2000 max)
-      SHORT_MSG="$(printf '%s' "$MSG" | awk 'BEGIN{max=1900} {s=s $0 "\n"} END{if (length(s)>max) print substr(s,1,max) "..."; else print s}')"
-
-      # Escape for JSON + turn real newlines into \n
-      JSON_BODY="$(printf '%s' "$SHORT_MSG" \
-        | sed 's/\\/\\\\/g; s/"/\\"/g; s/\r//g' \
-        | awk '{ printf "%s\\n", $0 }' )"
-      JSON_BODY="${JSON_BODY%\\n}" # drop trailing \n
-
-      # Color by status (set in on_exit)
-      [ "${STATUS:-SUCCESS}" = "SUCCESS" ] && COLOR=3066993 || COLOR=15158332
+      TITLE="Config Backups — ${STATUS:-UNKNOWN}"
       TS_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      [ "${STATUS:-SUCCESS}" = "SUCCESS" ] && COLOR=3066993 || COLOR=15158332
 
-      # Send as an embed with a code block description
-      PAYLOAD=$(cat <<EOF
-    {"username":"Config Backups",
-    "allowed_mentions":{"parse":[]},
-    "embeds":[
-      {"title":"Config Backups — ${STATUS:-UNKNOWN}",
-        "color":$COLOR,
-        "timestamp":"$TS_ISO",
-        "description":"\`\`\`\n$JSON_BODY\n\`\`\`"}
-    ]
-    }
+      BACKUPS="pfSense: ${PFS_BN}\nTrueNAS: ${TRU_BN}\nUniFi: ${UNI_BN:-none}"
+      UPLOADS="pfsense/${PFS_BN}\ntruenas/${TRU_BN}\n${UNI_BN:+unifi/${UNI_BN}}"
+      RETENTION="pfsense: ${RET_pfsense:-n/a}\ntruenas: ${RET_truenas:-n/a}\nunifi: ${RET_unifi:-n/a}"
+
+      PAYLOAD="$(cat <<EOF
+    {"username":"Config Backups","allowed_mentions":{"parse":[]},"embeds":[
+      {"title":"$(json_escape "$TITLE")",
+       "color":$COLOR,
+       "timestamp":"$TS_ISO",
+       "fields":[
+         {"name":"Backups","value":"$(json_escape "$BACKUPS")","inline":false},
+         {"name":"Uploads","value":"$(json_escape "$UPLOADS")","inline":false},
+         {"name":"Retention","value":"$(json_escape "$RETENTION")","inline":false}
+       ]}
+    ]}
     EOF
-    )
+    )"
       ${CURL} -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL" >/dev/null 2>&1 || true
     }
 
@@ -72,7 +70,6 @@ data:
       send_discord
       exit $rc
     }
-
     trap on_exit EXIT
 
     add "Starting config-backups @ ${DATE}"
@@ -104,6 +101,7 @@ data:
       --data-urlencode "__csrf_magic=$(head -n1 "$CSRF")" \
       "https://${PFSENSE_HOST}/diag_backup.php" > "$PFS_OUT"
     add "pfSense: $(basename "$PFS_OUT")"
+    PFS_BN="$(basename "$PFS_OUT")"
 
     # --- TrueNAS config.db -----------------------------------------------------
     TRU_OUT="${WORK}/truenas-${DATE}.db"
@@ -112,6 +110,7 @@ data:
       -X POST "https://${TRUENAS_HOST}/api/v2.0/config/save" \
       --output "$TRU_OUT"
     add "TrueNAS: $(basename "$TRU_OUT")"
+    TRU_BN="$(basename "$TRU_OUT")"
 
     # --- UniFi latest .unf from PVC -------------------------------------------
     UDIR="/unifi-data"
@@ -120,9 +119,11 @@ data:
       UNI_OUT="${WORK}/unifi-${DATE}.unf"
       cp "$UNF" "$UNI_OUT"
       add "UniFi: $(basename "$UNI_OUT")"
+      UNI_BN="$(basename "$UNI_OUT")"
     else
       add "UniFi: (no .unf found)"
       UNI_OUT=""
+      UNI_BN=""
     fi
 
     # --- Uploads to Azure Blob (SAS) ------------------------------------------
@@ -177,6 +178,7 @@ data:
 
       if [ "$COUNT" -le "$KEEP" ]; then
         add "Retention: ${FOLDER}/ nothing to delete (<= ${KEEP})"
+        eval "RET_${FOLDER}=\"kept ${COUNT} of ${COUNT}\""
         return 0
       fi
 
@@ -203,6 +205,7 @@ data:
         unifi)   DELETED_UNI=$((DELETED_UNI+DEL_COUNT));;
       esac
 
+      eval "RET_${FOLDER}=\"deleted ${DEL_COUNT}, kept ${KEEP} of ${COUNT}\""
       add "Retention: ${FOLDER}/ deleted ${DEL_COUNT}, kept ${KEEP} of ${COUNT}"
     }
 
