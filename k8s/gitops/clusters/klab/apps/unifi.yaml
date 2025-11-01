@@ -20,19 +20,19 @@ spec:
       - ServerSideApply=true
       - SkipDryRunOnMissingResource=true
       - PruneLast=true
-  ignoreDifferences:
-    - group: apps
-      kind: StatefulSet
-      name: unifi
-      namespace: unifi
-      jqPathExpressions:
-        - .spec.persistentVolumeClaimRetentionPolicy
-        - .spec.template.spec.terminationGracePeriodSeconds
-        - .spec.template.spec.restartPolicy
-        - .spec.template.spec.schedulerName
-        - .spec.template.spec.containers[].livenessProbe.successThreshold
-        - .spec.template.spec.containers[].readinessProbe.successThreshold
-        - .spec.template.spec.containers[].terminationMessagePath
-        - .spec.template.spec.containers[].terminationMessagePolicy
-        - .spec.template.spec.containers[].env[] | select(.name=="SYSTEM_IP").valueFrom.fieldRef.apiVersion
-        - .spec.volumeClaimTemplates[].spec.volumeMode
+  # ignoreDifferences:
+  #   - group: apps
+  #     kind: StatefulSet
+  #     name: unifi
+  #     namespace: unifi
+  #     jqPathExpressions:
+  #       - .spec.persistentVolumeClaimRetentionPolicy
+  #       - .spec.template.spec.terminationGracePeriodSeconds
+  #       - .spec.template.spec.restartPolicy
+  #       - .spec.template.spec.schedulerName
+  #       - .spec.template.spec.containers[].livenessProbe.successThreshold
+  #       - .spec.template.spec.containers[].readinessProbe.successThreshold
+  #       - .spec.template.spec.containers[].terminationMessagePath
+  #       - .spec.template.spec.containers[].terminationMessagePolicy
+  #       - .spec.template.spec.containers[].env[] | select(.name=="SYSTEM_IP").valueFrom.fieldRef.apiVersion
+  #       - .spec.volumeClaimTemplates[].spec.volumeMode
