@@ -64,5 +64,4 @@ spec:
   loadBalancerIPs: true
   externalIPs: false
   interfaces:
-    - "^e.*\\.2$"
-    - "^bond0\\.2$"
+    - '^bond0$' # untagged native VLAN 2
