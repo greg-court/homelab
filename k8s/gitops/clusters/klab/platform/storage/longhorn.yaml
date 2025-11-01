@@ -18,13 +18,14 @@ spec:
         # Make Longhorn the default StorageClass *now*
         persistence:
           defaultClass: true
-          # single node today; raise to 2 or 3 when you have 3 nodes
-          defaultClassReplicaCount: 1
+          defaultClassReplicaCount: 2
 
         # Longhorn cluster defaults
         defaultSettings:
-          # single node today; raise when you have 3 nodes
-          defaultReplicaCount: 1
+          defaultReplicaCount: 2
+          backupTarget: "s3://longhorn@minio/"
+          backupTargetCredentialSecret: "longhorn-backup-truenas-s3"
+          backupstorePollInterval: 300
 
         # Expose UI only on VLAN 3 via Traefik "trust" ingress class
         ingress:

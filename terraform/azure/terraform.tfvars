@@ -21,6 +21,8 @@ secret_names = {
   netbird-greg = ""
   netbird-dmz  = ""
   netbird-fam  = ""
+
+  longhorn-backup-truenas-s3 = ""
 }
 
 # need to be bootstrapped in GH repo
