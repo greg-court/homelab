@@ -1,6 +1,0 @@
-# ignore non-manifests & kustomize configs when a root app scans folders
-**/kustomization.yaml
-**/Kustomization
-**/*.json
-**/*.md
-**/README*
