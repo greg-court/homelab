@@ -19,14 +19,16 @@ spec:
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 2
-          backupTargetName: default
 
         # Longhorn cluster defaults
         defaultSettings:
           defaultReplicaCount: 2
+
+        # Default backup target (v1.8+ supported way)
+        defaultBackupStore:
           backupTarget: "s3://longhorn@minio/"
           backupTargetCredentialSecret: "longhorn-backup-truenas-s3"
-          backupstorePollInterval: 300
+          pollInterval: 300
 
         # Expose UI only on VLAN 3 via Traefik "trust" ingress class
         ingress:
