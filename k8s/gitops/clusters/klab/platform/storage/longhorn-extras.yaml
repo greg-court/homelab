@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: longhorn-extras
   namespace: argocd
-  annotations: { argocd.argoproj.io/sync-wave: '-29' } # before longhorn (-28)
+  annotations: { argocd.argoproj.io/sync-wave: '-27' } # after longhorn (-28) so CRDs exist
 spec:
   project: platform
   destination:
