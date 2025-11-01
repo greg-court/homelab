@@ -7,7 +7,7 @@ metadata:
     app: config-backups
     egress.zone: infra
 spec:
-  schedule: '00 1 * * *' # daily @ 01:00
+  schedule: '0 1 * * *' # daily @ 01:00
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
