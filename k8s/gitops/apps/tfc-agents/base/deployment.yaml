@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: tfc-agent
-          image: hashicorp/tfc-agent:1.25
+          image: hashicorp/tfc-agent:1.26
           envFrom:
             - secretRef: { name: tfc-agent-env }
           resources: {}
