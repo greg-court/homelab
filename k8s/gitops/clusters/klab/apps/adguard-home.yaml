@@ -26,6 +26,17 @@ spec:
         - .spec.sessionAffinity
         - .spec.ports[].nodePort
         - .status
+    - kind: StatefulSet
+      namespace: adguard
+      jqPathExpressions:
+        - .spec.template.spec.dnsPolicy
+        - .spec.template.spec.restartPolicy
+        - .spec.template.spec.schedulerName
+        - .spec.template.spec.securityContext
+        - .spec.template.spec.containers[].resources
+        - .spec.template.spec.containers[].terminationMessagePath
+        - .spec.template.spec.containers[].terminationMessagePolicy
+        - .status
   syncPolicy:
     automated:
       prune: true
