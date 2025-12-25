@@ -31,6 +31,10 @@ spec:
               ip -4 rule  del     from 192.168.2.240/32 table 102 2>/dev/null || true
               ip -4 rule  add pref 102 from 192.168.2.240/32 lookup 102
 
+              # Also allow INFRA VIP 192.168.2.241 for AdGuard Home
+              ip -4 rule  del     from 192.168.2.241/32 table 102 2>/dev/null || true
+              ip -4 rule  add pref 102 from 192.168.2.241/32 lookup 102
+
               # Table 103 -> VLAN 3 TRUST (VIP 192.168.3.240)
               ip -4 route replace 192.168.3.0/24 dev bond0.3  scope link table 103
               ip -4 route replace default via 192.168.3.1 dev bond0.3         table 103

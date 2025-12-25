@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - storageclass.yaml
+  - service-headless.yaml
+  - service-lb.yaml
+  - statefulset.yaml
+  - ingressroute-trust.yaml
+  - certificate.yaml

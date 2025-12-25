@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: adguard-home
+  namespace: adguard
+  annotations:
+    kubernetes.io/ingress.class: trust
+  labels:
+    egress.zone: trust
+spec:
+  entryPoints: ['websecure']
+  routes:
+    - match: Host(`adguardhome.apps.klab.internal`)
+      kind: Rule
+      services:
+        - name: adguard-home
+          port: 80
+  tls:
+    secretName: adguard-home-tls
