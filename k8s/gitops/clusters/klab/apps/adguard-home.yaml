@@ -14,6 +14,18 @@ spec:
     repoURL: https://github.com/greg-court/homelab.git
     targetRevision: main
     path: k8s/gitops/apps/adguard-home/overlays/klab
+  ignoreDifferences:
+    - kind: Service
+      namespace: adguard
+      jqPathExpressions:
+        - .spec.clusterIP
+        - .spec.clusterIPs
+        - .spec.healthCheckNodePort
+        - .spec.ipFamilies
+        - .spec.ipFamilyPolicy
+        - .spec.sessionAffinity
+        - .spec.ports[].nodePort
+        - .status
   syncPolicy:
     automated:
       prune: true
