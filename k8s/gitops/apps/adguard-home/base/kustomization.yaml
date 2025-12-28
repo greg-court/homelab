@@ -6,5 +6,5 @@ resources:
   - service-headless.yaml
   - service-lb.yaml
   - statefulset.yaml
-  - ingressroute-trust.yaml
+  - ingressroute-infra.yaml
   - certificate.yaml
