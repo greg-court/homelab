@@ -11,6 +11,9 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: adguard-home
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Delete
+    whenScaled: Delete
   template:
     metadata:
       labels:
