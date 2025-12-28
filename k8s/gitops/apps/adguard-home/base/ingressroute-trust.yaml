@@ -4,9 +4,9 @@ metadata:
   name: adguard-home
   namespace: adguard
   annotations:
-    kubernetes.io/ingress.class: trust
+    kubernetes.io/ingress.class: infra
   labels:
-    egress.zone: trust
+    egress.zone: infra
 spec:
   entryPoints: ['websecure']
   routes:
