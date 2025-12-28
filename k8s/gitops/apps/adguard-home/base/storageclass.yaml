@@ -5,6 +5,6 @@ metadata:
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Delete
-volumeBindingMode: Immediate
+volumeBindingMode: WaitForFirstConsumer
 parameters:
   recurringJobSelector: '[{"name":"daily-backup","isGroup":false}]'
