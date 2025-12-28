@@ -11,8 +11,8 @@ spec:
   replicas: 1
   podManagementPolicy: OrderedReady
   persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Delete
-    whenScaled: Delete
+    whenDeleted: Retain
+    whenScaled: Retain
   updateStrategy:
     type: RollingUpdate
   template:
