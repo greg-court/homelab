@@ -10,7 +10,7 @@ metadata:
 spec:
   entryPoints: ['websecure']
   routes:
-    - match: Host(`adguardhome.apps.klab.internal`)
+    - match: Host(`adguardhome.infra.klab.internal`)
       kind: Rule
       services:
         - name: adguard-home
