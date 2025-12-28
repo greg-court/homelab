@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - storageclass.yaml
+  - storageclass-wffc.yaml
   - service-headless.yaml
   - service-lb.yaml
   - statefulset.yaml
