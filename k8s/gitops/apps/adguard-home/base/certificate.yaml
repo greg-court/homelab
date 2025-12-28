@@ -7,7 +7,6 @@ spec:
   secretName: adguard-home-tls
   dnsNames:
     - adguardhome.infra.klab.internal
-    - adguardhome.apps.klab.internal
   issuerRef:
     kind: ClusterIssuer
     name: homelab-ca
