@@ -4,7 +4,7 @@ metadata:
   name: longhorn-unifi
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
-reclaimPolicy: Delete
+reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
 parameters:
   numberOfReplicas: '2'
