@@ -23,6 +23,7 @@ spec:
         # Longhorn cluster defaults
         defaultSettings:
           defaultReplicaCount: 2
+          nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
 
         # Default backup target (v1.8+ supported way)
         defaultBackupStore:
