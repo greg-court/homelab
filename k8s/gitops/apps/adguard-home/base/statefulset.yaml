@@ -32,7 +32,7 @@ spec:
       containers:
         - name: adguard-home
           image: adguard/adguardhome:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - name: dns
               containerPort: 53
