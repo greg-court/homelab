@@ -18,26 +18,24 @@ spec:
       labels:
         app.kubernetes.io/name: adguard-image-puller
     spec:
-      hostNetwork: true
-      hostPID: true
       dnsPolicy: ClusterFirst
       containers:
-      - name: image-puller
-        image: adguard/adguardhome:latest
-        imagePullPolicy: Always
-        command: ["/bin/sh", "-c"]
-        args:
-        - |
-          # Just sleep forever; the image is now cached on this node
-          sleep infinity
-        resources:
-          requests:
-            cpu: 10m
-            memory: 10Mi
-          limits:
-            cpu: 10m
-            memory: 10Mi
+        - name: image-puller
+          image: adguard/adguardhome:latest
+          imagePullPolicy: Always
+          command: ['/bin/sh', '-c']
+          args:
+            - |
+              # Just sleep forever; the image is now cached on this node
+              sleep infinity
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+            limits:
+              cpu: 10m
+              memory: 10Mi
       terminationGracePeriodSeconds: 1
       tolerations:
-      # Run on all nodes, including control plane
-      - operator: Exists
+        # Run on all nodes, including control plane
+        - operator: Exists
