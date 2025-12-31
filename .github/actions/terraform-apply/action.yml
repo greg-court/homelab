@@ -24,7 +24,7 @@ runs:
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
     - name: Download saved plan
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: tfplan-${{ inputs.name }}
         path: ${{ inputs.path }}
