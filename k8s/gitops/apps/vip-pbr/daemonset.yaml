@@ -25,6 +25,12 @@ spec:
             - |
               set -u
 
+              # Flush all custom routing tables to clear stale routes from bad boots
+              for table in 102 103 104 105 106; do
+                ip -4 route flush table $table 2>/dev/null || true
+                ip -4 rule del table $table 2>/dev/null || true
+              done
+
               # Table 102 -> VLAN 2 INFRA (VIP 192.168.2.240)
               ip -4 route replace 192.168.2.0/24 dev bond0    scope link table 102
               ip -4 route replace default via 192.168.2.1 dev bond0           table 102
