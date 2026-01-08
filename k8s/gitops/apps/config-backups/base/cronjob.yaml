@@ -31,7 +31,7 @@ spec:
                   topologyKey: kubernetes.io/hostname
           containers:
             - name: runner
-              image: curlimages/curl:8.10.1
+              image: curlimages/curl:8.18.0
               command: ['/bin/sh', '-c', '/scripts/backup.sh']
               envFrom:
                 - secretRef: { name: config-backups-env }
