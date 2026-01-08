@@ -17,7 +17,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: alloy
-          image: grafana/alloy:v1.11.2
+          image: grafana/alloy:v1.12.2
           args:
             [
               'run',
