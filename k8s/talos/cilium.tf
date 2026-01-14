@@ -80,7 +80,7 @@ resource "helm_release" "cilium" {
   namespace       = "kube-system"
   repository      = "https://helm.cilium.io"
   chart           = "cilium"
-  version         = "1.18.2"
+  version         = "1.18.6"
   values          = local.cilium_config
   timeout         = 600
   atomic          = true
