@@ -20,7 +20,7 @@ spec:
       securityContext: { fsGroup: 0 }
       containers:
         - name: buildkitd
-          image: moby/buildkit:v0.25.1
+          image: moby/buildkit:v0.27.0
           args:
             [
               '--addr',
