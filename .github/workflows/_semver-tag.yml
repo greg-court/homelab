@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout (sparse, full history)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           sparse-checkout: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: Calculate semantic version
         id: semver
-        uses: paulhatch/semantic-version@v5.4.0
+        uses: paulhatch/semantic-version@v6.0.1
         with:
           tag_prefix: ${{ inputs.tag_prefix }}
           change_path: ${{ inputs.change_path }}
